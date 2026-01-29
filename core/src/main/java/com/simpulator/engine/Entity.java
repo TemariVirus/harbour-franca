@@ -1,92 +1,97 @@
 package com.simpulator.engine;
 
+import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Quaternion;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 
+/**
+ * A rectangular entity with 3D position, 2D size, and 3D rotation.
+ * The appearence is defined by a TextureRegion.
+ */
 public class Entity {
 
-    /** The x position of the bottom left corner of the entity, in pixels. */
-    private float x;
-    /** The y position of the bottom left corner of the entity, in pixels. */
-    private float y;
-    /** The width of the entity, in pixels. */
-    private float width;
-    /** The height of the entity, in pixels. */
-    private float height;
-    /** The counter-clockwise rotation of the entity, in degrees. */
-    private float rotation;
+    /** Position, size and rotation encoded in a 4x4 matrix, in world units. */
+    public Matrix4 transform;
     /** The texture region used to render the entity. */
     private TextureRegion textureRegion;
+    /** Projected vertices for rendering. Prevents an allcoation on every render() call. */
+    private final float[] vertexData = new float[20];
 
-    public Entity(
-        float x,
-        float y,
-        float width,
-        float height,
-        TextureRegion textureRegion
-    ) {
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
-        this.rotation = 0f;
+    public Entity(Matrix4 transform, TextureRegion textureRegion) {
+        this.transform = transform.cpy();
         this.textureRegion = textureRegion;
     }
 
     public Entity(
-        float x,
-        float y,
-        float width,
-        float height,
+        Vector3 position,
+        Vector2 size,
+        Quaternion rotation,
+        TextureRegion textureRegion
+    ) {
+        this.transform = new Matrix4(
+            position,
+            rotation.nor(),
+            new Vector3(size.x, size.y, 1)
+        );
+        this.textureRegion = textureRegion;
+    }
+
+    public Entity(
+        Vector3 position,
+        Vector2 size,
+        Quaternion rotation,
         Texture texture
     ) {
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
-        this.rotation = 0f;
+        this.transform = new Matrix4(
+            position,
+            rotation.nor(),
+            new Vector3(size.x, size.y, 1)
+        );
         this.textureRegion = new TextureRegion(texture);
     }
 
-    public float getX() {
-        return x;
+    public Vector3 getPosition() {
+        Vector3 position = new Vector3();
+        transform.getTranslation(position);
+        return position;
     }
 
-    public void setX(float x) {
-        this.x = x;
+    public void setPosition(Vector3 position) {
+        transform.setTranslation(position);
     }
 
-    public float getY() {
-        return y;
+    public Vector2 getSize() {
+        Vector3 scale = new Vector3();
+        transform.getScale(scale);
+        return new Vector2(scale.x, scale.y);
     }
 
-    public void setY(float y) {
-        this.y = y;
+    public void setSize(Vector2 size) {
+        transform.setToScaling(size.x, size.y, 1);
     }
 
-    public float getWidth() {
-        return width;
-    }
-
-    public void setWidth(float width) {
-        this.width = width;
-    }
-
-    public float getHeight() {
-        return height;
-    }
-
-    public void setHeight(float height) {
-        this.height = height;
-    }
-
-    public float getRotation() {
+    public Quaternion getRotation() {
+        Quaternion rotation = new Quaternion();
+        transform.getRotation(rotation);
         return rotation;
     }
 
-    public void setRotation(float rotation) {
-        this.rotation = rotation;
+    public void setRotation(Quaternion rotation) {
+        Vector3 scale = new Vector3();
+        transform.getScale(scale);
+        Vector3 position = new Vector3();
+        transform.getTranslation(position);
+        transform.set(position, rotation.nor(), scale);
+    }
+
+    public void setRotation(Vector3 axis, float radians) {
+        transform.setToRotationRad(axis, radians);
     }
 
     public TextureRegion getTextureRegion() {
@@ -101,22 +106,52 @@ public class Entity {
         this.textureRegion = new TextureRegion(textureRegion);
     }
 
-    public void translate(float deltaX, float deltaY) {
-        this.x += deltaX;
-        this.y += deltaY;
+    public void translate(Vector3 delta) {
+        transform.getValues()[Matrix4.M03] += delta.x;
+        transform.getValues()[Matrix4.M13] += delta.y;
+        transform.getValues()[Matrix4.M23] += delta.z;
     }
 
-    public void scale(float scaleX, float scaleY) {
-        this.width *= scaleX;
-        this.height *= scaleY;
+    public void scale(Vector2 scale) {
+        transform.scale(scale.x, scale.y, 1);
     }
 
-    /** Rotates the entity by the specified amount in degrees, counter-clockwise. */
-    public void rotate(float deltaRotation) {
-        this.rotation += deltaRotation;
+    public void rotate(Quaternion delta) {
+        transform.rotate(delta);
     }
 
-    public void render(SpriteBatch batch) {
-        batch.draw(textureRegion, x, y, 0, 0, width, height, 1, 1, rotation);
+    public void rotate(Vector3 axis, float radians) {
+        transform.rotateRad(axis, radians);
+    }
+
+    public void transform(Matrix4 transform) {
+        this.transform.mul(transform);
+    }
+
+    private Vector3 localToScreen(float x, float y, Camera camera) {
+        Vector3 position = new Vector3(x, y, 0);
+        position.mul(transform); // World space
+        camera.project(position); // Screen space
+        return position;
+    }
+
+    public void render(SpriteBatch batch, Camera camera) {
+        // TODO: frustum culling
+        for (int i = 0; i < 4; i++) {
+            boolean isLeft = i < 2;
+            boolean isBottom = (i == 0) || (i == 3);
+
+            float x = isLeft ? -0.5f : 0.5f;
+            float y = isBottom ? -0.5f : 0.5f;
+            float u = isLeft ? textureRegion.getU() : textureRegion.getU2();
+            float v = isBottom ? textureRegion.getV2() : textureRegion.getV();
+            Vector3 vertPos = localToScreen(x, y, camera);
+            vertexData[i * 5 + 0] = vertPos.x;
+            vertexData[i * 5 + 1] = vertPos.y;
+            vertexData[i * 5 + 2] = Color.WHITE_FLOAT_BITS;
+            vertexData[i * 5 + 3] = u;
+            vertexData[i * 5 + 4] = v;
+        }
+        batch.draw(textureRegion.getTexture(), vertexData, 0, 20);
     }
 }
