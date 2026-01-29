@@ -3,8 +3,9 @@ package com.simpulator.game;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.Vector3;
 import com.simpulator.engine.Action;
+import com.simpulator.engine.KeyboardManager.KeyEvent;
 
-public class MoveCameraAction implements Action {
+public class MoveCameraAction implements Action<KeyEvent> {
 
     /** The camera this action acts on. */
     protected Camera target;
@@ -70,7 +71,7 @@ public class MoveCameraAction implements Action {
     }
 
     @Override
-    public void act(float deltaTime) {
+    public void act(float deltaTime, KeyEvent event) {
         if (deltaTime <= 0) {
             return;
         }

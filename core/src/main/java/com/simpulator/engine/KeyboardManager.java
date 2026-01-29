@@ -13,14 +13,46 @@ public class KeyboardManager extends InputAdapter {
         UP,
     }
 
+    public class KeyEvent {
+
+        public final int keycode;
+        public final BindType type;
+        public final float timestamp;
+        public final boolean isShiftPressed;
+        public final boolean isCtrlPressed;
+        public final boolean isAltPressed;
+
+        public KeyEvent(
+            int keycode,
+            BindType type,
+            float timestamp,
+            HashSet<Integer> pressedKeys
+        ) {
+            this.keycode = keycode;
+            this.type = type;
+            this.timestamp = timestamp;
+            this.isShiftPressed =
+                pressedKeys.contains(com.badlogic.gdx.Input.Keys.SHIFT_LEFT) ||
+                pressedKeys.contains(com.badlogic.gdx.Input.Keys.SHIFT_RIGHT);
+            this.isCtrlPressed =
+                pressedKeys.contains(
+                    com.badlogic.gdx.Input.Keys.CONTROL_LEFT
+                ) ||
+                pressedKeys.contains(com.badlogic.gdx.Input.Keys.CONTROL_RIGHT);
+            this.isAltPressed =
+                pressedKeys.contains(com.badlogic.gdx.Input.Keys.ALT_LEFT) ||
+                pressedKeys.contains(com.badlogic.gdx.Input.Keys.ALT_RIGHT);
+        }
+    }
+
     private HashSet<Integer> lastFrameKeys = new HashSet<>();
     private HashSet<Integer> thisFrameKeys = new HashSet<>();
 
-    private final HashMap<Integer, ArrayList<Action>> downBindings =
+    private final HashMap<Integer, ArrayList<Action<KeyEvent>>> downBindings =
         new HashMap<>();
-    private final HashMap<Integer, ArrayList<Action>> holdBindings =
+    private final HashMap<Integer, ArrayList<Action<KeyEvent>>> holdBindings =
         new HashMap<>();
-    private final HashMap<Integer, ArrayList<Action>> upBindings =
+    private final HashMap<Integer, ArrayList<Action<KeyEvent>>> upBindings =
         new HashMap<>();
 
     @Override
@@ -35,7 +67,9 @@ public class KeyboardManager extends InputAdapter {
         return true;
     }
 
-    private HashMap<Integer, ArrayList<Action>> getBindings(BindType type) {
+    private HashMap<Integer, ArrayList<Action<KeyEvent>>> getBindings(
+        BindType type
+    ) {
         switch (type) {
             case DOWN:
                 return downBindings;
@@ -48,12 +82,12 @@ public class KeyboardManager extends InputAdapter {
         }
     }
 
-    public void bind(BindType type, int keycode, Action action) {
+    public void bind(BindType type, int keycode, Action<KeyEvent> action) {
         getBindings(type).putIfAbsent(keycode, new ArrayList<>());
         getBindings(type).get(keycode).add(action);
     }
 
-    public void unbind(BindType type, int keycode, Action action) {
+    public void unbind(BindType type, int keycode, Action<KeyEvent> action) {
         if (getBindings(type).containsKey(keycode)) {
             // Compare by reference instead of using equals()
             getBindings(type)
@@ -86,16 +120,20 @@ public class KeyboardManager extends InputAdapter {
         return keys;
     }
 
-    public void update(float deltaTime) {
+    public void update(float deltaTime, float timestamp) {
         for (BindType type : BindType.values()) {
             HashSet<Integer> keys = computeKeys(type);
-            HashMap<Integer, ArrayList<Action>> bindings = getBindings(type);
+            HashMap<Integer, ArrayList<Action<KeyEvent>>> bindings =
+                getBindings(type);
             for (int key : keys) {
                 if (!bindings.containsKey(key)) {
                     continue;
                 }
-                for (Action action : bindings.get(key)) {
-                    action.act(deltaTime);
+                for (Action<KeyEvent> action : bindings.get(key)) {
+                    action.act(
+                        deltaTime,
+                        new KeyEvent(key, type, timestamp, thisFrameKeys)
+                    );
                 }
             }
         }

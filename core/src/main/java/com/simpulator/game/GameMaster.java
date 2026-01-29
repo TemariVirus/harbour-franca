@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.simpulator.engine.Clock;
 import com.simpulator.engine.Entity;
 import com.simpulator.engine.KeyboardManager;
 import com.simpulator.engine.KeyboardManager.BindType;
@@ -18,6 +19,7 @@ import com.simpulator.engine.TextureManager;
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class GameMaster extends ApplicationAdapter {
 
+    private final Clock clock = new Clock(0);
     private PerspectiveCamera playerCamera;
     private SpriteBatch batch;
     private TextureManager tm;
@@ -87,7 +89,8 @@ public class GameMaster extends ApplicationAdapter {
 
     @Override
     public void render() {
-        km.update(Gdx.graphics.getDeltaTime());
+        clock.forward(Gdx.graphics.getDeltaTime());
+        km.update(Gdx.graphics.getDeltaTime(), clock.getSeconds());
 
         ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
         batch.begin();

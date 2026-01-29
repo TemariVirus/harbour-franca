@@ -1,8 +1,9 @@
 package com.simpulator.engine;
 
 import com.badlogic.gdx.math.Vector3;
+import com.simpulator.engine.KeyboardManager.KeyEvent;
 
-public class MoveEntityAction implements Action {
+public class MoveEntityAction implements Action<KeyEvent> {
 
     /** The entity this action acts on. */
     protected Entity target;
@@ -68,7 +69,7 @@ public class MoveEntityAction implements Action {
     }
 
     @Override
-    public void act(float deltaTime) {
+    public void act(float deltaTime, KeyEvent event) {
         if (deltaTime <= 0) {
             return;
         }
