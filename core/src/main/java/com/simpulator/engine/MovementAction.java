@@ -1,6 +1,6 @@
-package com.mygdx.engine;
+package com.simpulator.engine;
 
-public class MovementAction implements IAction {
+public class MovementAction implements Action {
 
     /** The entity this action acts on. */
     protected Entity target;

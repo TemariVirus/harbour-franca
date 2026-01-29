@@ -1,10 +1,9 @@
-package com.mygdx.engine;
+package com.simpulator.engine;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
-import java.util.HashMap;
 
-public class TextureManager extends Cache<String, Texture> {
+public class TextureManager extends ResourceCache<String, Texture> {
 
     public TextureManager() {
         super();

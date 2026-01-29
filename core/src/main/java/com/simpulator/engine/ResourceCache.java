@@ -1,10 +1,12 @@
-package com.mygdx.engine;
+package com.simpulator.engine;
 
-import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Disposable;
 import java.util.HashMap;
 
-public abstract class Cache<K, V extends Disposable> implements Disposable {
+public abstract class ResourceCache<
+    K,
+    V extends Disposable
+> implements Disposable {
 
     private final HashMap<K, V> items = new HashMap<>();
 

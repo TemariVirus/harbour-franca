@@ -1,10 +1,9 @@
-package com.mygdx.engine;
+package com.simpulator.engine;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
-import java.util.HashMap;
 
-public class SoundManager extends Cache<String, Sound> {
+public class SoundManager extends ResourceCache<String, Sound> {
 
     public SoundManager() {
         super();

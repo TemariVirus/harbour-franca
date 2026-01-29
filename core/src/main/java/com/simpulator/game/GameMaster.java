@@ -1,16 +1,16 @@
-package com.mygdx.game;
+package com.simpulator.game;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.mygdx.engine.Entity;
-import com.mygdx.engine.IAction;
-import com.mygdx.engine.KeyboardManager;
-import com.mygdx.engine.KeyboardManager.BindType;
-import com.mygdx.engine.MovementAction;
-import com.mygdx.engine.TextureManager;
+import com.simpulator.engine.Action;
+import com.simpulator.engine.Entity;
+import com.simpulator.engine.KeyboardManager;
+import com.simpulator.engine.KeyboardManager.BindType;
+import com.simpulator.engine.MovementAction;
+import com.simpulator.engine.TextureManager;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class GameMaster extends ApplicationAdapter {
@@ -20,8 +20,8 @@ public class GameMaster extends ApplicationAdapter {
     private Entity entity;
 
     private KeyboardManager km;
-    private IAction moveLeft;
-    private IAction moveRight;
+    private Action moveLeft;
+    private Action moveRight;
 
     @Override
     public void create() {

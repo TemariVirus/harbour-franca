@@ -1,7 +1,5 @@
-package com.mygdx.engine;
+package com.simpulator.engine;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputAdapter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,11 +16,11 @@ public class KeyboardManager extends InputAdapter {
     private HashSet<Integer> lastFrameKeys = new HashSet<>();
     private HashSet<Integer> thisFrameKeys = new HashSet<>();
 
-    private final HashMap<Integer, ArrayList<IAction>> downBindings =
+    private final HashMap<Integer, ArrayList<Action>> downBindings =
         new HashMap<>();
-    private final HashMap<Integer, ArrayList<IAction>> holdBindings =
+    private final HashMap<Integer, ArrayList<Action>> holdBindings =
         new HashMap<>();
-    private final HashMap<Integer, ArrayList<IAction>> upBindings =
+    private final HashMap<Integer, ArrayList<Action>> upBindings =
         new HashMap<>();
 
     @Override
@@ -37,7 +35,7 @@ public class KeyboardManager extends InputAdapter {
         return true;
     }
 
-    private HashMap<Integer, ArrayList<IAction>> getBindings(BindType type) {
+    private HashMap<Integer, ArrayList<Action>> getBindings(BindType type) {
         switch (type) {
             case DOWN:
                 return downBindings;
@@ -50,12 +48,12 @@ public class KeyboardManager extends InputAdapter {
         }
     }
 
-    public void bind(BindType type, int keycode, IAction action) {
+    public void bind(BindType type, int keycode, Action action) {
         getBindings(type).putIfAbsent(keycode, new ArrayList<>());
         getBindings(type).get(keycode).add(action);
     }
 
-    public void unbind(BindType type, int keycode, IAction action) {
+    public void unbind(BindType type, int keycode, Action action) {
         if (getBindings(type).containsKey(keycode)) {
             // Compare by reference instead of using equals()
             getBindings(type)
@@ -91,12 +89,12 @@ public class KeyboardManager extends InputAdapter {
     public void update(float deltaTime) {
         for (BindType type : BindType.values()) {
             HashSet<Integer> keys = computeKeys(type);
-            HashMap<Integer, ArrayList<IAction>> bindings = getBindings(type);
+            HashMap<Integer, ArrayList<Action>> bindings = getBindings(type);
             for (int key : keys) {
                 if (!bindings.containsKey(key)) {
                     continue;
                 }
-                for (IAction action : bindings.get(key)) {
+                for (Action action : bindings.get(key)) {
                     action.act(deltaTime);
                 }
             }

@@ -1,4 +1,4 @@
-package com.mygdx.engine;
+package com.simpulator.engine;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
