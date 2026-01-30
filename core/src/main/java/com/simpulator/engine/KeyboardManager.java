@@ -55,6 +55,16 @@ public class KeyboardManager extends InputAdapter {
     private final HashMap<Integer, ArrayList<Action<KeyEvent>>> upBindings =
         new HashMap<>();
 
+    public KeyboardManager() {}
+
+    public KeyboardManager(
+        HashSet<Integer> lastFrameKeys,
+        HashSet<Integer> thisFrameKeys
+    ) {
+        this.lastFrameKeys.addAll(lastFrameKeys);
+        this.thisFrameKeys.addAll(thisFrameKeys);
+    }
+
     @Override
     public boolean keyDown(int keycode) {
         thisFrameKeys.add(keycode);
