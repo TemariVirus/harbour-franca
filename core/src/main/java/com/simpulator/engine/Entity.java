@@ -108,9 +108,9 @@ public class Entity implements Moveable {
 
     @Override
     public void translate(Vector3 delta) {
-        transform.getValues()[Matrix4.M03] += delta.x;
-        transform.getValues()[Matrix4.M13] += delta.y;
-        transform.getValues()[Matrix4.M23] += delta.z;
+        transform.val[Matrix4.M03] += delta.x;
+        transform.val[Matrix4.M13] += delta.y;
+        transform.val[Matrix4.M23] += delta.z;
     }
 
     public void scale(Vector2 scale) {
@@ -130,13 +130,6 @@ public class Entity implements Moveable {
         this.transform.mul(transform);
     }
 
-    private Vector3 localToScreen(float x, float y, Camera camera) {
-        Vector3 position = new Vector3(x, y, 0);
-        position.mul(transform); // World space
-        camera.project(position); // Screen space
-        return position;
-    }
-
     public void render(SpriteBatch batch, Camera camera) {
         // TODO: frustum culling
         for (int i = 0; i < 4; i++) {
@@ -147,7 +140,10 @@ public class Entity implements Moveable {
             float y = isBottom ? -0.5f : 0.5f;
             float u = isLeft ? textureRegion.getU() : textureRegion.getU2();
             float v = isBottom ? textureRegion.getV2() : textureRegion.getV();
-            Vector3 vertPos = localToScreen(x, y, camera);
+            Vector3 vertPos = new Vector3(x, y, 0); // Local space
+            vertPos.mul(transform); // World space
+            camera.project(vertPos); // Screen space
+
             vertexData[i * 5 + 0] = vertPos.x;
             vertexData[i * 5 + 1] = vertPos.y;
             vertexData[i * 5 + 2] = Color.WHITE_FLOAT_BITS;
