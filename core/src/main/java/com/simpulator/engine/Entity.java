@@ -14,7 +14,7 @@ import com.badlogic.gdx.math.Vector3;
  * A rectangular entity with 3D position, 2D size, and 3D rotation.
  * The appearence is defined by a TextureRegion.
  */
-public class Entity {
+public class Entity implements Moveable {
 
     /** Position, size and rotation encoded in a 4x4 matrix, in world units. */
     public Matrix4 transform;
@@ -106,6 +106,7 @@ public class Entity {
         this.textureRegion = new TextureRegion(textureRegion);
     }
 
+    @Override
     public void translate(Vector3 delta) {
         transform.getValues()[Matrix4.M03] += delta.x;
         transform.getValues()[Matrix4.M13] += delta.y;
@@ -120,6 +121,7 @@ public class Entity {
         transform.rotate(delta);
     }
 
+    @Override
     public void rotate(Vector3 axis, float radians) {
         transform.rotateRad(axis, radians);
     }

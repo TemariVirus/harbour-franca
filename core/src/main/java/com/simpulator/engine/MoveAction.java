@@ -3,10 +3,10 @@ package com.simpulator.engine;
 import com.badlogic.gdx.math.Vector3;
 import com.simpulator.engine.KeyboardManager.KeyEvent;
 
-public class MoveEntityAction implements Action<KeyEvent> {
+public class MoveAction implements Action<KeyEvent> {
 
-    /** The entity this action acts on. */
-    protected Entity target;
+    /** The object this action acts on. */
+    protected Moveable target;
     /** Velocity in world units/s */
     private Vector3 velocity;
     /** Axis of rotation. */
@@ -14,8 +14,8 @@ public class MoveEntityAction implements Action<KeyEvent> {
     /** Rotation speed in radians/s. */
     private float rotationSpeed;
 
-    public MoveEntityAction(
-        Entity target,
+    public MoveAction(
+        Moveable target,
         Vector3 velocity,
         Vector3 rotationAxis,
         float rotationSpeed
@@ -26,15 +26,15 @@ public class MoveEntityAction implements Action<KeyEvent> {
         this.rotationSpeed = rotationSpeed;
     }
 
-    public MoveEntityAction(Entity target, Vector3 velocity) {
+    public MoveAction(Moveable target, Vector3 velocity) {
         this.target = target;
         setVelocity(velocity);
         this.rotationAxis = new Vector3();
         this.rotationSpeed = 0;
     }
 
-    public MoveEntityAction(
-        Entity target,
+    public MoveAction(
+        Moveable target,
         Vector3 rotationAxis,
         float rotationSpeed
     ) {

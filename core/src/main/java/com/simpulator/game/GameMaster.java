@@ -13,7 +13,7 @@ import com.simpulator.engine.Clock;
 import com.simpulator.engine.Entity;
 import com.simpulator.engine.KeyboardManager;
 import com.simpulator.engine.KeyboardManager.BindType;
-import com.simpulator.engine.MoveEntityAction;
+import com.simpulator.engine.MoveAction;
 import com.simpulator.engine.TextureManager;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
@@ -82,7 +82,7 @@ public class GameMaster extends ApplicationAdapter {
         km.bind(
             BindType.HOLD,
             Keys.R,
-            new MoveEntityAction(entity, new Vector3(1, 0, 1), 4)
+            new MoveAction(entity, new Vector3(1, 0, 1), 4)
         );
         Gdx.input.setInputProcessor(km);
     }
