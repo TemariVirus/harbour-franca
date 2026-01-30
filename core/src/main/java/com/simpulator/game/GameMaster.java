@@ -82,7 +82,11 @@ public class GameMaster extends ApplicationAdapter {
         km.bind(
             BindType.HOLD,
             Keys.R,
-            new MoveAction(entity, new Vector3(1, 0, 1), 4)
+            new MoveAction<KeyboardManager.KeyEvent>(
+                entity,
+                new Vector3(1, 0, 1),
+                4
+            )
         );
         Gdx.input.setInputProcessor(km);
     }
