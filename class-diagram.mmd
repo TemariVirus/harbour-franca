@@ -1,0 +1,245 @@
+---
+config:
+    theme: neutral
+    layout: elk
+    defaultRenderer: elk
+    elk:
+        nodePlacementStrategy: NETWORK_SIMPLEX
+---
+
+classDiagram
+    ColliderMesh --|> Moveable: implements
+    Cuboid --|> Polyhedron: extends
+    Entity --o EntityManager: aggregates
+    Entity --|> Moveable: implements
+    Entity --|> Renderable~SpriteBatch~: implements
+    EntityManager --* Scene: composes
+    KeyboardManager --|> InputAdapter: extends
+    MouseManager --|> InputAdapter: extends
+    MoveAction~T~ --|> Action~T~: #60;#60;bind#62;#62; #60;T -> T#62;
+    ResourceCache~K&comma; V: Disposable~ --|> Disposable: implements
+    Scene --o SceneManager: aggregates
+    SoundManager --|> ResourceCache: #60;#60;bind#62;#62; #60;K -> String, V -> Sound#62;
+    TextureManager --|> ResourceCache: #60;#60;bind#62;#62; #60;K -> String, V -> Texture#62;
+
+    class Action~T~ {
+        <<interface>>
+
+        + act(deltaTime: float, extraData: T) void
+    }
+
+    class BindType {
+        <<enumeration>>
+
+        DOWN
+        HOLD
+        UP
+    }
+
+    class Clock {
+        - seconds: float
+
+        + Clock(seconds: float)
+        + getSeconds() float
+        + setSeconds(seconds: float) void
+        + reset() void
+        + forward(seconds: float) void
+        + backward(seconds: float) void
+    }
+
+    class ColliderMesh {
+        <<interface>>
+
+        + getPolyhedra() Polyhedron[]
+        + getBoundingBoxes() OrientedBoundingBox[]
+        + getBounds() BoundingBox
+        + intersects(other: ColliderMesh) boolean
+    }
+
+    class CollisionManager {
+        + isSeperatingAxis(verts1: Vector3[], verts2: Vector3[], axis: Vector3)$ boolean
+        + polygonIntersects(verts1: Vector3[], edges1: Vector3[], verts2: Vector3[], edges2: Vector3[])$ boolean
+    }
+
+    class Cuboid {
+        - obb: OrientedBoundingBox
+
+        + Cuboid(obb: OrientedBoundingBox)
+        + getFaceCount() int
+        + getFaceVertices(faceIndex: int) Vector3[]
+        + getBounds() BoundingBox
+        + getNonParallelEdges(faceIndex: int) Vector3[]
+    }
+
+    class Entity {
+        # transform: Matrix4
+        # tint: Color
+        # textureRegion: TextureRegion
+
+        # Entity(transform: Matrix4, textureRegion: TextureRegion)
+        + Entity(position: Vector3, size: Vector2, rotation: Quaternion, textureRegion: TextureRegion)
+        + getPosition() Vector3
+        + setPosition(position: Vector3) void
+        + getSize() Vector2
+        + setSize(size: Vector2) void
+        + getRotation() Quaternion
+        + setRotation(rotation: Quaternion) void
+        + setRotation(axis: Vector3, radians: float) void
+        + getTransform() Matrix4
+        + getTint() Color
+        + setTint(tint: Color) void
+        + getTextureRegion() TextureRegion
+        + setTextureRegion(textureRegion: TextureRegion) void
+        + getLocalVertex(index: int) Vector3
+        + getVertex(index: int) Vector3
+        + getVertex(index: int, localZ: float) Vector3
+        + getVertices() Vector3[]
+        + translate(delta: Vector3) void
+        + scale(scale: Vector2) void
+        + rotate(delta: Quaternion) void
+        + rotate(axis: Vector3, radians: float) void
+        + transform(Matrix4 transform) void
+        + render(batch: SpriteBatch, camera: Camera) void
+    }
+
+    class EntityManager {
+        - entities: ArrayList~Entity~
+
+        + EntityManager()
+        + render(batch: SpriteBatch, camera: Camera) void
+        + add(Entity: entity) void
+    }
+
+    class GraphicsManager {
+        - batch: SpriteBatch
+
+        + renderScene(scene: Scene) void
+    }
+
+    class KeyboardManager {
+        - lastFrameKeys: HashSet~Integer~
+        - thisFrameKeys: HashSet~Integer~
+        - downBindings: HashMap~Integer&comma; ArrayList~Action~KeyEvent~~~
+        - holdBindings: HashMap~Integer&comma; ArrayList~Action~KeyEvent~~~
+        - upBindings: HashMap~Integer&comma; ArrayList~Action~KeyEvent~~~
+
+        + KeyboardManager()
+        + KeyboardManager(lastFrameKeys: HashSet~Integer~, thisFrameKeys: HashSet~Integer~)
+        + keyDown(keycode: int) boolean
+        + keyUp(keycode: int) boolean
+        + bind(type: BindType, keycode: int, action: Action<KeyEvent>) void
+        + unbind(type: BindType, keycode: int, action: Action<KeyEvent>) void
+        + unbindAll(type: BindType) void
+        - computeKeys(type: BindType) HashSet~Integer~
+        + update(deltatime: float, timestamp: float) void
+    }
+
+    class KeyEvent {
+        <<dataType>>
+
+        + keycode: int
+        + type: BindType
+        + timestamp: float
+        + isShiftPressed: boolean
+        + isCtrlPressed: boolean
+        + isAltPressed: boolean
+
+        + KeyEvent(keycode: int, type: BindType, timestamp: float, pressedKeys: HashSet~Integer~)
+    }
+
+    class MouseManager {
+        - X: float
+        - Y: float
+        - downBindings: HashMap~Integer&comma; ArrayList~Action~MouseEvent~~~
+        - holdBindings: HashMap~Integer&comma; ArrayList~Action~MouseEvent~~~
+        - upBindings: HashMap~Integer&comma; ArrayList~Action~MouseEvent~~~
+
+        + MouseManager()
+        + touchDown(x: float, y: float, pointer: int, button: int) boolean
+        + touchUp(float x, float y, int pointer, button: int) boolean
+        + touchDragged(x: float, y: float, pointer: int) boolean
+        + update(deltaTime: float, timestamp: float) void
+    }
+
+    class Moveable {
+        <<interface>>
+
+        + translate(delta: Vector3) void
+        + rotate(axis: Vector3, radians: float) void
+    }
+
+    class MoveAction~T~ {
+        # target: Moveable
+        - velocity: Vector3
+        - rotationAxis: Vector3
+        - rotationSpeed: float
+
+        + MoveAction(target: Moveable, velocity: Vector3, rotationAxis: Vector3, rotationSpeed: float)
+        + MoveAction(Moveable target, Vector3 velocity)
+        + MoveAction(target: Moveable, rotationAxis: Vector3, rotationSpeed: float)
+        + getVelocity() Vector3
+        + setVelocity(velocity: Vector3) void
+        + getRotationAxis() Vector3
+        + setRotationAxis(rotationAxis: Vector3) void
+        + getRotationSpeed() float
+        + setRotationSpeed(rotationSpeed: float) void
+        + act(deltaTime: float, extraData: T) void
+    }
+
+    class Polyhedron {
+        <<abstract>>
+
+        + getFaceCount()* int
+        + getFaceVertices(faceIndex: int)* Vector3[]
+        + getBounds() BoundingBox*
+        + getNonParallelEdges(faceIndex: int) Vector3[]
+        + intersects(other: Polyhedron) boolean
+    }
+
+    class Renderable~T~ {
+        <<interface>>
+
+        + render(renderer: T, camera: Camera) void
+    }
+
+    class ResourceCache~K&comma; V: Disposable~ {
+        <<abstract>>
+
+        - items: HashMap~K&comma; V~
+
+        # load(key: K)* V
+        + get(key: K) V
+        + remove(key: K) void
+        + dispose() void
+    }
+
+    class Scene {
+        - EntityManager entityManager
+        - Camera camera
+        - boolean isLoaded
+
+        - load() void
+        - start() void
+        - update(float dt) void
+        - render() void
+        - unload() void
+    }
+
+    class SceneManager {
+        - currentScene: Scene
+        - scenes: HashMap~String&comma; Scene~
+        - graphics: GraphicsManager
+
+        + addScene(name: String, scene: Scene) void
+        + switchTo(name: String) void
+        + update(deltaTime: float) void
+        + render() void
+    }
+
+    class SoundManager {
+        # load(path: String)* Sound
+    }
+
+    class TextureManager {
+        # load(path: String)* Texture
+    }

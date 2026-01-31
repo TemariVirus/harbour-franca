@@ -2,7 +2,6 @@ package com.simpulator.engine;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Matrix4;
@@ -98,10 +97,6 @@ public class Entity implements Moveable, Renderable<SpriteBatch> {
 
     public void setTextureRegion(TextureRegion textureRegion) {
         this.textureRegion = textureRegion;
-    }
-
-    public void setTextureRegion(Texture textureRegion) {
-        this.textureRegion = new TextureRegion(textureRegion);
     }
 
     /** Returns the vertex in local space, indexed in clockwise order. */
