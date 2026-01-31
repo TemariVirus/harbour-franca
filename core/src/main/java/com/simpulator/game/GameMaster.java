@@ -10,7 +10,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.simpulator.engine.Clock;
-import com.simpulator.engine.Entity;
 import com.simpulator.engine.KeyboardManager;
 import com.simpulator.engine.KeyboardManager.BindType;
 import com.simpulator.engine.MoveAction;
@@ -24,7 +23,8 @@ public class GameMaster extends ApplicationAdapter {
     private SpriteBatch batch;
     private TextureManager tm;
     private KeyboardManager km;
-    private Entity entity;
+    private CollidableEntity entity1;
+    private CollidableEntity entity2;
 
     @Override
     public void create() {
@@ -41,10 +41,19 @@ public class GameMaster extends ApplicationAdapter {
 
         batch = new SpriteBatch();
         tm = new TextureManager();
-        entity = new Entity(
+        entity1 = new CollidableEntity(
             new Vector3(100, 100, -200),
             new Vector2(200, 100),
-            new Quaternion().setFromAxisRad(1, 0, 1, 1),
+            0,
+            new Quaternion().idt(),
+            // new Quaternion().setFromAxisRad(1, 0, 1, 1),
+            tm.get("libgdx.png")
+        );
+        entity2 = new CollidableEntity(
+            new Vector3(0, 0, -200),
+            new Vector2(200, 200),
+            2,
+            new Quaternion().idt(),
             tm.get("libgdx.png")
         );
 
@@ -79,15 +88,50 @@ public class GameMaster extends ApplicationAdapter {
             Keys.SPACE,
             new MoveCameraAction(playerCamera, new Vector3(0, 100, 0))
         );
+
         km.bind(
             BindType.HOLD,
             Keys.R,
             new MoveAction<KeyboardManager.KeyEvent>(
-                entity,
+                entity1,
                 new Vector3(1, 0, 1),
                 4
             )
         );
+
+        km.bind(
+            BindType.HOLD,
+            Keys.LEFT,
+            new MoveAction<KeyboardManager.KeyEvent>(
+                entity2,
+                new Vector3(-100, 0, 0)
+            )
+        );
+        km.bind(
+            BindType.HOLD,
+            Keys.RIGHT,
+            new MoveAction<KeyboardManager.KeyEvent>(
+                entity2,
+                new Vector3(100, 0, 0)
+            )
+        );
+        km.bind(
+            BindType.HOLD,
+            Keys.UP,
+            new MoveAction<KeyboardManager.KeyEvent>(
+                entity2,
+                new Vector3(0, 0, -100)
+            )
+        );
+        km.bind(
+            BindType.HOLD,
+            Keys.DOWN,
+            new MoveAction<KeyboardManager.KeyEvent>(
+                entity2,
+                new Vector3(0, 0, 100)
+            )
+        );
+
         Gdx.input.setInputProcessor(km);
     }
 
@@ -96,9 +140,12 @@ public class GameMaster extends ApplicationAdapter {
         clock.forward(Gdx.graphics.getDeltaTime());
         km.update(Gdx.graphics.getDeltaTime(), clock.getSeconds());
 
+        System.out.println(entity1.intersects(entity2));
+
         ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
         batch.begin();
-        entity.render(batch, playerCamera);
+        entity1.render(batch, playerCamera);
+        entity2.render(batch, playerCamera);
         batch.end();
     }
 

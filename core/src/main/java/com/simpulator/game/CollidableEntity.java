@@ -1,0 +1,52 @@
+package com.simpulator.game;
+
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Quaternion;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.math.collision.BoundingBox;
+import com.badlogic.gdx.math.collision.OrientedBoundingBox;
+import com.simpulator.engine.ColliderMesh;
+import com.simpulator.engine.Entity;
+import com.simpulator.engine.Polyhedron;
+
+public class CollidableEntity extends Entity implements ColliderMesh {
+
+    private float thickness;
+
+    public CollidableEntity(
+        Vector3 position,
+        Vector2 size,
+        float thickness,
+        Quaternion rotation,
+        Texture texture
+    ) {
+        super(position, size, rotation, new TextureRegion(texture));
+        this.thickness = Math.abs(thickness);
+    }
+
+    public float getThickness() {
+        return thickness;
+    }
+
+    public void setThickness(float thickness) {
+        this.thickness = Math.abs(thickness);
+    }
+
+    @Override
+    public Polyhedron[] getPolyhedra() {
+        return new Polyhedron[0];
+    }
+
+    @Override
+    public OrientedBoundingBox[] getBoundingBoxes() {
+        BoundingBox localBoundingBox = new BoundingBox(
+            getVertex(0, -thickness),
+            getVertex(2, thickness)
+        );
+        return new OrientedBoundingBox[] {
+            new OrientedBoundingBox(localBoundingBox, transform),
+        };
+    }
+}

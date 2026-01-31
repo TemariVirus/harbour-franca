@@ -23,6 +23,11 @@ public class Entity implements Moveable, Renderable<SpriteBatch> {
     /** The texture region used to render the entity. */
     protected TextureRegion textureRegion;
 
+    protected Entity(Matrix4 transform, TextureRegion textureRegion) {
+        this.transform = transform;
+        this.textureRegion = textureRegion;
+    }
+
     public Entity(
         Vector3 position,
         Vector2 size,
@@ -35,20 +40,6 @@ public class Entity implements Moveable, Renderable<SpriteBatch> {
             new Vector3(size.x, size.y, 1)
         );
         this.textureRegion = textureRegion;
-    }
-
-    public Entity(
-        Vector3 position,
-        Vector2 size,
-        Quaternion rotation,
-        Texture texture
-    ) {
-        this.transform = new Matrix4(
-            position,
-            rotation.nor(),
-            new Vector3(size.x, size.y, 1)
-        );
-        this.textureRegion = new TextureRegion(texture);
     }
 
     public Vector3 getPosition() {
