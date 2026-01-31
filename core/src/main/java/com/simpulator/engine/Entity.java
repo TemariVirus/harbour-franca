@@ -14,19 +14,14 @@ import com.badlogic.gdx.math.Vector3;
  * A rectangular entity with 3D position, 2D size, and 3D rotation.
  * The appearence is defined by a TextureRegion.
  */
-public class Entity implements Moveable {
+public class Entity implements Moveable, Renderable<SpriteBatch> {
 
     /** Position, size and rotation encoded in a 4x4 matrix, in world units. */
-    public Matrix4 transform;
+    protected Matrix4 transform;
+    /** The tint color applied when rendering the entity. */
+    protected Color tint = Color.WHITE.cpy();
     /** The texture region used to render the entity. */
-    private TextureRegion textureRegion;
-    /** Projected vertices for rendering. Prevents an allcoation on every render() call. */
-    private final float[] vertexData = new float[20];
-
-    public Entity(Matrix4 transform, TextureRegion textureRegion) {
-        this.transform = transform.cpy();
-        this.textureRegion = textureRegion;
-    }
+    protected TextureRegion textureRegion;
 
     public Entity(
         Vector3 position,
@@ -94,6 +89,18 @@ public class Entity implements Moveable {
         transform.setToRotationRad(axis, radians);
     }
 
+    public Matrix4 getTransform() {
+        return transform.cpy();
+    }
+
+    public Color getTint() {
+        return tint.cpy();
+    }
+
+    public void setTint(Color tint) {
+        this.tint = tint.cpy();
+    }
+
     public TextureRegion getTextureRegion() {
         return textureRegion;
     }
@@ -104,6 +111,46 @@ public class Entity implements Moveable {
 
     public void setTextureRegion(Texture textureRegion) {
         this.textureRegion = new TextureRegion(textureRegion);
+    }
+
+    /** Returns the vertex in local space, indexed in clockwise order. */
+    public Vector3 getLocalVertex(int index) {
+        switch (index) {
+            case 0:
+                return new Vector3(-0.5f, -0.5f, 0); // Bottom left
+            case 1:
+                return new Vector3(-0.5f, 0.5f, 0); // Top left
+            case 2:
+                return new Vector3(0.5f, 0.5f, 0); // Top right
+            case 3:
+                return new Vector3(0.5f, -0.5f, 0); // Bottom right
+            default:
+                throw new IllegalArgumentException(
+                    "Index must be in range [0, 3]"
+                );
+        }
+    }
+
+    /** Returns the vertex in world space, indexed in clockwise order. */
+    public Vector3 getVertex(int index) {
+        return getLocalVertex(index).mul(transform);
+    }
+
+    /** Returns the vertex in world space with a local Z offset, indexed in clockwise order. */
+    public Vector3 getVertex(int index, float localZ) {
+        Vector3 localVertex = getLocalVertex(index);
+        localVertex.z = localZ;
+        return localVertex.mul(transform);
+    }
+
+    /** Returns all vertices in world space in clockwise order. */
+    public Vector3[] getVertices() {
+        return new Vector3[] {
+            getVertex(0),
+            getVertex(1),
+            getVertex(2),
+            getVertex(3),
+        };
     }
 
     @Override
@@ -130,23 +177,22 @@ public class Entity implements Moveable {
         this.transform.mul(transform);
     }
 
+    @Override
     public void render(SpriteBatch batch, Camera camera) {
         // TODO: frustum culling
+        float[] vertexData = new float[20];
         for (int i = 0; i < 4; i++) {
             boolean isLeft = i < 2;
             boolean isBottom = (i == 0) || (i == 3);
 
-            float x = isLeft ? -0.5f : 0.5f;
-            float y = isBottom ? -0.5f : 0.5f;
             float u = isLeft ? textureRegion.getU() : textureRegion.getU2();
             float v = isBottom ? textureRegion.getV2() : textureRegion.getV();
-            Vector3 vertPos = new Vector3(x, y, 0); // Local space
-            vertPos.mul(transform); // World space
+            Vector3 vertPos = getVertex(i); // World space
             camera.project(vertPos); // Screen space
 
             vertexData[i * 5 + 0] = vertPos.x;
             vertexData[i * 5 + 1] = vertPos.y;
-            vertexData[i * 5 + 2] = Color.WHITE_FLOAT_BITS;
+            vertexData[i * 5 + 2] = tint.toFloatBits();
             vertexData[i * 5 + 3] = u;
             vertexData[i * 5 + 4] = v;
         }
