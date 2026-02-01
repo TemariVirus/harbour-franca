@@ -12,13 +12,18 @@ classDiagram
     Cuboid --|> Polyhedron: extends
     Entity --o EntityManager: aggregates
     Entity --|> Moveable: implements
-    Entity --|> Renderable~SpriteBatch~: implements
+    Entity --|> Renderable~T~: #60;#60;binds#62;#62; #60;T -> SpriteBatch#62;
     EntityManager --* Scene: composes
+    GraphicsManager --o SceneManager: composes
+    KeyboardManager --* ButtonManager: #60;#60;binds#62;#62; #60;T -> KeyEvent#62
     KeyboardManager --|> InputAdapter: extends
+    MouseManager --* ButtonManager: #60;#60;binds#62;#62; #60;T -> MouseButtonEvent#62
     MouseManager --|> InputAdapter: extends
     MoveAction~T~ --|> Action~T~: #60;#60;bind#62;#62; #60;T -> T#62;
     ResourceCache~K&comma; V: Disposable~ --|> Disposable: implements
     Scene --o SceneManager: aggregates
+    SoundManager --* Scene: composes
+    TextureManager --* Scene: composes
     SoundManager --|> ResourceCache: #60;#60;bind#62;#62; #60;K -> String, V -> Sound#62;
     TextureManager --|> ResourceCache: #60;#60;bind#62;#62; #60;K -> String, V -> Texture#62;
 
@@ -26,14 +31,6 @@ classDiagram
         <<interface>>
 
         + act(deltaTime: float, extraData: T) void
-    }
-
-    class BindType {
-        <<enumeration>>
-
-        DOWN
-        HOLD
-        UP
     }
 
     class Clock {
@@ -54,11 +51,13 @@ classDiagram
         + getBoundingBoxes() OrientedBoundingBox[]
         + getBounds() BoundingBox
         + intersects(other: ColliderMesh) boolean
+        + intersects(immovable: ColliderMesh, prevMtv: Vector3, out outMtv: Vector3) boolean
     }
 
     class CollisionManager {
         + isSeperatingAxis(verts1: Vector3[], verts2: Vector3[], axis: Vector3)$ boolean
         + polygonIntersects(verts1: Vector3[], edges1: Vector3[], verts2: Vector3[], edges2: Vector3[])$ boolean
+        + polyhedraIntersects(verts1: Vector3[], verts2: Vector3[], prevMtv: Vector3, out outMtv: Vector3)$ boolean
     }
 
     class Cuboid {
@@ -106,31 +105,56 @@ classDiagram
         - entities: ArrayList~Entity~
 
         + EntityManager()
-        + render(batch: SpriteBatch, camera: Camera) void
+        + update(deltaTime: float) void
         + add(Entity: entity) void
     }
 
-    class GraphicsManager {
-        - batch: SpriteBatch
+    class ButtonBindType {
+        <<enumeration>>
 
-        + renderScene(scene: Scene) void
+        DOWN
+        HOLD
+        UP
+    }
+
+    class ButtonManager~T~ {
+        - lastFrameButtons: HashSet~Integer~
+        - thisFrameButtons: HashSet~Integer~
+        - downBindings: HashMap~Integer&comma; ArrayList~Action~T~~~
+        - holdBindings: HashMap~Integer&comma; ArrayList~Action~T~~~
+        - upBindings: HashMap~Integer&comma; ArrayList~Action~T~~~
+
+        + ButtonManager~T~()
+        + ButtonManager(lastFrameButtons: HashSet~Integer~, lastFrameButtons: HashSet~Integer~)
+        + getButtonDown(button: int) boolean
+        + getButtonUp(button: int) boolean
+        + setButtonDown(button: int) void
+        + setButtonUp(button: int) void
+        + bind(type: ButtonBindType, button: int, action: Action~T~) void
+        + unbind(type: ButtonBindType, button: int, action: Action~T~) void
+        + unbindAll(type: ButtonBindType) void
+        + update(deltatime: float, timestamp: float) void
+    }
+
+    class GraphicsManager {
+        # batch: SpriteBatch
+        # isRendering: boolean
+
+        + GraphicsManager()
+        + renderEntity(entity: Entity) void
+        + renderEntities(entities: Entity[]) void
+        + endRender() void
     }
 
     class KeyboardManager {
-        - lastFrameKeys: HashSet~Integer~
-        - thisFrameKeys: HashSet~Integer~
-        - downBindings: HashMap~Integer&comma; ArrayList~Action~KeyEvent~~~
-        - holdBindings: HashMap~Integer&comma; ArrayList~Action~KeyEvent~~~
-        - upBindings: HashMap~Integer&comma; ArrayList~Action~KeyEvent~~~
+        - buttonManager: ButtonManager~KeyEvent~
 
         + KeyboardManager()
-        + KeyboardManager(lastFrameKeys: HashSet~Integer~, thisFrameKeys: HashSet~Integer~)
         + keyDown(keycode: int) boolean
         + keyUp(keycode: int) boolean
-        + bind(type: BindType, keycode: int, action: Action<KeyEvent>) void
-        + unbind(type: BindType, keycode: int, action: Action<KeyEvent>) void
-        + unbindAll(type: BindType) void
-        - computeKeys(type: BindType) HashSet~Integer~
+        + bind(type: ButtonBindType, keycode: int, action: Action<KeyEvent>) void
+        + unbind(type: ButtonBindType, keycode: int, action: Action<KeyEvent>) void
+        + unbindAll(type: ButtonBindType) void
         + update(deltatime: float, timestamp: float) void
     }
 
@@ -138,27 +162,76 @@ classDiagram
         <<dataType>>
 
         + keycode: int
-        + type: BindType
+        + type: ButtonBindType
         + timestamp: float
         + isShiftPressed: boolean
         + isCtrlPressed: boolean
         + isAltPressed: boolean
 
-        + KeyEvent(keycode: int, type: BindType, timestamp: float, pressedKeys: HashSet~Integer~)
+        + KeyEvent(keycode: int, type: ButtonBindType, timestamp: float, pressedKeys: HashSet~Integer~)
+    }
+
+    class MouseButtonEvent {
+        <<dataType>>
+
+        + x: int
+        + y: int
+        + pointer: int
+        + button: int
+        + type: ButtonBindType
+        + timestamp: float
+
+        + MouseButtonEvent(x: int, y: int, pointer: int, button: int, type: ButtonBindType, timestamp: float)
     }
 
     class MouseManager {
-        - X: float
-        - Y: float
-        - downBindings: HashMap~Integer&comma; ArrayList~Action~MouseEvent~~~
-        - holdBindings: HashMap~Integer&comma; ArrayList~Action~MouseEvent~~~
-        - upBindings: HashMap~Integer&comma; ArrayList~Action~MouseEvent~~~
+        - lastFrameX: int
+        - lastFrameY: int
+        - thisFrameX: int
+        - thisFrameY: int
+        - scrolledX: float
+        - scrolledY: float
+        - moveBindings: ArrayList~Action~MouseMoveEvent~~
+        - scrollBindings: ArrayList~Action~MouseScrollEvent~~
+        - buttonManager: ButtonManager~MouseButtonEvent~
 
         + MouseManager()
-        + touchDown(x: float, y: float, pointer: int, button: int) boolean
-        + touchUp(float x, float y, int pointer, button: int) boolean
-        + touchDragged(x: float, y: float, pointer: int) boolean
+        + mouseMoved(screenX: int, screenY: int) boolean
+        + touchDown(screenX: int, screenY: int, pointer: int, button: int) boolean
+        + touchUp(screenX: int, screenY: int, pointer: int, button: int) boolean
+        + scrolled(amountX: float, amountY: float) boolean
+        + bindButton(type: ButtonBindType, button: int, action: Action<MouseButtonEvent>) void
+        + unbindButton(type: ButtonBindType, button: int, action: Action<MouseButtonEvent>) void
+        + unbindAllButton(type: ButtonBindType) void
+        + bindMove(action: Action<MouseMoveEvent>) void
+        + unbindMove(action: Action<MouseMoveEvent>) void
+        + unbindAllMove() void
+        + bindScroll(action: Action<MouseScrollEvent>) void
+        + unbindScroll(action: Action<MouseScrollEvent>) void
+        + unbindAllScroll() void
         + update(deltaTime: float, timestamp: float) void
+    }
+
+    class MouseMoveEvent {
+        <<dataType>>
+
+        + x: int
+        + y: int
+        + deltaX: int
+        + deltaY: int
+        + timestamp: float
+
+        + MouseMoveEvent(x: int, y: int, deltaX: int, deltaY: int, timestamp: float)
+    }
+
+    class MouseScrollEvent {
+        <<dataType>>
+
+        + scrollX: float
+        + scrollY: float
+        + timestamp: float
+
+        + MouseScrollEvent(scrollX: float, scrollY: float, timestamp: float)
     }
 
     class Moveable {
@@ -194,6 +267,7 @@ classDiagram
         + getBounds() BoundingBox*
         + getNonParallelEdges(faceIndex: int) Vector3[]
         + intersects(other: Polyhedron) boolean
+        + intersects(immovable: Polyhedron, prevMtv: Vector3, out outMtv: Vector3) boolean
     }
 
     class Renderable~T~ {
@@ -214,15 +288,18 @@ classDiagram
     }
 
     class Scene {
-        - EntityManager entityManager
-        - Camera camera
-        - boolean isLoaded
+        - camera: Camera
+        - entityManager: EntityManager
+        - sounds: SoundManager
+        - textures: TextureManager
 
-        - load() void
-        - start() void
-        - update(float dt) void
-        - render() void
-        - unload() void
+        + Scene()
+        + load() void
+        + unload() void
+        + getSound(path: String) Sound
+        + getTexture(path: String) Texture
+        + update(deltaTime: float) void
+        + render(graphics: GraphicsManager) void
     }
 
     class SceneManager {
@@ -231,7 +308,9 @@ classDiagram
         - graphics: GraphicsManager
 
         + addScene(name: String, scene: Scene) void
-        + switchTo(name: String) void
+        + switchScene(name: String) void
+        + getSound(path: String) Sound
+        + getTexture(path: String) Texture
         + update(deltaTime: float) void
         + render() void
     }
