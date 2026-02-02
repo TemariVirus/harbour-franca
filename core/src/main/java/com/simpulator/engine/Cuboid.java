@@ -21,10 +21,12 @@ public class Cuboid extends Polyhedron {
         this.obb = obb;
     }
 
+    @Override
     public int getFaceCount() {
         return FACE_VERTEX_INDICES.length;
     }
 
+    @Override
     public Vector3[] getFaceVertices(int faceIndex) {
         Vector3[] vertices = obb.getVertices();
         int[] indices = FACE_VERTEX_INDICES[faceIndex];
@@ -36,10 +38,17 @@ public class Cuboid extends Polyhedron {
         return faceVertices;
     }
 
+    @Override
+    public Iterable<Vector3> getAllVertices() {
+        return java.util.Arrays.asList(obb.getVertices());
+    }
+
+    @Override
     public BoundingBox getBounds() {
         return obb.getBounds();
     }
 
+    @Override
     public Vector3[] getNonParallelEdges(int faceIndex) {
         Vector3[] verts = getFaceVertices(faceIndex);
         return new Vector3[] { verts[1].sub(verts[0]), verts[3].sub(verts[0]) };

@@ -13,8 +13,10 @@ classDiagram
     Entity ..|> Moveable
     EntityManager --* Scene
     Cuboid --|> Polyhedron
+    Polyhedron ..|> GJKTarget
     ColliderMesh --|> Moveable
     Polyhedron ..> CollisionManager: Uses
+    CollisionManager ..> GJKTarget: Uses
     GraphicsManager --o SceneManager
     ResourceCache~K&comma; V: Disposable~ ..|> Disposable
     Scene --o SceneManager: aggregates
@@ -46,13 +48,13 @@ classDiagram
         + getBoundingBoxes() OrientedBoundingBox[]
         + getBounds() BoundingBox
         + intersects(other: ColliderMesh) boolean
-        + intersects(immovable: ColliderMesh, prevMtv: Vector3, out outMtv: Vector3) boolean
+        + intersects(immovable: ColliderMesh, out outMtv: Vector3) boolean
     }
 
     class CollisionManager {
         + isSeperatingAxis(verts1: Vector3[], verts2: Vector3[], axis: Vector3)$ boolean
         + polygonIntersects(verts1: Vector3[], edges1: Vector3[], verts2: Vector3[], edges2: Vector3[])$ boolean
-        + polyhedraIntersects(verts1: Vector3[], verts2: Vector3[], prevMtv: Vector3, out outMtv: Vector3)$ boolean
+        + intersects(movable: GJKTarget, immovable: GJKTarget, out outMtv: Vector3)$ boolean
     }
 
     class Cuboid {
@@ -241,10 +243,12 @@ classDiagram
 
         + getFaceCount()* int
         + getFaceVertices(faceIndex: int)* Vector3[]
+        + getAllVertices() Iterable~Vector3~
         + getBounds() BoundingBox*
         + getNonParallelEdges(faceIndex: int) Vector3[]
+        + furthestPoint(direction: Vector3, reverse: boolean) Vector3
         + intersects(other: Polyhedron) boolean
-        + intersects(immovable: Polyhedron, prevMtv: Vector3, out outMtv: Vector3) boolean
+        + intersects(immovable: Polyhedron, out outMtv: Vector3) boolean
     }
 
     class Renderable~T~ {
@@ -298,4 +302,10 @@ classDiagram
 
     class TextureManager {
         # load(path: String)* Texture
+    }
+
+    class GJKTarget {
+        <<interface>>
+
+        + furthestPoint(direction: Vector3, reverse: boolean) Vector3
     }

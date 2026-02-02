@@ -2,14 +2,28 @@ package com.simpulator.engine;
 
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
+import java.util.HashSet;
 
-public abstract class Polyhedron {
+/** Represents a convex polyhedron. */
+public abstract class Polyhedron implements GJKTarget {
 
     /** Returns the total number of faces in the polyhedron. */
     public abstract int getFaceCount();
 
     /** Returns the face vertices in clockwise order. Must return at least 2 vertices. */
     public abstract Vector3[] getFaceVertices(int faceIndex);
+
+    /** Returns all unique vertices of the polyhedron. */
+    public Iterable<Vector3> getAllVertices() {
+        HashSet<Vector3> uniqueVerts = new HashSet<>();
+        for (int i = 0; i < getFaceCount(); i++) {
+            Vector3[] faceVerts = getFaceVertices(i);
+            for (Vector3 vert : faceVerts) {
+                uniqueVerts.add(vert);
+            }
+        }
+        return uniqueVerts;
+    }
 
     /** Returns a bounding box containing the polyhedron. */
     public abstract BoundingBox getBounds();
@@ -28,6 +42,23 @@ public abstract class Polyhedron {
             edges[i] = next.cpy().sub(current);
         }
         return edges;
+    }
+
+    @Override
+    public Vector3 furthestPoint(Vector3 direction, boolean reverse) {
+        float distance = reverse
+            ? Float.POSITIVE_INFINITY
+            : Float.NEGATIVE_INFINITY;
+        Vector3 furthest = null;
+        // The furthest point will be one of the vertices, so just check all of them
+        for (Vector3 vert : getAllVertices()) {
+            float dot = vert.dot(direction);
+            if (dot < distance == reverse) {
+                distance = dot;
+                furthest = vert;
+            }
+        }
+        return furthest.cpy();
     }
 
     /** Returns whether this polyhedron intersects with another polyhedron. */
@@ -53,5 +84,17 @@ public abstract class Polyhedron {
             }
         }
         return false;
+    }
+
+    /**
+     * Returns whether this polyhedron intersects with another polyhedron.
+     * If they intersect, the minimum translation vector (moving this polyhedron)
+     * to separate them is stored in outMtv.
+     */
+    public boolean intersects(Polyhedron immovable, Vector3 outMtv) {
+        if (!this.getBounds().intersects(immovable.getBounds())) {
+            return false;
+        }
+        return CollisionManager.intersects(this, immovable, outMtv);
     }
 }

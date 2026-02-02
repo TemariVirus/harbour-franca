@@ -8,13 +8,12 @@ import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.simpulator.engine.Entity;
+import com.simpulator.engine.EntityManager;
+import com.simpulator.engine.GraphicsManager;
 import com.simpulator.engine.KeyboardManager;
 import com.simpulator.engine.KeyboardManager.BindType;
 import com.simpulator.engine.TextureManager;
-import com.simpulator.engine.GraphicsManager;
-import com.simpulator.engine.Entity;
-import com.simpulator.engine.EntityManager;
-
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class GameMaster extends ApplicationAdapter {
@@ -25,8 +24,8 @@ public class GameMaster extends ApplicationAdapter {
     private TextureManager tm;
     private KeyboardManager km;
     private EntityManager em;
-    private CollidableEntity entity1;
-    private CollidableEntity entity2;
+    private CollidableEntity pushable;
+    private CollidableEntity playerEntity;
 
     @Override
     public void create() {
@@ -44,7 +43,7 @@ public class GameMaster extends ApplicationAdapter {
         gm = new GraphicsManager();
         tm = new TextureManager();
         em = new EntityManager();
-        entity1 = new CollidableEntity(
+        pushable = new CollidableEntity(
             new Vector3(100, 100, -200),
             new Vector2(200, 100),
             0,
@@ -52,15 +51,15 @@ public class GameMaster extends ApplicationAdapter {
             // new Quaternion().setFromAxisRad(1, 0, 1, 1),
             tm.get("libgdx.png")
         );
-        entity2 = new CollidableEntity(
+        playerEntity = new CollidableEntity(
             new Vector3(0, 0, -200),
             new Vector2(200, 200),
-            2,
+            10,
             new Quaternion().idt(),
             tm.get("libgdx.png")
         );
-        em.add(entity1);
-        em.add(entity2);
+        em.add(pushable);
+        em.add(playerEntity);
 
         km = new KeyboardManager();
         km.bind(
@@ -98,7 +97,7 @@ public class GameMaster extends ApplicationAdapter {
             BindType.HOLD,
             Keys.R,
             new MoveAction<KeyboardManager.KeyEvent>(
-                entity1,
+                pushable,
                 new Vector3(1, 0, 1),
                 4
             )
@@ -108,7 +107,7 @@ public class GameMaster extends ApplicationAdapter {
             BindType.HOLD,
             Keys.LEFT,
             new MoveAction<KeyboardManager.KeyEvent>(
-                entity2,
+                playerEntity,
                 new Vector3(-100, 0, 0)
             )
         );
@@ -116,7 +115,7 @@ public class GameMaster extends ApplicationAdapter {
             BindType.HOLD,
             Keys.RIGHT,
             new MoveAction<KeyboardManager.KeyEvent>(
-                entity2,
+                playerEntity,
                 new Vector3(100, 0, 0)
             )
         );
@@ -124,7 +123,7 @@ public class GameMaster extends ApplicationAdapter {
             BindType.HOLD,
             Keys.UP,
             new MoveAction<KeyboardManager.KeyEvent>(
-                entity2,
+                playerEntity,
                 new Vector3(0, 0, -100)
             )
         );
@@ -132,7 +131,7 @@ public class GameMaster extends ApplicationAdapter {
             BindType.HOLD,
             Keys.DOWN,
             new MoveAction<KeyboardManager.KeyEvent>(
-                entity2,
+                playerEntity,
                 new Vector3(0, 0, 100)
             )
         );
@@ -146,10 +145,24 @@ public class GameMaster extends ApplicationAdapter {
         km.update(Gdx.graphics.getDeltaTime(), clock.getSeconds());
         em.update(Gdx.graphics.getDeltaTime());
 
-        System.out.println(entity1.intersects(entity2));
+        Vector3 mtv = new Vector3().setZero();
+        System.out.printf(
+            "%b %b (%f, %f, %f)\n",
+            pushable.intersects(playerEntity),
+            pushable.intersects(playerEntity, mtv),
+            mtv.x,
+            mtv.y,
+            mtv.z
+        );
+        if (pushable.intersects(playerEntity, mtv)) {
+            // pushable.translate(mtv);
+        }
 
         ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
-        gm.renderEntities(em.getEntities().toArray(new Entity[0]), playerCamera);
+        gm.renderEntities(
+            em.getEntities().toArray(new Entity[0]),
+            playerCamera
+        );
         gm.endRender();
     }
 
