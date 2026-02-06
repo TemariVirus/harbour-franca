@@ -1,6 +1,8 @@
-package com.simpulator.engine;
+package com.simpulator.game;
 
 import com.badlogic.gdx.math.Vector3;
+import com.simpulator.engine.Action;
+import com.simpulator.engine.Moveable;
 
 public class MoveAction<T> implements Action<T> {
 
