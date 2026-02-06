@@ -1,4 +1,4 @@
-package com.simpulator.engine;
+package com.simpulator.game;
 
 public class Clock {
 

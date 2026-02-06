@@ -9,10 +9,8 @@ import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.simpulator.engine.Clock;
 import com.simpulator.engine.KeyboardManager;
 import com.simpulator.engine.KeyboardManager.BindType;
-import com.simpulator.engine.MoveAction;
 import com.simpulator.engine.TextureManager;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */

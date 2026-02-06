@@ -15,7 +15,6 @@ classDiagram
     Cuboid --|> Polyhedron
     ColliderMesh --|> Moveable
     Polyhedron ..> CollisionManager: Uses
-    MoveAction~T~ --|> Action~T~: #60;#60;bind#62;#62; #60;T -> T#62;
     GraphicsManager --o SceneManager
     ResourceCache~K&comma; V: Disposable~ ..|> Disposable
     Scene --o SceneManager: aggregates
@@ -38,17 +37,6 @@ classDiagram
         <<interface>>
 
         + act(deltaTime: float, extraData: T) void
-    }
-
-    class Clock {
-        - seconds: float
-
-        + Clock(seconds: float)
-        + getSeconds() float
-        + setSeconds(seconds: float) void
-        + reset() void
-        + forward(seconds: float) void
-        + backward(seconds: float) void
     }
 
     class ColliderMesh {
@@ -246,24 +234,6 @@ classDiagram
 
         + translate(delta: Vector3) void
         + rotate(axis: Vector3, radians: float) void
-    }
-
-    class MoveAction~T~ {
-        # target: Moveable
-        - velocity: Vector3
-        - rotationAxis: Vector3
-        - rotationSpeed: float
-
-        + MoveAction(target: Moveable, velocity: Vector3, rotationAxis: Vector3, rotationSpeed: float)
-        + MoveAction(Moveable target, Vector3 velocity)
-        + MoveAction(target: Moveable, rotationAxis: Vector3, rotationSpeed: float)
-        + getVelocity() Vector3
-        + setVelocity(velocity: Vector3) void
-        + getRotationAxis() Vector3
-        + setRotationAxis(rotationAxis: Vector3) void
-        + getRotationSpeed() float
-        + setRotationSpeed(rotationSpeed: float) void
-        + act(deltaTime: float, extraData: T) void
     }
 
     class Polyhedron {
