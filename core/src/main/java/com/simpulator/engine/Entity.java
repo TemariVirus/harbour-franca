@@ -154,6 +154,8 @@ public class Entity implements Moveable, Renderable<SpriteBatch> {
         transform.rotate(delta);
     }
 
+    public void update(float deltaTime) {}
+    
     @Override
     public void rotate(Vector3 axis, float radians) {
         transform.rotateRad(axis, radians);
