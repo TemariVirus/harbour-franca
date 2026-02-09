@@ -3,179 +3,6 @@ package com.simpulator.engine;
 import com.badlogic.gdx.math.Vector3;
 import java.util.ArrayList;
 
-/** GJK algorithm and its helper functions. */
-class GJK {
-
-    public static <T> void swap(ArrayList<T> list, int i, int j) {
-        T temp = list.get(i);
-        list.set(i, list.get(j));
-        list.set(j, temp);
-    }
-
-    public static boolean sameDirection(Vector3 a, Vector3 b) {
-        return a.dot(b) > 0;
-    }
-
-    private static boolean handleLine(
-        ArrayList<Vector3> simplex,
-        Vector3 direction
-    ) {
-        // Line segment AB
-        Vector3 ab = simplex.get(1).cpy().sub(simplex.get(0));
-        Vector3 ao = simplex.get(0).cpy().scl(-1);
-
-        if (sameDirection(ab, ao)) {
-            // Set direction to be perpendicular to AB towards the origin
-            direction.set(ab).crs(ao).crs(ab);
-        } else {
-            // Remove point B
-            simplex.remove(1);
-            direction.set(ao);
-        }
-        // Line segment cannot "contain" a point
-        return false;
-    }
-
-    private static boolean handleTriangle(
-        ArrayList<Vector3> simplex,
-        Vector3 direction
-    ) {
-        // Triangle ABC
-        Vector3 ab = simplex.get(1).cpy().sub(simplex.get(0));
-        Vector3 ac = simplex.get(2).cpy().sub(simplex.get(0));
-        Vector3 ao = simplex.get(0).cpy().scl(-1);
-        Vector3 abcNormal = ab.cpy().crs(ac);
-
-        if (sameDirection(abcNormal.cpy().crs(ac), ao)) {
-            if (sameDirection(ac, ao)) {
-                // Remove point B
-                simplex.remove(1);
-                direction.set(ac).crs(ao).crs(ac);
-            } else {
-                // Remove point C
-                simplex.remove(2);
-                return handleLine(simplex, direction);
-            }
-        } else {
-            if (sameDirection(ab.cpy().crs(abcNormal), ao)) {
-                // Remove point C
-                simplex.remove(2);
-                return handleLine(simplex, direction);
-            } else {
-                if (sameDirection(abcNormal, ao)) {
-                    direction.set(abcNormal);
-                } else {
-                    // Swap B and C
-                    swap(simplex, 1, 2);
-                    direction.set(abcNormal).scl(-1);
-                }
-            }
-        }
-        // Triangle is too thin to "contain" a point in 3D space
-        return false;
-    }
-
-    private static boolean handleTetrahedron(
-        ArrayList<Vector3> simplex,
-        Vector3 direction
-    ) {
-        // Tetrahedron ABCD
-        Vector3 ab = simplex.get(1).cpy().sub(simplex.get(0));
-        Vector3 ac = simplex.get(2).cpy().sub(simplex.get(0));
-        Vector3 ad = simplex.get(3).cpy().sub(simplex.get(0));
-        Vector3 ao = simplex.get(0).cpy().scl(-1);
-
-        Vector3 abcNormal = ab.cpy().crs(ac);
-        Vector3 acdNormal = ac.cpy().crs(ad);
-        Vector3 adbNormal = ad.cpy().crs(ab);
-
-        if (sameDirection(abcNormal, ao)) {
-            // Remove point D
-            simplex.remove(3);
-            return handleTriangle(simplex, direction);
-        }
-        if (sameDirection(acdNormal, ao)) {
-            // Remove point B
-            simplex.remove(1);
-            return handleTriangle(simplex, direction);
-        }
-        if (sameDirection(adbNormal, ao)) {
-            // Remove point C
-            simplex.remove(2);
-            // Swap B and D
-            swap(simplex, 1, 2);
-            return handleTriangle(simplex, direction);
-        }
-
-        // Origin is inside tetrahedron
-        return true;
-    }
-
-    /**
-     * Returns true if the simplex contains the origin, false otherwise.
-     * Updates the simplex and the next direction to check if the origin is not contained.
-     */
-    private static boolean simplexContainsOrigin(
-        ArrayList<Vector3> simplex,
-        Vector3 direction
-    ) {
-        switch (simplex.size()) {
-            case 0:
-            case 1:
-                throw new IllegalArgumentException(
-                    "Simplex must have at least 2 points."
-                );
-            case 2:
-                return handleLine(simplex, direction);
-            case 3:
-                return handleTriangle(simplex, direction);
-            case 4:
-                return handleTetrahedron(simplex, direction);
-            default:
-                throw new IllegalArgumentException(
-                    "Simplex has too many points."
-                );
-        }
-    }
-
-    /**
-     * Returns whether 2 convex shapes are intersecting.
-     * The simplex containing the origin is stored in simplex.
-     */
-    public static boolean isIntersecting(
-        GJKTarget shape1,
-        GJKTarget shape2,
-        ArrayList<Vector3> simplex
-    ) {
-        Vector3 direction = new Vector3(1, 1, 1).nor();
-
-        Vector3 simplexNextPoint = shape1
-            .furthestPoint(direction, false)
-            .sub(shape2.furthestPoint(direction, true));
-        simplex.clear();
-        simplex.add(0, simplexNextPoint);
-        direction = simplexNextPoint.cpy().scl(-1);
-        while (true) {
-            simplexNextPoint = shape1
-                .furthestPoint(direction, false)
-                .sub(shape2.furthestPoint(direction, true));
-            if (
-                simplexNextPoint.dot(direction) <= 0 ||
-                simplex.contains(simplexNextPoint)
-            ) {
-                // Simplex cannot possibly contain origin; no collision
-                return false;
-            }
-
-            simplex.add(0, simplexNextPoint);
-            if (GJK.simplexContainsOrigin(simplex, direction)) {
-                // Simplex contains origin; collision detected
-                return true;
-            }
-        }
-    }
-}
-
 public class CollisionManager {
 
     public static boolean isSeperatingAxis(
@@ -249,12 +76,335 @@ public class CollisionManager {
         GJKTarget immovable,
         Vector3 outMtv
     ) {
-        ArrayList<Vector3> polytope = new ArrayList<>();
-        if (!GJK.isIntersecting(movable, immovable, polytope)) {
+        final int MAX_ITERATIONS = 500;
+        // EPA is numerically sensitive
+        // Prevent extra iterations due to rounding errors
+        final float THRESHOLD = 1e-3f;
+
+        ArrayList<Vector3> simplex = new ArrayList<>();
+        if (!GJK.isIntersecting(movable, immovable, simplex)) {
             return false;
         }
 
-        // TODO: EPA
+        Polytope polytope = new Polytope(simplex);
+        for (int iters = 0; iters < MAX_ITERATIONS; iters++) {
+            Vector3 faceNormal = polytope.closestFaceNormalToOrigin();
+            float faceDistance = faceNormal.len();
+            faceNormal.nor();
+
+            Vector3 support = movable
+                .furthestPoint(faceNormal, false)
+                .sub(immovable.furthestPoint(faceNormal, true));
+            float distance = support.dot(faceNormal);
+            if (
+                Math.abs(distance - faceDistance) <
+                Math.max(THRESHOLD, distance * THRESHOLD)
+            ) {
+                // No closer point found; face normal is the MTV
+                outMtv.set(faceNormal).scl(-distance);
+                return true;
+            }
+
+            polytope.expand(support);
+        }
+
+        // Max iterations reached; Return closest result to MTV so far
+        outMtv.set(polytope.closestFaceNormalToOrigin()).scl(-1 - THRESHOLD);
         return true;
+    }
+}
+
+/** GJK algorithm and its helper functions. */
+class GJK {
+
+    public static boolean sameDirection(Vector3 a, Vector3 b) {
+        return a.dot(b) > 0;
+    }
+
+    private static boolean handleLine(
+        ArrayList<Vector3> simplex,
+        Vector3 direction
+    ) {
+        // Line segment AB
+        Vector3 ab = simplex.get(1).cpy().sub(simplex.get(0));
+        Vector3 ao = simplex.get(0).cpy().scl(-1);
+
+        if (sameDirection(ab, ao)) {
+            // Set direction to be perpendicular to AB towards the origin
+            direction.set(ab).crs(ao).crs(ab);
+        } else {
+            // Remove point B
+            simplex.remove(1);
+            direction.set(ao);
+        }
+        // Line segment cannot "contain" a point
+        return false;
+    }
+
+    private static boolean handleTriangle(
+        ArrayList<Vector3> simplex,
+        Vector3 direction
+    ) {
+        // Triangle ABC
+        Vector3 ab = simplex.get(1).cpy().sub(simplex.get(0));
+        Vector3 ac = simplex.get(2).cpy().sub(simplex.get(0));
+        Vector3 ao = simplex.get(0).cpy().scl(-1);
+        Vector3 abcNormal = ab.cpy().crs(ac);
+
+        if (sameDirection(abcNormal.cpy().crs(ac), ao)) {
+            if (sameDirection(ac, ao)) {
+                // Remove point B
+                simplex.remove(1);
+                direction.set(ac).crs(ao).crs(ac);
+            } else {
+                // Remove point C
+                simplex.remove(2);
+                return handleLine(simplex, direction);
+            }
+        } else {
+            if (sameDirection(ab.cpy().crs(abcNormal), ao)) {
+                // Remove point C
+                simplex.remove(2);
+                return handleLine(simplex, direction);
+            } else {
+                if (sameDirection(abcNormal, ao)) {
+                    direction.set(abcNormal);
+                } else {
+                    // Swap B and C
+                    ListUtil.swap(simplex, 1, 2);
+                    direction.set(abcNormal).scl(-1);
+                }
+            }
+        }
+        // Triangle is too thin to "contain" a point in 3D space
+        return false;
+    }
+
+    private static boolean handleTetrahedron(
+        ArrayList<Vector3> simplex,
+        Vector3 direction
+    ) {
+        // Tetrahedron ABCD
+        Vector3 ab = simplex.get(1).cpy().sub(simplex.get(0));
+        Vector3 ac = simplex.get(2).cpy().sub(simplex.get(0));
+        Vector3 ad = simplex.get(3).cpy().sub(simplex.get(0));
+        Vector3 ao = simplex.get(0).cpy().scl(-1);
+
+        Vector3 abcNormal = ab.cpy().crs(ac);
+        Vector3 acdNormal = ac.cpy().crs(ad);
+        Vector3 adbNormal = ad.cpy().crs(ab);
+
+        if (sameDirection(abcNormal, ao)) {
+            // Remove point D
+            simplex.remove(3);
+            return handleTriangle(simplex, direction);
+        }
+        if (sameDirection(acdNormal, ao)) {
+            // Remove point B
+            simplex.remove(1);
+            return handleTriangle(simplex, direction);
+        }
+        if (sameDirection(adbNormal, ao)) {
+            // Remove point C
+            simplex.remove(2);
+            // Swap B and D
+            ListUtil.swap(simplex, 1, 2);
+            return handleTriangle(simplex, direction);
+        }
+
+        // Origin is inside tetrahedron
+        return true;
+    }
+
+    /**
+     * Returns true if the simplex contains the origin, false otherwise.
+     * Updates the simplex and the next direction to check if the origin is not contained.
+     */
+    private static boolean simplexContainsOrigin(
+        ArrayList<Vector3> simplex,
+        Vector3 direction
+    ) {
+        switch (simplex.size()) {
+            case 0:
+            case 1:
+                throw new IllegalArgumentException(
+                    "Simplex must have at least 2 points."
+                );
+            case 2:
+                return handleLine(simplex, direction);
+            case 3:
+                return handleTriangle(simplex, direction);
+            case 4:
+                return handleTetrahedron(simplex, direction);
+            default:
+                throw new IllegalArgumentException(
+                    "Simplex has too many points."
+                );
+        }
+    }
+
+    /**
+     * Returns whether 2 convex shapes are intersecting.
+     * The simplex containing the origin is stored in simplex.
+     */
+    public static boolean isIntersecting(
+        GJKTarget shape1,
+        GJKTarget shape2,
+        ArrayList<Vector3> simplex
+    ) {
+        final int MAX_ITERATIONS = 100;
+        Vector3 direction = new Vector3(1, 1, 1).nor();
+
+        Vector3 simplexNextPoint = shape1
+            .furthestPoint(direction, false)
+            .sub(shape2.furthestPoint(direction, true));
+        simplex.clear();
+        simplex.add(0, simplexNextPoint);
+        direction = simplexNextPoint.cpy().scl(-1);
+        for (int iters = 0; iters < MAX_ITERATIONS; iters++) {
+            simplexNextPoint = shape1
+                .furthestPoint(direction, false)
+                .sub(shape2.furthestPoint(direction, true));
+            if (
+                simplexNextPoint.dot(direction) < 1e-5 ||
+                simplex.contains(simplexNextPoint)
+            ) {
+                // Simplex cannot possibly contain origin; no collision
+                return false;
+            }
+
+            simplex.add(0, simplexNextPoint);
+            if (GJK.simplexContainsOrigin(simplex, direction)) {
+                // Simplex contains origin; collision detected
+                return true;
+            }
+        }
+
+        // Max iterations reached; assume no collision
+        return false;
+    }
+}
+
+/** 3D Polytope for Expanding Polytope Algorithm. */
+class Polytope {
+
+    private ArrayList<Vector3> vertices;
+    private ArrayList<Face> faces;
+
+    class Pair<T> {
+
+        public T first;
+        public T second;
+
+        public Pair(T first, T second) {
+            this.first = first;
+            this.second = second;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (obj == null || getClass() != obj.getClass()) return false;
+            Pair<?> pair = (Pair<?>) obj;
+            return first.equals(pair.first) && second.equals(pair.second);
+        }
+    }
+
+    class Face {
+
+        /** Indices into the vertices of the polytope. */
+        public int p1Index;
+        public int p2Index;
+        public int p3Index;
+
+        public Vector3 normal;
+        public float distance;
+
+        public Face(
+            ArrayList<Vector3> vertices,
+            int p1Index,
+            int p2Index,
+            int p3Index
+        ) {
+            this.p1Index = p1Index;
+            this.p2Index = p2Index;
+            this.p3Index = p3Index;
+            updateNormal(vertices);
+        }
+
+        public void updateNormal(ArrayList<Vector3> vertices) {
+            Vector3 a = vertices.get(p1Index);
+            Vector3 b = vertices.get(p2Index);
+            Vector3 c = vertices.get(p3Index);
+            Vector3 ab = b.cpy().sub(a);
+            Vector3 ac = c.cpy().sub(a);
+            this.normal = ab.crs(ac).nor();
+            this.distance = this.normal.dot(a);
+            // Ensure the normal points away from the origin
+            if (this.distance < 0) {
+                this.normal.scl(-1);
+                this.distance = -this.distance;
+            }
+        }
+    }
+
+    public Polytope(ArrayList<Vector3> tetrahedron) {
+        assert tetrahedron.size() == 4 : "Simplex must be a tetrahedron.";
+
+        this.vertices = new ArrayList<>(tetrahedron);
+        this.faces = new ArrayList<>();
+
+        faces.add(new Face(this.vertices, 0, 1, 2));
+        faces.add(new Face(this.vertices, 0, 3, 1));
+        faces.add(new Face(this.vertices, 0, 2, 3));
+        faces.add(new Face(this.vertices, 1, 3, 2));
+    }
+
+    public Vector3 closestFaceNormalToOrigin() {
+        float minDistance = Float.POSITIVE_INFINITY;
+        Face closestFace = null;
+        for (Face face : faces) {
+            if (face.distance < minDistance) {
+                minDistance = face.distance;
+                closestFace = face;
+            }
+        }
+        return closestFace.normal.cpy().scl(closestFace.distance);
+    }
+
+    public void expand(Vector3 support) {
+        // Remove faces that can "see" the support point
+        // and collect their edges
+        ArrayList<Pair<Integer>> uniqueEdgeIndices = new ArrayList<>();
+        for (int i = 0; i < faces.size(); i++) {
+            Face face = faces.get(i);
+            if (GJK.sameDirection(face.normal, support)) {
+                addIfUniqueEdge(uniqueEdgeIndices, face.p1Index, face.p2Index);
+                addIfUniqueEdge(uniqueEdgeIndices, face.p2Index, face.p3Index);
+                addIfUniqueEdge(uniqueEdgeIndices, face.p3Index, face.p1Index);
+                ListUtil.swapRemove(faces, i--);
+            }
+        }
+
+        // Add new faces along the collected edges
+        vertices.add(support);
+        for (Pair<Integer> pair : uniqueEdgeIndices) {
+            faces.add(
+                new Face(vertices, pair.first, pair.second, vertices.size() - 1)
+            );
+        }
+    }
+
+    private void addIfUniqueEdge(
+        ArrayList<Pair<Integer>> edges,
+        int aIndex,
+        int bIndex
+    ) {
+        int reverseIndex = edges.indexOf(new Pair<Integer>(bIndex, aIndex));
+        if (reverseIndex < 0) {
+            edges.add(new Pair<Integer>(aIndex, bIndex));
+        } else {
+            ListUtil.swapRemove(edges, reverseIndex);
+        }
     }
 }
