@@ -4,7 +4,6 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -12,13 +11,16 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.simpulator.engine.KeyboardManager;
 import com.simpulator.engine.KeyboardManager.BindType;
 import com.simpulator.engine.TextureManager;
+import com.simpulator.engine.GraphicsManager;
+import com.simpulator.engine.Entity;
+
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class GameMaster extends ApplicationAdapter {
 
     private final Clock clock = new Clock(0);
     private PerspectiveCamera playerCamera;
-    private SpriteBatch batch;
+    private GraphicsManager gm;
     private TextureManager tm;
     private KeyboardManager km;
     private CollidableEntity entity1;
@@ -37,7 +39,7 @@ public class GameMaster extends ApplicationAdapter {
         playerCamera.far = 300f;
         playerCamera.update();
 
-        batch = new SpriteBatch();
+        gm = new GraphicsManager();
         tm = new TextureManager();
         entity1 = new CollidableEntity(
             new Vector3(100, 100, -200),
@@ -141,15 +143,13 @@ public class GameMaster extends ApplicationAdapter {
         System.out.println(entity1.intersects(entity2));
 
         ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
-        batch.begin();
-        entity1.render(batch, playerCamera);
-        entity2.render(batch, playerCamera);
-        batch.end();
+        gm.renderEntities(new Entity[]{ entity1, entity2 }, playerCamera);
+        gm.endRender();
     }
 
     @Override
     public void dispose() {
-        batch.dispose();
+        gm.dispose();
         tm.dispose();
     }
 }
