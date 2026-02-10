@@ -13,6 +13,7 @@ import com.simpulator.engine.KeyboardManager.BindType;
 import com.simpulator.engine.TextureManager;
 import com.simpulator.engine.GraphicsManager;
 import com.simpulator.engine.Entity;
+import com.simpulator.engine.EntityManager;
 
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
@@ -23,6 +24,7 @@ public class GameMaster extends ApplicationAdapter {
     private GraphicsManager gm;
     private TextureManager tm;
     private KeyboardManager km;
+    private EntityManager em;
     private CollidableEntity entity1;
     private CollidableEntity entity2;
 
@@ -41,6 +43,7 @@ public class GameMaster extends ApplicationAdapter {
 
         gm = new GraphicsManager();
         tm = new TextureManager();
+        em = new EntityManager();
         entity1 = new CollidableEntity(
             new Vector3(100, 100, -200),
             new Vector2(200, 100),
@@ -56,6 +59,8 @@ public class GameMaster extends ApplicationAdapter {
             new Quaternion().idt(),
             tm.get("libgdx.png")
         );
+        em.add(entity1);
+        em.add(entity2);
 
         km = new KeyboardManager();
         km.bind(
@@ -139,11 +144,12 @@ public class GameMaster extends ApplicationAdapter {
     public void render() {
         clock.forward(Gdx.graphics.getDeltaTime());
         km.update(Gdx.graphics.getDeltaTime(), clock.getSeconds());
+        em.update(Gdx.graphics.getDeltaTime());
 
         System.out.println(entity1.intersects(entity2));
 
         ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
-        gm.renderEntities(new Entity[]{ entity1, entity2 }, playerCamera);
+        gm.renderEntities(em.getEntities().toArray(new Entity[0]), playerCamera);
         gm.endRender();
     }
 

@@ -24,4 +24,9 @@ public class EntityManager {
             entity.update(deltaTime);
         }
     }
+
+    public ArrayList<Entity> getEntities() {
+        return new ArrayList<>(entities);
+    }
+
 }
