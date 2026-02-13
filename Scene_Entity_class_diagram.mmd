@@ -1,0 +1,135 @@
+---
+config:
+    theme: neutral
+    layout: elk
+    defaultRenderer: elk
+    elk:
+        nodePlacementStrategy: NETWORK_SIMPLEX
+---
+
+classDiagram
+    Entity ..|> Renderable~T~: #60;#60;binds#62;#62; #60;T -> SpriteBatch#62;
+    Entity --o EntityManager: aggregates
+    Entity ..|> Moveable
+    EntityManager --* Scene
+    GraphicsManager --o SceneManager
+    ResourceCache~K&comma; V: Disposable~ ..|> Disposable
+    Scene --o SceneManager: aggregates
+    TextureManager --|> ResourceCache: #60;#60;bind#62;#62; #60;K -> String, V -> Texture#62;
+    TextureManager --* Scene
+    SoundManager --|> ResourceCache: #60;#60;bind#62;#62; #60;K -> String, V -> Sound#62;
+    SoundManager --* Scene
+   
+
+    class Entity {
+        # transform: Matrix4
+        # tint: Color
+        # textureRegion: TextureRegion
+
+        # Entity(transform: Matrix4, textureRegion: TextureRegion)
+        + Entity(position: Vector3, size: Vector2, rotation: Quaternion, textureRegion: TextureRegion)
+        + getPosition() Vector3
+        + setPosition(position: Vector3) void
+        + getSize() Vector2
+        + setSize(size: Vector2) void
+        + getRotation() Quaternion
+        + setRotation(rotation: Quaternion) void
+        + setRotation(axis: Vector3, radians: float) void
+        + getTransform() Matrix4
+        + getTint() Color
+        + setTint(tint: Color) void
+        + getTextureRegion() TextureRegion
+        + setTextureRegion(textureRegion: TextureRegion) void
+        + getLocalVertex(index: int) Vector3
+        + getVertex(index: int) Vector3
+        + getVertex(index: int, localZ: float) Vector3
+        + getVertices() Vector3[]
+        + translate(delta: Vector3) void
+        + scale(scale: Vector2) void
+        + rotate(delta: Quaternion) void
+        + rotate(axis: Vector3, radians: float) void
+        + transform(Matrix4 transform) void
+        + render(batch: SpriteBatch, camera: Camera) void
+    }
+
+    class EntityManager {
+        - entities: ArrayList~Entity~
+
+        + EntityManager()
+        + update(deltaTime: float) void
+        + add(Entity: entity) void
+    }
+
+    class GraphicsManager {
+        # batch: SpriteBatch
+        # isRendering: boolean
+
+        + GraphicsManager()
+        + renderEntity(entity: Entity) void
+        + renderEntities(entities: Entity[]) void
+        + endRender() void
+    }
+
+    class Renderable~T~ {
+        <<interface>>
+
+        + render(renderer: T, camera: Camera) void
+    }
+
+    class Moveable {
+        <<interface>>
+
+        + translate(delta: Vector3) void
+        + rotate(axis: Vector3, radians: float) void
+    }
+    class ResourceCache~K&comma; V: Disposable~ {
+        <<abstract>>
+
+        - items: HashMap~K&comma; V~
+
+        # load(key: K)* V
+        + get(key: K) V
+        + remove(key: K) void
+        + dispose() void
+    }
+
+    class Scene {
+        - camera: Camera
+        # entityManager: EntityManager
+        # sounds: SoundManager
+        # textures: TextureManager
+
+        + Scene()
+        + load() void
+        + unload() void
+        + getSound(path: String) Sound
+        + getTexture(path: String) Texture
+        + update(deltaTime: float) void
+        + render(graphics: GraphicsManager) void
+    }
+
+    class SceneManager {
+        - currentScene: Scene
+        - scenes: HashMap~String&comma; Scene~
+        - graphics: GraphicsManager
+
+        + addScene(name: String, scene: Scene) void
+        + switchScene(name: String) void
+        + update(deltaTime: float) void
+        + render() void
+        + dispose() void
+    }
+
+    class SoundManager {
+        - globalVolume: float
+        + backgroundMusic: Music
+        # load(path: String)* Sound
+        + setGlobalVolume() void
+        + getGlobalVolume() float
+        + play(path: String)* Sound
+    }
+
+    class TextureManager {
+        # load(path: String)* Texture
+    }
+
