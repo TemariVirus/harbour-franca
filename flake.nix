@@ -12,6 +12,7 @@
         pkgs = import nixpkgs { inherit system; };
         runtimeLibs = with pkgs;
           lib.makeLibraryPath [
+            alsa-lib
             glfw3-minecraft
             libGL
             xorg.libX11
