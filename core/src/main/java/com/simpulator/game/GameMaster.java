@@ -8,23 +8,22 @@ import com.simpulator.engine.SceneManager;
 public class GameMaster extends ApplicationAdapter {
 
     private SceneManager sceneManager;
-    private MusicManager musics = new MusicManager();
+    private MusicManager musics;
 
     @Override
     public void create() {
         sceneManager = new SceneManager();
+        musics = new MusicManager();
 
         MainMenu mainMenu = new MainMenu(sceneManager);
         SoundMenu soundMenu = new SoundMenu(sceneManager, musics);
         MainGame mainGame = new MainGame(sceneManager);
 
-        sceneManager.addScene("MainMenu", mainMenu);
-        sceneManager.addScene("SoundMenu", soundMenu);
-        sceneManager.addScene("MainGame", mainGame);
+        sceneManager.addScene(Scenes.MainMenu, mainMenu);
+        sceneManager.addScene(Scenes.SoundMenu, soundMenu);
+        sceneManager.addScene(Scenes.MainGame, mainGame);
 
-        // start scene
-        sceneManager.switchScene("MainMenu");
-
+        sceneManager.switchScene(Scenes.MainMenu);
         musics.startMusic("GameAudio.mp3");
     }
 

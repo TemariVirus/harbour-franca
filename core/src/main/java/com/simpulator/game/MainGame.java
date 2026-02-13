@@ -7,26 +7,22 @@ import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.simpulator.engine.Action;
 import com.simpulator.engine.ButtonManager.ButtonBindType;
 import com.simpulator.engine.Entity;
 import com.simpulator.engine.GraphicsManager;
 import com.simpulator.engine.KeyboardManager;
-import com.simpulator.engine.Scene;
 import com.simpulator.engine.SceneManager;
 
-public class MainGame extends Scene {
+public class MainGame extends SwitchableScene {
 
     private final Clock clock = new Clock(0);
     private PerspectiveCamera playerCamera;
     private KeyboardManager km;
     private CollidableEntity pushable;
     private CollidableEntity playerEntity;
-    private SceneManager sceneManager;
 
     public MainGame(SceneManager sceneManager) {
-        super();
-        this.sceneManager = sceneManager;
+        super(sceneManager);
     }
 
     @Override
@@ -70,28 +66,22 @@ public class MainGame extends Scene {
         km.bind(ButtonBindType.HOLD, Keys.SHIFT_LEFT, new MoveCameraAction(playerCamera, new Vector3(0, -100, 0)));
         km.bind(ButtonBindType.HOLD, Keys.SPACE, new MoveCameraAction(playerCamera, new Vector3(0, 100, 0)));
 
-        km.bind(ButtonBindType.HOLD, Keys.R, new MoveAction<KeyboardManager.KeyEvent>(pushable, new Vector3(1, 0, 1), 4));
-        km.bind(ButtonBindType.HOLD, Keys.LEFT, new MoveAction<KeyboardManager.KeyEvent>(playerEntity, new Vector3(-100, 0, 0)));
-        km.bind(ButtonBindType.HOLD, Keys.RIGHT, new MoveAction<KeyboardManager.KeyEvent>(playerEntity, new Vector3(100, 0, 0)));
-        km.bind(ButtonBindType.HOLD, Keys.UP, new MoveAction<KeyboardManager.KeyEvent>(playerEntity, new Vector3(0, 0, -100)));
-        km.bind(ButtonBindType.HOLD, Keys.DOWN, new MoveAction<KeyboardManager.KeyEvent>(playerEntity, new Vector3(0, 0, 100)));
+        km.bind(ButtonBindType.HOLD, Keys.R, new MoveAction<>(pushable, new Vector3(1, 0, 1), 4));
+        km.bind(ButtonBindType.HOLD, Keys.LEFT, new MoveAction<>(playerEntity, new Vector3(-100, 0, 0)));
+        km.bind(ButtonBindType.HOLD, Keys.RIGHT, new MoveAction<>(playerEntity, new Vector3(100, 0, 0)));
+        km.bind(ButtonBindType.HOLD, Keys.UP, new MoveAction<>(playerEntity, new Vector3(0, 0, -100)));
+        km.bind(ButtonBindType.HOLD, Keys.DOWN, new MoveAction<>(playerEntity, new Vector3(0, 0, 100)));
 
-        km.bind(
-            ButtonBindType.DOWN,
-            Keys.ESCAPE,
-            new Action<KeyboardManager.KeyEvent>() {
-                @Override
-                public void act(
-                    float deltaTime,
-                    KeyboardManager.KeyEvent extraData
-                ) {
-                    sceneManager.switchScene("MainMenu");
-                }
-            }
-        );
+        km.bind(ButtonBindType.DOWN, Keys.ESCAPE, switchSceneAction(Scenes.MainMenu));
 
         // TODO: add input processor to abstract engine that has all input managers
         Gdx.input.setInputProcessor(km);
+    }
+
+    @Override
+    public void unload() {
+        super.unload();
+        Gdx.input.setInputProcessor(null);
     }
 
     @Override
