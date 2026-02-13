@@ -39,8 +39,14 @@ public class GraphicsManager implements Disposable {
         Arrays.sort(
             entities,
             new Comparator<Entity>() {
-                Vector3 tmpA = new Vector3();
-                Vector3 tmpB = new Vector3();
+                // Needed to not allocate a new vector for every calculation
+                Vector3 tmp = new Vector3();
+
+                float getZ(Entity entity) {
+                    tmp.set(entity.getPosition());
+                    camera.project(tmp);
+                    return tmp.z;
+                }
 
                 @Override
                 public int compare(Entity a, Entity b) {
@@ -48,23 +54,16 @@ public class GraphicsManager implements Disposable {
                     if (a == null) return 1;
                     if (b == null) return -1;
 
-                    // TODO: extract to function
-                    tmpA.set(a.getPosition());
-                    camera.project(tmpA);
-                    float za = tmpA.z;
-
-                    tmpB.set(b.getPosition());
-                    camera.project(tmpB);
-                    float zb = tmpB.z;
-
-                    return Float.compare(zb, za);
+                    return Float.compare(getZ(b), getZ(a));
                 }
             }
         );
 
         beginRender();
         for (Entity e : entities) {
-            if (e != null) e.render(batch, camera);
+            if (e != null) {
+                e.render(batch, camera);
+            }
         }
     }
 
