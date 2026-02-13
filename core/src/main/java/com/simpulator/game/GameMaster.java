@@ -8,11 +8,11 @@ import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.simpulator.engine.ButtonManager.ButtonBindType;
 import com.simpulator.engine.Entity;
 import com.simpulator.engine.EntityManager;
 import com.simpulator.engine.GraphicsManager;
 import com.simpulator.engine.KeyboardManager;
-import com.simpulator.engine.KeyboardManager.BindType;
 import com.simpulator.engine.TextureManager;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
@@ -63,38 +63,38 @@ public class GameMaster extends ApplicationAdapter {
 
         km = new KeyboardManager();
         km.bind(
-            BindType.HOLD,
+            ButtonBindType.HOLD,
             Keys.W,
             new MoveCameraAction(playerCamera, new Vector3(0, 0, -100))
         );
         km.bind(
-            BindType.HOLD,
+            ButtonBindType.HOLD,
             Keys.A,
             new MoveCameraAction(playerCamera, new Vector3(-100, 0, 0))
         );
         km.bind(
-            BindType.HOLD,
+            ButtonBindType.HOLD,
             Keys.S,
             new MoveCameraAction(playerCamera, new Vector3(0, 0, 100))
         );
         km.bind(
-            BindType.HOLD,
+            ButtonBindType.HOLD,
             Keys.D,
             new MoveCameraAction(playerCamera, new Vector3(100, 0, 0))
         );
         km.bind(
-            BindType.HOLD,
+            ButtonBindType.HOLD,
             Keys.SHIFT_LEFT,
             new MoveCameraAction(playerCamera, new Vector3(0, -100, 0))
         );
         km.bind(
-            BindType.HOLD,
+            ButtonBindType.HOLD,
             Keys.SPACE,
             new MoveCameraAction(playerCamera, new Vector3(0, 100, 0))
         );
 
         km.bind(
-            BindType.HOLD,
+            ButtonBindType.HOLD,
             Keys.R,
             new MoveAction<KeyboardManager.KeyEvent>(
                 pushable,
@@ -104,7 +104,7 @@ public class GameMaster extends ApplicationAdapter {
         );
 
         km.bind(
-            BindType.HOLD,
+            ButtonBindType.HOLD,
             Keys.LEFT,
             new MoveAction<KeyboardManager.KeyEvent>(
                 playerEntity,
@@ -112,7 +112,7 @@ public class GameMaster extends ApplicationAdapter {
             )
         );
         km.bind(
-            BindType.HOLD,
+            ButtonBindType.HOLD,
             Keys.RIGHT,
             new MoveAction<KeyboardManager.KeyEvent>(
                 playerEntity,
@@ -120,7 +120,7 @@ public class GameMaster extends ApplicationAdapter {
             )
         );
         km.bind(
-            BindType.HOLD,
+            ButtonBindType.HOLD,
             Keys.UP,
             new MoveAction<KeyboardManager.KeyEvent>(
                 playerEntity,
@@ -128,7 +128,7 @@ public class GameMaster extends ApplicationAdapter {
             )
         );
         km.bind(
-            BindType.HOLD,
+            ButtonBindType.HOLD,
             Keys.DOWN,
             new MoveAction<KeyboardManager.KeyEvent>(
                 playerEntity,

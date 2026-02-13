@@ -3,33 +3,48 @@ package com.simpulator.engine;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 
 public class ButtonManager<T> {
 
     public enum ButtonBindType {
         DOWN,
         HOLD,
-        UP
+        UP,
     }
-    
-    // Attributes
+
+    @FunctionalInterface
+    public interface EventConstructor<T> {
+        public T apply(
+            int button,
+            ButtonBindType type,
+            Set<Integer> thiFrameButtons
+        );
+    }
+
     private HashSet<Integer> lastFrameButtons = new HashSet<>();
     private HashSet<Integer> thisFrameButtons = new HashSet<>();
 
-    private final HashMap<Integer, ArrayList<Action<T>>> downBindings = new HashMap<>();
-    private final HashMap<Integer, ArrayList<Action<T>>> holdBindings = new HashMap<>();
-    private final HashMap<Integer, ArrayList<Action<T>>> upBindings = new HashMap<>();
+    private final HashMap<Integer, ArrayList<Action<T>>> downBindings =
+        new HashMap<>();
+    private final HashMap<Integer, ArrayList<Action<T>>> holdBindings =
+        new HashMap<>();
+    private final HashMap<Integer, ArrayList<Action<T>>> upBindings =
+        new HashMap<>();
 
-    // Contructors
     public ButtonManager() {}
 
-    public ButtonManager(HashSet<Integer> lastFrameButtons, HashSet<Integer> thisFrameButtons){
+    public ButtonManager(
+        Set<Integer> lastFrameButtons,
+        Set<Integer> thisFrameButtons
+    ) {
         this.lastFrameButtons.addAll(lastFrameButtons);
         this.thisFrameButtons.addAll(thisFrameButtons);
     }
 
-    // ButtonBindType
-    private HashMap<Integer, ArrayList<Action<T>>> getBindings(ButtonBindType type) {
+    private HashMap<Integer, ArrayList<Action<T>>> getBindings(
+        ButtonBindType type
+    ) {
         switch (type) {
             case DOWN:
                 return downBindings;
@@ -38,22 +53,22 @@ public class ButtonManager<T> {
             case UP:
                 return upBindings;
             default:
-                throw new IllegalArgumentException("Unknowm ButtonBindType: " + type);
+                throw new IllegalArgumentException(
+                    "Unknown ButtonBindType: " + type
+                );
         }
     }
 
-    public boolean getButtonDown(int button){
-        return thisFrameButtons.contains(button) && !lastFrameButtons.contains(button);
-    }
-    public boolean getButtonUp(int button){
-        return !thisFrameButtons.contains(button) && lastFrameButtons.contains(button);
+    public boolean getButtonDown(int button) {
+        return thisFrameButtons.contains(button);
     }
 
-    public void setButtonDown(int button){
-        thisFrameButtons.add(button);
-    }
-    public void setButtonUp(int button){
-        thisFrameButtons.remove(button);
+    public void setButton(int button, boolean down) {
+        if (down) {
+            thisFrameButtons.add(button);
+        } else {
+            thisFrameButtons.remove(button);
+        }
     }
 
     public void bind(ButtonBindType type, int button, Action<T> action) {
@@ -61,9 +76,12 @@ public class ButtonManager<T> {
         getBindings(type).get(button).add(action);
     }
 
-    public void unbind(ButtonBindType type,int button, Action<T> action){
+    public void unbind(ButtonBindType type, int button, Action<T> action) {
         if (getBindings(type).containsKey(button)) {
-            getBindings(type).get(button).removeIf(a -> a == action);
+            getBindings(type)
+                .get(button)
+                // Check reference instead of using .equals()
+                .removeIf(a -> a == action);
         }
     }
 
@@ -71,27 +89,43 @@ public class ButtonManager<T> {
         getBindings(type).clear();
     }
 
-    public void update(float deltaTime, float timestamp, T eventData) {
-        for(int button : thisFrameButtons) {
-            if(getButtonDown(button) && downBindings.containsKey(button)) {
-                for (Action<T> action : downBindings.get(button)) {
-                    action.act(deltaTime, eventData);
-                }
-            }
-        }
+    public void unbindAll(ButtonBindType type, int button) {
+        getBindings(type).remove(button);
+    }
 
-        for (int button : thisFrameButtons) {
-            if (holdBindings.containsKey(button)) {
-                for(Action<T> action : holdBindings.get(button)) {
-                    action.act(deltaTime, eventData);
-                }
-            }
+    private HashSet<Integer> computeButtons(ButtonBindType type) {
+        HashSet<Integer> buttons = new HashSet<>();
+        switch (type) {
+            case DOWN:
+                buttons.addAll(thisFrameButtons);
+                buttons.removeAll(lastFrameButtons);
+                break;
+            case HOLD:
+                buttons.addAll(thisFrameButtons);
+                break;
+            case UP:
+                buttons.addAll(lastFrameButtons);
+                buttons.removeAll(thisFrameButtons);
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown BindType: " + type);
         }
+        return buttons;
+    }
 
-        for (int button : lastFrameButtons) {
-            if(getButtonUp(button) && upBindings.containsKey(button)) {
-                for (Action<T> action : upBindings.get(button)) {
-                    action.act(deltaTime, eventData);
+    public void update(float deltaTime, EventConstructor<T> constructor) {
+        for (ButtonBindType type : ButtonBindType.values()) {
+            HashSet<Integer> buttons = computeButtons(type);
+            HashMap<Integer, ArrayList<Action<T>>> bindings = getBindings(type);
+            for (int button : buttons) {
+                if (!bindings.containsKey(button)) {
+                    continue;
+                }
+                for (Action<T> action : bindings.get(button)) {
+                    action.act(
+                        deltaTime,
+                        constructor.apply(button, type, thisFrameButtons)
+                    );
                 }
             }
         }

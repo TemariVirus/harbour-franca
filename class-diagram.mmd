@@ -124,13 +124,12 @@ classDiagram
         + ButtonManager~T~()
         + ButtonManager(lastFrameButtons: HashSet~Integer~, lastFrameButtons: HashSet~Integer~)
         + getButtonDown(button: int) boolean
-        + getButtonUp(button: int) boolean
-        + setButtonDown(button: int) void
-        + setButtonUp(button: int) void
+        + setButton(button: int, down: boolean) void
         + bind(type: ButtonBindType, button: int, action: Action~T~) void
         + unbind(type: ButtonBindType, button: int, action: Action~T~) void
         + unbindAll(type: ButtonBindType) void
-        + update(deltatime: float, timestamp: float) void
+        + unbindAll(type: ButtonBindType, button: int) void
+        + update(deltatime: float, timestamp: float, eventData: T) void
     }
 
     class GraphicsManager {

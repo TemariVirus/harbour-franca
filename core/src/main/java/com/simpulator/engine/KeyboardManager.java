@@ -1,22 +1,15 @@
 package com.simpulator.engine;
 
 import com.badlogic.gdx.InputAdapter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
+import com.simpulator.engine.ButtonManager.ButtonBindType;
+import java.util.Set;
 
 public class KeyboardManager extends InputAdapter {
-
-    public enum BindType {
-        DOWN,
-        HOLD,
-        UP,
-    }
 
     public class KeyEvent {
 
         public final int keycode;
-        public final BindType type;
+        public final ButtonBindType type;
         public final float timestamp;
         public final boolean isShiftPressed;
         public final boolean isCtrlPressed;
@@ -24,9 +17,9 @@ public class KeyboardManager extends InputAdapter {
 
         public KeyEvent(
             int keycode,
-            BindType type,
+            ButtonBindType type,
             float timestamp,
-            HashSet<Integer> pressedKeys
+            Set<Integer> pressedKeys
         ) {
             this.keycode = keycode;
             this.type = type;
@@ -45,110 +38,58 @@ public class KeyboardManager extends InputAdapter {
         }
     }
 
-    private HashSet<Integer> lastFrameKeys = new HashSet<>();
-    private HashSet<Integer> thisFrameKeys = new HashSet<>();
+    private final ButtonManager<KeyEvent> buttonManager;
 
-    private final HashMap<Integer, ArrayList<Action<KeyEvent>>> downBindings =
-        new HashMap<>();
-    private final HashMap<Integer, ArrayList<Action<KeyEvent>>> holdBindings =
-        new HashMap<>();
-    private final HashMap<Integer, ArrayList<Action<KeyEvent>>> upBindings =
-        new HashMap<>();
-
-    public KeyboardManager() {}
+    public KeyboardManager() {
+        buttonManager = new ButtonManager<>();
+    }
 
     public KeyboardManager(
-        HashSet<Integer> lastFrameKeys,
-        HashSet<Integer> thisFrameKeys
+        Set<Integer> lastFrameKeys,
+        Set<Integer> thisFrameKeys
     ) {
-        this.lastFrameKeys.addAll(lastFrameKeys);
-        this.thisFrameKeys.addAll(thisFrameKeys);
+        buttonManager = new ButtonManager<>(lastFrameKeys, thisFrameKeys);
     }
 
     @Override
     public boolean keyDown(int keycode) {
-        thisFrameKeys.add(keycode);
+        buttonManager.setButton(keycode, true);
         return true;
     }
 
     @Override
     public boolean keyUp(int keycode) {
-        thisFrameKeys.remove(keycode);
+        buttonManager.setButton(keycode, false);
         return true;
     }
 
-    private HashMap<Integer, ArrayList<Action<KeyEvent>>> getBindings(
-        BindType type
+    public void bind(
+        ButtonBindType type,
+        int keycode,
+        Action<KeyEvent> action
     ) {
-        switch (type) {
-            case DOWN:
-                return downBindings;
-            case HOLD:
-                return holdBindings;
-            case UP:
-                return upBindings;
-            default:
-                throw new IllegalArgumentException("Unknown BindType: " + type);
-        }
+        buttonManager.bind(type, keycode, action);
     }
 
-    public void bind(BindType type, int keycode, Action<KeyEvent> action) {
-        getBindings(type).putIfAbsent(keycode, new ArrayList<>());
-        getBindings(type).get(keycode).add(action);
+    public void unbind(
+        ButtonBindType type,
+        int keycode,
+        Action<KeyEvent> action
+    ) {
+        buttonManager.unbind(type, keycode, action);
     }
 
-    public void unbind(BindType type, int keycode, Action<KeyEvent> action) {
-        if (getBindings(type).containsKey(keycode)) {
-            // Compare by reference instead of using equals()
-            getBindings(type)
-                .get(keycode)
-                .removeIf(a -> a == action);
-        }
+    public void unbindAll(ButtonBindType type) {
+        buttonManager.unbindAll(type);
     }
 
-    public void unbindAll(BindType type) {
-        getBindings(type).clear();
-    }
-
-    private HashSet<Integer> computeKeys(BindType type) {
-        HashSet<Integer> keys = new HashSet<>();
-        switch (type) {
-            case DOWN:
-                keys.addAll(thisFrameKeys);
-                keys.removeAll(lastFrameKeys);
-                break;
-            case HOLD:
-                keys.addAll(thisFrameKeys);
-                break;
-            case UP:
-                keys.addAll(lastFrameKeys);
-                keys.removeAll(thisFrameKeys);
-                break;
-            default:
-                throw new IllegalArgumentException("Unknown BindType: " + type);
-        }
-        return keys;
+    public void unbindAll(ButtonBindType type, int keycode) {
+        buttonManager.unbindAll(type, keycode);
     }
 
     public void update(float deltaTime, float timestamp) {
-        for (BindType type : BindType.values()) {
-            HashSet<Integer> keys = computeKeys(type);
-            HashMap<Integer, ArrayList<Action<KeyEvent>>> bindings =
-                getBindings(type);
-            for (int key : keys) {
-                if (!bindings.containsKey(key)) {
-                    continue;
-                }
-                for (Action<KeyEvent> action : bindings.get(key)) {
-                    action.act(
-                        deltaTime,
-                        new KeyEvent(key, type, timestamp, thisFrameKeys)
-                    );
-                }
-            }
-        }
-
-        lastFrameKeys.clear();
-        lastFrameKeys.addAll(thisFrameKeys);
+        buttonManager.update(deltaTime, (keycode, bindType, thisFrameKeys) ->
+            new KeyEvent(keycode, bindType, timestamp, thisFrameKeys)
+        );
     }
 }
