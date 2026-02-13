@@ -8,8 +8,10 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.math.collision.OrientedBoundingBox;
 import com.simpulator.engine.ColliderMesh;
+import com.simpulator.engine.Cuboid;
 import com.simpulator.engine.Entity;
 import com.simpulator.engine.Polyhedron;
+import java.util.Arrays;
 
 public class CollidableEntity extends Entity implements ColliderMesh {
 
@@ -35,18 +37,17 @@ public class CollidableEntity extends Entity implements ColliderMesh {
     }
 
     @Override
-    public Polyhedron[] getPolyhedra() {
-        return new Polyhedron[0];
-    }
-
-    @Override
-    public OrientedBoundingBox[] getBoundingBoxes() {
+    public Iterable<Polyhedron> getPolyhedra() {
         BoundingBox localBoundingBox = new BoundingBox(
             getVertex(0, -thickness),
             getVertex(2, thickness)
         );
-        return new OrientedBoundingBox[] {
-            new OrientedBoundingBox(localBoundingBox, transform),
-        };
+        return Arrays.asList(
+            new Polyhedron[] {
+                new Cuboid(
+                    new OrientedBoundingBox(localBoundingBox, transform)
+                ),
+            }
+        );
     }
 }

@@ -6,64 +6,11 @@ import java.util.ArrayList;
 /** Collision detection and resolution. */
 public class CollisionManager {
 
-    public static boolean isSeperatingAxis(
-        Vector3[] verts1,
-        Vector3[] verts2,
-        Vector3 axis
-    ) {
-        float min1 = Float.MAX_VALUE,
-            max1 = Float.MIN_VALUE;
-        float min2 = Float.MAX_VALUE,
-            max2 = Float.MIN_VALUE;
-
-        for (Vector3 vert : verts1) {
-            float distance = vert.dot(axis);
-            min1 = Math.min(min1, distance);
-            max1 = Math.max(max1, distance);
-        }
-
-        for (Vector3 vert : verts2) {
-            float distance = vert.dot(axis);
-            min2 = Math.min(min2, distance);
-            max2 = Math.max(max2, distance);
-        }
-
-        return max1 < min2 || max2 < min1;
-    }
-
     /**
-     * Checks if 2 polygons are intersecting using the separating axis theorem.
-     * https://en.wikipedia.org/wiki/Hyperplane_separation_theorem#Use_in_collision_detection
-     *
-     * @param verts1 The vertices of the first polygon.
-     * @param edges1 The non-parallel edges of the first polygon.
-     * @param verts2 The vertices of the second polygon.
-     * @param edges2 The non-parallel edges of the second polygon.
-     * @return Whether the polygons are intersecting.
+     * Returns whether 2 convex shapes are intersecting using the GJK algorithm.
      */
-    public static boolean polygonIntersects(
-        Vector3[] verts1,
-        Vector3[] edges1,
-        Vector3[] verts2,
-        Vector3[] edges2
-    ) {
-        // Face normals
-        if (isSeperatingAxis(verts1, verts2, edges1[0].cpy().crs(edges1[1]))) {
-            return false;
-        }
-        if (isSeperatingAxis(verts1, verts2, edges2[0].cpy().crs(edges2[1]))) {
-            return false;
-        }
-        // Edge cross products
-        for (Vector3 edge1 : edges1) {
-            for (Vector3 edge2 : edges2) {
-                Vector3 axis = edge1.cpy().crs(edge2);
-                if (isSeperatingAxis(verts1, verts2, axis)) {
-                    return false;
-                }
-            }
-        }
-        return true;
+    public static boolean intersects(GJKTarget movable, GJKTarget immovable) {
+        return GJK.isIntersecting(movable, immovable, new ArrayList<>());
     }
 
     /**
@@ -259,6 +206,9 @@ class GJK {
     ) {
         final int MAX_ITERATIONS = 100;
         Vector3 direction = new Vector3(1, 1, 1).nor();
+        if (simplex == null) {
+            simplex = new ArrayList<>();
+        }
 
         Vector3 simplexNextPoint = shape1
             .furthestPoint(direction, false)
@@ -296,32 +246,32 @@ class Polytope {
     private ArrayList<Vector3> vertices;
     private ArrayList<Face> faces;
 
-    class Pair<T> {
+    /** An edge of the polytope, refering the vertices by index. */
+    private class Edge {
 
-        public T first;
-        public T second;
+        public int p1Index;
+        public int p2Index;
 
-        public Pair(T first, T second) {
-            this.first = first;
-            this.second = second;
+        public Edge(int p1Index, int p2Index) {
+            this.p1Index = p1Index;
+            this.p2Index = p2Index;
         }
 
         @Override
         public boolean equals(Object obj) {
             if (this == obj) return true;
             if (obj == null || getClass() != obj.getClass()) return false;
-            Pair<?> pair = (Pair<?>) obj;
-            return first.equals(pair.first) && second.equals(pair.second);
+            Edge edge = (Edge) obj;
+            return p1Index == edge.p1Index && p2Index == edge.p2Index;
         }
     }
 
-    class Face {
+    /** A face of the polytope, refering the vertices by index. */
+    private class Face {
 
-        /** Indices into the vertices of the polytope. */
         public int p1Index;
         public int p2Index;
         public int p3Index;
-
         public Vector3 normal;
         public float distance;
 
@@ -383,7 +333,7 @@ class Polytope {
     public void expand(Vector3 support) {
         // Remove faces that can "see" the support point
         // and collect their edges
-        ArrayList<Pair<Integer>> uniqueEdgeIndices = new ArrayList<>();
+        ArrayList<Edge> uniqueEdgeIndices = new ArrayList<>();
         for (int i = 0; i < faces.size(); i++) {
             Face face = faces.get(i);
             if (GJK.sameDirection(face.normal, support)) {
@@ -396,21 +346,26 @@ class Polytope {
 
         // Add new faces along the collected edges
         vertices.add(support);
-        for (Pair<Integer> pair : uniqueEdgeIndices) {
+        for (Edge edge : uniqueEdgeIndices) {
             faces.add(
-                new Face(vertices, pair.first, pair.second, vertices.size() - 1)
+                new Face(
+                    vertices,
+                    edge.p1Index,
+                    edge.p2Index,
+                    vertices.size() - 1
+                )
             );
         }
     }
 
     private void addIfUniqueEdge(
-        ArrayList<Pair<Integer>> edges,
-        int aIndex,
-        int bIndex
+        ArrayList<Edge> edges,
+        int p1Index,
+        int p2Index
     ) {
-        int reverseIndex = edges.indexOf(new Pair<Integer>(bIndex, aIndex));
+        int reverseIndex = edges.indexOf(new Edge(p2Index, p1Index));
         if (reverseIndex < 0) {
-            edges.add(new Pair<Integer>(aIndex, bIndex));
+            edges.add(new Edge(p1Index, p2Index));
         } else {
             ListUtil.swapRemove(edges, reverseIndex);
         }
