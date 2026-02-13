@@ -1,0 +1,117 @@
+---
+config:
+    theme: neutral
+    layout: elk
+    defaultRenderer: elk
+    elk:
+        nodePlacementStrategy: NETWORK_SIMPLEX
+---
+
+classDiagram
+    Entity ..|> Renderable~T~: #60;#60;binds#62;#62; #60;T -> SpriteBatch#62;
+    Entity --o EntityManager: aggregates
+    Entity ..|> Moveable
+    EntityManager --* Scene
+    Cuboid --|> Polyhedron
+    Polyhedron ..|> GJKTarget
+    ColliderMesh --|> Moveable
+    Polyhedron ..> CollisionManager: Uses
+    CollisionManager ..> GJKTarget: Uses
+    GraphicsManager --o SceneManager
+    ResourceCache~K&comma; V: Disposable~ ..|> Disposable
+    Scene --o SceneManager: aggregates
+    TextureManager --|> ResourceCache: #60;#60;bind#62;#62; #60;K -> String, V -> Texture#62;
+    TextureManager --* Scene
+    MouseManager ..> MouseMoveEvent: Creates
+    SoundManager --|> ResourceCache: #60;#60;bind#62;#62; #60;K -> String, V -> Sound#62;
+    SoundManager --* Scene
+    KeyboardManager --|> InputAdapter
+    KeyboardManager ..> KeyEvent: Creates
+    KeyboardManager --* ButtonManager~T~: #60;#60;binds#62;#62; #60;T -> KeyEvent#62;
+    KeyEvent --* ButtonBindType
+    MouseButtonEvent --* ButtonBindType
+    MouseManager --* ButtonManager~T~: #60;#60;binds#62;#62; #60;T -> MouseButtonEvent#62;
+    MouseManager ..> MouseButtonEvent: Creates
+    MouseManager ..> MouseScrollEvent: Creates
+    MouseManager --|> InputAdapter
+
+    class Action~T~ {
+        <<interface>>
+    }
+
+    class ColliderMesh {
+        <<interface>>
+
+       }
+
+    class CollisionManager {
+       }
+
+    class Cuboid {
+        }
+
+    class Entity {
+        }
+
+    class EntityManager {
+         }
+
+    class ButtonBindType {
+         }
+
+    class ButtonManager~T~ {
+       }
+
+    class GraphicsManager {
+       }
+
+    class KeyboardManager {
+       }
+
+    class KeyEvent {
+       }
+
+    class MouseButtonEvent {
+       }
+
+    class MouseManager {
+       }
+
+    class MouseMoveEvent {
+       }
+
+    class MouseScrollEvent {
+       }
+
+    class Moveable {
+        + translate(delta: Vector3) void
+        + rotate(axis: Vector3, radians: float) void
+      }
+
+    class Polyhedron {
+        }
+
+    class Renderable~T~ {
+        <<interface>>
+    }
+
+    class ResourceCache~K&comma; V: Disposable~ {
+        }
+
+    class Scene {
+       }
+
+    class SceneManager {
+        }
+
+    class SoundManager {
+      
+    }
+
+    class TextureManager {
+    }
+
+    class GJKTarget {
+        <<interface>>
+
+    }
