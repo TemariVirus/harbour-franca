@@ -1,6 +1,7 @@
 package com.simpulator.engine;
 
 import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Disposable;
@@ -65,6 +66,29 @@ public class GraphicsManager implements Disposable {
         for (Entity e : entities) {
             if (e != null) e.render(batch, camera);
         }
+    }
+
+    public void renderText(
+        BitmapFont font,
+        CharSequence str,
+        float x,
+        float y
+    ) {
+        beginRender();
+        font.draw(batch, str, x, y);
+    }
+
+    public void renderText(
+        BitmapFont font,
+        CharSequence str,
+        float x,
+        float y,
+        float targetWidth,
+        int halign,
+        boolean wrap
+    ) {
+        beginRender();
+        font.draw(batch, str, x, y, targetWidth, halign, wrap);
     }
 
     public void endRender() {
