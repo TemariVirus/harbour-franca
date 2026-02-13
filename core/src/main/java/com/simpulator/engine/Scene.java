@@ -1,30 +1,22 @@
 package com.simpulator.engine;
 
-import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Texture;
 
+public abstract class Scene {
 
-public class Scene {
-    private Camera camera;
     protected EntityManager entityManager;
     protected SoundManager sounds;
     protected TextureManager textures;
 
     public Scene() {
-        this.entityManager = new EntityManager();
-        this.sounds = new SoundManager();
-        this.textures = new TextureManager();
+        entityManager = new EntityManager();
+        sounds = new SoundManager();
+        textures = new TextureManager();
     }
 
-    public void load() {
-
-    }
-
-
-    public void unload() {
-        sounds.dispose();
-        textures.dispose();
+    public EntityManager getEntityManager() {
+        return entityManager;
     }
 
     public Sound getSound(String path) {
@@ -35,13 +27,22 @@ public class Scene {
         return textures.get(path);
     }
 
+    public abstract void load();
+
+    public void unload() {
+        // These fields can be safely reused in the next load()
+        entityManager.removeAll();
+        sounds.dispose();
+        textures.dispose();
+    }
 
     public void update(float deltaTime) {
         entityManager.update(deltaTime);
     }
 
-
-    public void render(GraphicsManager graphics) {
-
+    public long playSound(String path) {
+        return sounds.play(path);
     }
+
+    public abstract void render(GraphicsManager graphics);
 }

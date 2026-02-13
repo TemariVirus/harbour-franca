@@ -25,12 +25,12 @@ public class MainGame extends Scene {
     private SceneManager sceneManager;
 
     public MainGame(SceneManager sceneManager) {
+        super();
         this.sceneManager = sceneManager;
     }
 
     @Override
     public void load() {
-        // Cam
         playerCamera = new PerspectiveCamera(
             70,
             Gdx.graphics.getWidth(),
@@ -90,6 +90,7 @@ public class MainGame extends Scene {
             }
         );
 
+        // TODO: add input processor to abstract engine that has all input managers
         Gdx.input.setInputProcessor(km);
     }
 
