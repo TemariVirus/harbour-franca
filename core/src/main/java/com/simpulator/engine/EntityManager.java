@@ -3,6 +3,7 @@ package com.simpulator.engine;
 import java.util.ArrayList;
 
 public class EntityManager {
+
     private ArrayList<Entity> entities;
 
     public EntityManager() {
@@ -14,9 +15,11 @@ public class EntityManager {
     }
 
     public void remove(Entity entity) {
-        if (entities.contains(entity)) {
-            this.entities.remove(entity);
-        }
+        this.entities.remove(entity);
+    }
+
+    public void removeAll() {
+        this.entities.clear();
     }
 
     public void update(float deltaTime) {
@@ -28,5 +31,4 @@ public class EntityManager {
     public ArrayList<Entity> getEntities() {
         return new ArrayList<>(entities);
     }
-
 }
