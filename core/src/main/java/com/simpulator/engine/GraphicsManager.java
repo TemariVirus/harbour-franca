@@ -1,22 +1,20 @@
 package com.simpulator.engine;
 
-import com.badlogic.gdx.Gdx;
+import java.util.Arrays;
+import java.util.Comparator;
+
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Disposable;
 
-public class GraphicsManager {
+public class GraphicsManager implements Disposable {
 
     protected SpriteBatch batch = new SpriteBatch();
     protected boolean isRendering = false;
 
-    private final Matrix4 screenProj = new Matrix4();
-
     private void beginRender() {
         if (isRendering) return;
-
-        screenProj.setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        batch.setProjectionMatrix(screenProj);
 
         batch.begin();
         isRendering = true;
@@ -34,6 +32,28 @@ public class GraphicsManager {
         if (entities == null) return;
         if (camera == null) throw new IllegalArgumentException("camera cannot be null");
 
+        Arrays.sort(entities, new Comparator<Entity>() {
+            Vector3 tmpA = new Vector3();
+            Vector3 tmpB = new Vector3();
+
+            @Override
+            public int compare(Entity a, Entity b) {
+                if (a == null && b == null) return 0;
+                if (a == null) return 1;
+                if (b == null) return -1;
+
+                tmpA.set(a.getPosition());
+                camera.project(tmpA);
+                float za = tmpA.z;
+
+                tmpB.set(b.getPosition());
+                camera.project(tmpB);
+                float zb = tmpB.z;
+
+                return Float.compare(zb, za);
+            }
+        });
+
         beginRender();
         for (Entity e : entities) {
             if (e != null) e.render(batch, camera);
@@ -46,6 +66,7 @@ public class GraphicsManager {
         isRendering = false;
     }
 
+    @Override
     public void dispose() {
         batch.dispose();
     }
