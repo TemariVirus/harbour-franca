@@ -34,8 +34,8 @@ public class MainGame extends SwitchableScene {
         );
         playerCamera.position.set(0, 0, 0);
         playerCamera.lookAt(0, 0, 0);
-        playerCamera.near = 1f;
-        playerCamera.far = 300f;
+        playerCamera.near = 10f;
+        playerCamera.far = 3000f;
         playerCamera.update();
 
         pushable = new CollidableEntity(
@@ -59,18 +59,19 @@ public class MainGame extends SwitchableScene {
 
         km = new KeyboardManager();
 
-        km.bind(ButtonBindType.HOLD, Keys.W, new MoveCameraAction(playerCamera, new Vector3(0, 0, -100)));
-        km.bind(ButtonBindType.HOLD, Keys.A, new MoveCameraAction(playerCamera, new Vector3(-100, 0, 0)));
-        km.bind(ButtonBindType.HOLD, Keys.S, new MoveCameraAction(playerCamera, new Vector3(0, 0, 100)));
-        km.bind(ButtonBindType.HOLD, Keys.D, new MoveCameraAction(playerCamera, new Vector3(100, 0, 0)));
-        km.bind(ButtonBindType.HOLD, Keys.SHIFT_LEFT, new MoveCameraAction(playerCamera, new Vector3(0, -100, 0)));
-        km.bind(ButtonBindType.HOLD, Keys.SPACE, new MoveCameraAction(playerCamera, new Vector3(0, 100, 0)));
+        MoveableCamera moveableCam = new MoveableCamera(playerCamera);
+        km.bind(ButtonBindType.HOLD, Keys.W, new MoveAction(moveableCam, new Vector3(0, 0, -100)));
+        km.bind(ButtonBindType.HOLD, Keys.A, new MoveAction(moveableCam, new Vector3(-100, 0, 0)));
+        km.bind(ButtonBindType.HOLD, Keys.S, new MoveAction(moveableCam, new Vector3(0, 0, 100)));
+        km.bind(ButtonBindType.HOLD, Keys.D, new MoveAction(moveableCam, new Vector3(100, 0, 0)));
+        km.bind(ButtonBindType.HOLD, Keys.SHIFT_LEFT, new MoveAction(moveableCam, new Vector3(0, -100, 0)));
+        km.bind(ButtonBindType.HOLD, Keys.SPACE, new MoveAction(moveableCam, new Vector3(0, 100, 0)));
 
-        km.bind(ButtonBindType.HOLD, Keys.R, new MoveAction<>(pushable, new Vector3(1, 0, 1), 4));
-        km.bind(ButtonBindType.HOLD, Keys.LEFT, new MoveAction<>(playerEntity, new Vector3(-100, 0, 0)));
-        km.bind(ButtonBindType.HOLD, Keys.RIGHT, new MoveAction<>(playerEntity, new Vector3(100, 0, 0)));
-        km.bind(ButtonBindType.HOLD, Keys.UP, new MoveAction<>(playerEntity, new Vector3(0, 0, -100)));
-        km.bind(ButtonBindType.HOLD, Keys.DOWN, new MoveAction<>(playerEntity, new Vector3(0, 0, 100)));
+        km.bind(ButtonBindType.HOLD, Keys.R, new MoveAction(pushable, new Vector3(1, 0, 1), 4));
+        km.bind(ButtonBindType.HOLD, Keys.LEFT, new MoveAction(playerEntity, new Vector3(-100, 0, 0)));
+        km.bind(ButtonBindType.HOLD, Keys.RIGHT, new MoveAction(playerEntity, new Vector3(100, 0, 0)));
+        km.bind(ButtonBindType.HOLD, Keys.UP, new MoveAction(playerEntity, new Vector3(0, 0, -100)));
+        km.bind(ButtonBindType.HOLD, Keys.DOWN, new MoveAction(playerEntity, new Vector3(0, 0, 100)));
 
         km.bind(ButtonBindType.DOWN, Keys.ESCAPE, switchSceneAction(Scenes.MainMenu));
 

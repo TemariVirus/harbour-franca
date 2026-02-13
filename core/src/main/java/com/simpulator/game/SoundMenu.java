@@ -26,7 +26,7 @@ public class SoundMenu extends SwitchableScene {
 
     private <T> Action<T> changeVolumeAction(float amount) {
         return new Action<T>() {
-            public void act(float deltaTime, T extraData) {
+            public void act(T data) {
                 float current = sounds.getVolume();
                 float target = current + amount;
 
@@ -47,8 +47,16 @@ public class SoundMenu extends SwitchableScene {
         font.getData().setScale(2);
 
         km = new KeyboardManager();
-        km.bind(ButtonBindType.DOWN, Keys.ESCAPE, switchSceneAction(Scenes.MainMenu));
-        km.bind(ButtonBindType.DOWN, Keys.BACKSPACE, switchSceneAction(Scenes.MainMenu));
+        km.bind(
+            ButtonBindType.DOWN,
+            Keys.ESCAPE,
+            switchSceneAction(Scenes.MainMenu)
+        );
+        km.bind(
+            ButtonBindType.DOWN,
+            Keys.BACKSPACE,
+            switchSceneAction(Scenes.MainMenu)
+        );
         km.bind(ButtonBindType.DOWN, Keys.LEFT, changeVolumeAction(-0.1f));
         km.bind(ButtonBindType.DOWN, Keys.RIGHT, changeVolumeAction(0.1f));
 

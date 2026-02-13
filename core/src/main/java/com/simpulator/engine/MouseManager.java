@@ -11,6 +11,7 @@ public class MouseManager extends InputAdapter {
 
         public final int x, y;
         public final int deltaX, deltaY;
+        public final float deltaTime;
         public final float timestamp;
 
         public MouseMoveEvent(
@@ -18,12 +19,14 @@ public class MouseManager extends InputAdapter {
             int y,
             int deltaX,
             int deltaY,
+            float deltaTime,
             float timestamp
         ) {
             this.x = x;
             this.y = y;
             this.deltaX = deltaX;
             this.deltaY = deltaY;
+            this.deltaTime = deltaTime;
             this.timestamp = timestamp;
         }
     }
@@ -34,6 +37,7 @@ public class MouseManager extends InputAdapter {
         public final int pointer;
         public final int button;
         public final ButtonBindType type;
+        public final float deltaTime;
         public final float timestamp;
 
         public MouseButtonEvent(
@@ -42,6 +46,7 @@ public class MouseManager extends InputAdapter {
             int pointer,
             int button,
             ButtonBindType type,
+            float deltaTime,
             float timestamp
         ) {
             this.x = x;
@@ -49,6 +54,7 @@ public class MouseManager extends InputAdapter {
             this.pointer = pointer;
             this.button = button;
             this.type = type;
+            this.deltaTime = deltaTime;
             this.timestamp = timestamp;
         }
     }
@@ -56,11 +62,18 @@ public class MouseManager extends InputAdapter {
     public class MouseScrollEvent {
 
         public final float scrollX, scrollY;
+        public final float deltaTime;
         public final float timestamp;
 
-        public MouseScrollEvent(float scrollX, float scrollY, float timestamp) {
+        public MouseScrollEvent(
+            float scrollX,
+            float scrollY,
+            float deltaTime,
+            float timestamp
+        ) {
             this.scrollX = scrollX;
             this.scrollY = scrollY;
+            this.deltaTime = deltaTime;
             this.timestamp = timestamp;
         }
     }
@@ -166,25 +179,26 @@ public class MouseManager extends InputAdapter {
     }
 
     public void update(float deltaTime, float timestamp) {
-        buttonManager.update(deltaTime, (button, type, thisFrameButtons) ->
+        buttonManager.update((button, type, thisFrameButtons) ->
             new MouseButtonEvent(
                 thisFrameX,
                 thisFrameY,
                 0,
                 button,
                 type,
+                deltaTime,
                 timestamp
             )
         );
 
         for (Action<MouseMoveEvent> action : moveBindings) {
             action.act(
-                deltaTime,
                 new MouseMoveEvent(
                     thisFrameX,
                     thisFrameY,
                     thisFrameX - lastFrameX,
                     thisFrameY - lastFrameY,
+                    deltaTime,
                     timestamp
                 )
             );
@@ -192,8 +206,7 @@ public class MouseManager extends InputAdapter {
 
         for (Action<MouseScrollEvent> action : scrollBindings) {
             action.act(
-                deltaTime,
-                new MouseScrollEvent(scrolledX, scrolledY, timestamp)
+                new MouseScrollEvent(scrolledX, scrolledY, deltaTime, timestamp)
             );
         }
 

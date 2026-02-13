@@ -2,9 +2,10 @@ package com.simpulator.game;
 
 import com.badlogic.gdx.math.Vector3;
 import com.simpulator.engine.Action;
+import com.simpulator.engine.KeyboardManager;
 import com.simpulator.engine.Moveable;
 
-public class MoveAction<T> implements Action<T> {
+public class MoveAction implements Action<KeyboardManager.KeyEvent> {
 
     /** The object this action acts on. */
     protected Moveable target;
@@ -70,12 +71,12 @@ public class MoveAction<T> implements Action<T> {
     }
 
     @Override
-    public void act(float deltaTime, T extraData) {
-        if (deltaTime <= 0) {
+    public void act(KeyboardManager.KeyEvent event) {
+        if (event.deltaTime <= 0) {
             return;
         }
 
-        target.translate(velocity.cpy().scl(deltaTime));
-        target.rotate(rotationAxis, rotationSpeed * deltaTime);
+        target.translate(velocity.cpy().scl(event.deltaTime));
+        target.rotate(rotationAxis, rotationSpeed * event.deltaTime);
     }
 }

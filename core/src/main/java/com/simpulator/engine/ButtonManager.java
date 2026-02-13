@@ -113,7 +113,7 @@ public class ButtonManager<T> {
         return buttons;
     }
 
-    public void update(float deltaTime, EventConstructor<T> constructor) {
+    public void update(EventConstructor<T> constructor) {
         for (ButtonBindType type : ButtonBindType.values()) {
             HashSet<Integer> buttons = computeButtons(type);
             HashMap<Integer, ArrayList<Action<T>>> bindings = getBindings(type);
@@ -123,7 +123,6 @@ public class ButtonManager<T> {
                 }
                 for (Action<T> action : bindings.get(button)) {
                     action.act(
-                        deltaTime,
                         constructor.apply(button, type, thisFrameButtons)
                     );
                 }

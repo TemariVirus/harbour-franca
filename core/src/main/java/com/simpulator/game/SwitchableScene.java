@@ -15,7 +15,7 @@ public abstract class SwitchableScene extends Scene {
 
     protected <T> Action<T> switchSceneAction(String sceneName) {
         return new Action<T>() {
-            public void act(float deltaTime, T extraData) {
+            public void act(T data) {
                 sceneManager.switchScene(sceneName);
             }
         };

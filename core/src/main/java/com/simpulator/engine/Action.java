@@ -1,5 +1,7 @@
 package com.simpulator.engine;
 
+/** Capable of performing an action. */
 public interface Action<T> {
-    public void act(float deltaTime, T extraData);
+    /** Perform the action, parameterised by the given data. */
+    public void act(T data);
 }

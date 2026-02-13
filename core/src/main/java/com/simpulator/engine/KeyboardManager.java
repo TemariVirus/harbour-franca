@@ -10,6 +10,7 @@ public class KeyboardManager extends InputAdapter {
 
         public final int keycode;
         public final ButtonBindType type;
+        public final float deltaTime;
         public final float timestamp;
         public final boolean isShiftPressed;
         public final boolean isCtrlPressed;
@@ -18,11 +19,13 @@ public class KeyboardManager extends InputAdapter {
         public KeyEvent(
             int keycode,
             ButtonBindType type,
+            float deltaTime,
             float timestamp,
             Set<Integer> pressedKeys
         ) {
             this.keycode = keycode;
             this.type = type;
+            this.deltaTime = deltaTime;
             this.timestamp = timestamp;
             this.isShiftPressed =
                 pressedKeys.contains(com.badlogic.gdx.Input.Keys.SHIFT_LEFT) ||
@@ -88,8 +91,8 @@ public class KeyboardManager extends InputAdapter {
     }
 
     public void update(float deltaTime, float timestamp) {
-        buttonManager.update(deltaTime, (keycode, bindType, thisFrameKeys) ->
-            new KeyEvent(keycode, bindType, timestamp, thisFrameKeys)
+        buttonManager.update((keycode, bindType, thisFrameKeys) ->
+            new KeyEvent(keycode, bindType, deltaTime, timestamp, thisFrameKeys)
         );
     }
 }
