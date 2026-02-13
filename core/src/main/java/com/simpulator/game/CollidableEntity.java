@@ -38,16 +38,13 @@ public class CollidableEntity extends Entity implements ColliderMesh {
 
     @Override
     public Iterable<Polyhedron> getPolyhedra() {
-        BoundingBox localBoundingBox = new BoundingBox(
-            getVertex(0, -thickness),
-            getVertex(2, thickness)
-        );
-        return Arrays.asList(
-            new Polyhedron[] {
-                new Cuboid(
-                    new OrientedBoundingBox(localBoundingBox, transform)
-                ),
-            }
-        );
+        Vector3 minCorner = getLocalVertex(0);
+        minCorner.z = -thickness;
+        Vector3 maxCorner = getLocalVertex(2);
+        maxCorner.z = thickness;
+
+        BoundingBox box = new BoundingBox(minCorner, maxCorner);
+        Cuboid cuboid = new Cuboid(new OrientedBoundingBox(box, transform));
+        return Arrays.asList(new Polyhedron[] { cuboid });
     }
 }

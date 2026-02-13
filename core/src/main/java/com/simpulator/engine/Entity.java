@@ -128,13 +128,6 @@ public class Entity implements Moveable, Renderable<SpriteBatch> {
         return getLocalVertex(index).mul(transform);
     }
 
-    /** Returns the vertex in world space with a local Z offset, indexed in clockwise order. */
-    public Vector3 getVertex(int index, float localZ) {
-        Vector3 localVertex = getLocalVertex(index);
-        localVertex.z = localZ;
-        return localVertex.mul(transform);
-    }
-
     /** Returns all vertices in world space in clockwise order. */
     public Vector3[] getVertices() {
         return new Vector3[] {
