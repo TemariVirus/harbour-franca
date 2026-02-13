@@ -3,6 +3,7 @@ package com.simpulator.engine;
 import com.badlogic.gdx.math.Vector3;
 import java.util.ArrayList;
 
+/** Collision detection and resolution. */
 public class CollisionManager {
 
     public static boolean isSeperatingAxis(
@@ -66,9 +67,8 @@ public class CollisionManager {
     }
 
     /**
-     * Checks if 2 convex shapes are intersecting using the GJK algorithm.
+     * Returns whether 2 convex shapes are intersecting using the GJK algorithm.
      * If they intersect, the minimum translation vector (moving movable) to separate them is stored in outMtv.
-     * The previous frame's minimum translation vector may be provided to speed up the calculation.
      * https://en.wikipedia.org/wiki/Gilbert%E2%80%93Johnson%E2%80%93Keerthi_distance_algorithm
      */
     public static boolean intersects(
@@ -86,6 +86,7 @@ public class CollisionManager {
             return false;
         }
 
+        // Collision detected; Expand Polytope Algorithm to find MTV
         Polytope polytope = new Polytope(simplex);
         for (int iters = 0; iters < MAX_ITERATIONS; iters++) {
             Vector3 faceNormal = polytope.closestFaceNormalToOrigin();
@@ -114,13 +115,15 @@ public class CollisionManager {
     }
 }
 
-/** GJK algorithm and its helper functions. */
+/** GJK algorithm implementation. */
 class GJK {
 
+    /** Returns whether 2 vectors generally point in the same direction. */
     public static boolean sameDirection(Vector3 a, Vector3 b) {
         return a.dot(b) > 0;
     }
 
+    /** Handles the case where the simplex is a line segment. */
     private static boolean handleLine(
         ArrayList<Vector3> simplex,
         Vector3 direction
@@ -141,6 +144,7 @@ class GJK {
         return false;
     }
 
+    /** Handles the case where the simplex is a triangle. */
     private static boolean handleTriangle(
         ArrayList<Vector3> simplex,
         Vector3 direction
@@ -180,6 +184,7 @@ class GJK {
         return false;
     }
 
+    /** Handles the case where the simplex is a tetrahedron. */
     private static boolean handleTetrahedron(
         ArrayList<Vector3> simplex,
         Vector3 direction
@@ -285,7 +290,7 @@ class GJK {
     }
 }
 
-/** 3D Polytope for Expanding Polytope Algorithm. */
+/** 3D Polytope used in the Expanding Polytope Algorithm. */
 class Polytope {
 
     private ArrayList<Vector3> vertices;
@@ -348,6 +353,7 @@ class Polytope {
         }
     }
 
+    /** Create a new polytope with the same shape as the given tetrahedron. */
     public Polytope(ArrayList<Vector3> tetrahedron) {
         assert tetrahedron.size() == 4 : "Simplex must be a tetrahedron.";
 
@@ -360,6 +366,7 @@ class Polytope {
         faces.add(new Face(this.vertices, 1, 3, 2));
     }
 
+    /** Returns the polytope's face that is closest to the origin. */
     public Vector3 closestFaceNormalToOrigin() {
         float minDistance = Float.POSITIVE_INFINITY;
         Face closestFace = null;
@@ -372,6 +379,7 @@ class Polytope {
         return closestFace.normal.cpy().scl(closestFace.distance);
     }
 
+    /** Adds a new point to the polytope, assuming the point is outside the polytope. */
     public void expand(Vector3 support) {
         // Remove faces that can "see" the support point
         // and collect their edges

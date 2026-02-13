@@ -13,7 +13,7 @@ import com.badlogic.gdx.math.collision.OrientedBoundingBox;
 
 /**
  * A rectangular entity with 3D position, 2D size, and 3D rotation.
- * The appearence is defined by a TextureRegion.
+ * The appearence is defined by a TextureRegion and tint.
  */
 public class Entity implements Moveable, Renderable<SpriteBatch> {
 
@@ -43,12 +43,14 @@ public class Entity implements Moveable, Renderable<SpriteBatch> {
         this.textureRegion = textureRegion;
     }
 
+    /** Returns the center of the entity in world space. */
     public Vector3 getPosition() {
         Vector3 position = new Vector3();
         transform.getTranslation(position);
         return position;
     }
 
+    /** Sets the center of the entity in world space. */
     public void setPosition(Vector3 position) {
         transform.setTranslation(position);
     }
@@ -77,10 +79,12 @@ public class Entity implements Moveable, Renderable<SpriteBatch> {
         transform.set(position, rotation.nor(), scale);
     }
 
+    /** Sets the rotation of the entity in world space. */
     public void setRotation(Vector3 axis, float radians) {
         transform.setToRotationRad(axis, radians);
     }
 
+    /** Returns the entity's world space transform. */
     public Matrix4 getTransform() {
         return transform.cpy();
     }
@@ -156,6 +160,11 @@ public class Entity implements Moveable, Renderable<SpriteBatch> {
         transform.rotate(delta);
     }
 
+    /**
+     * Update the entity's state. Usually called once per frame.
+     *
+     * @param deltaTime The time elapsed since the last update, in seconds.
+     */
     public void update(float deltaTime) {}
 
     @Override
@@ -163,6 +172,7 @@ public class Entity implements Moveable, Renderable<SpriteBatch> {
         transform.rotateRad(axis, radians);
     }
 
+    /** Applies the given matrix to the entity's world space transform. */
     public void transform(Matrix4 transform) {
         this.transform.mul(transform);
     }

@@ -5,6 +5,7 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Disposable;
 
+/** Manages streaming music files. */
 public class MusicManager implements Disposable {
 
     private class MusicCache extends ResourceCache<String, Music> {
@@ -29,10 +30,12 @@ public class MusicManager implements Disposable {
     private final MusicCache musicCache = new MusicCache();
     private float volume = 1f;
 
+    /** Get the current volume. */
     public float getVolume() {
         return volume;
     }
 
+    /** Set a new volume. Currently playing musics are affected as well. */
     public void setVolume(float volume) {
         this.volume = MathUtils.clamp(volume, 0f, 1f);
         for (Music music : musicCache.values()) {
@@ -40,29 +43,33 @@ public class MusicManager implements Disposable {
         }
     }
 
+    /** Returns whether the given file is playing. */
     public boolean isMusicPlaying(String path) {
         Music music = musicCache.get(path);
-        return music != null && music.isPlaying();
+        return music.isPlaying();
     }
 
+    /** Start playing the given file. */
     public void startMusic(String path) {
         Music music = musicCache.get(path);
-        if (music != null && !music.isPlaying()) {
+        if (!music.isPlaying()) {
             music.setVolume(volume);
             music.play();
         }
     }
 
+    /** Pause playback of the given file. startMusic() will resume at the current position. */
     public void pauseMusic(String path) {
         Music music = musicCache.get(path);
-        if (music != null && music.isPlaying()) {
+        if (music.isPlaying()) {
             music.pause();
         }
     }
 
+    /** Stop playback of the given file. startMusic() will start from the beginning. */
     public void stopMusic(String path) {
         Music music = musicCache.get(path);
-        if (music != null && music.isPlaying()) {
+        if (music.isPlaying()) {
             music.stop();
         }
     }

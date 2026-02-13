@@ -5,13 +5,23 @@ import com.badlogic.gdx.InputAdapter;
 import com.simpulator.engine.ButtonManager.ButtonBindType;
 import java.util.ArrayList;
 
+/** Invokes actions from mouse inputs. */
 public class MouseManager extends InputAdapter {
 
+    /** Represents a mouse movement event. */
     public class MouseMoveEvent {
 
-        public final int x, y;
-        public final int deltaX, deltaY;
+        /** The x position of the mouse, in pixels */
+        public final int x;
+        /** The y position of the mouse, in pixels */
+        public final int y;
+        /** The change in x position since last update, in pixels */
+        public final int deltaX;
+        /** The change in y position since last update, in pixels */
+        public final int deltaY;
+        /** Time since last update, in seconds. */
         public final float deltaTime;
+        /** Time since some epoch, in seconds. */
         public final float timestamp;
 
         public MouseMoveEvent(
@@ -31,13 +41,22 @@ public class MouseManager extends InputAdapter {
         }
     }
 
+    /** Represents a mouse button event. */
     public class MouseButtonEvent {
 
-        public final int x, y;
+        /** The x position of the mouse, in pixels */
+        public final int x;
+        /** The y position of the mouse, in pixels */
+        public final int y;
+        /** The pointer that the button belongs to. */
         public final int pointer;
+        /** The relevant button. */
         public final int button;
+        /** Whether the button was pressed, held, or released. */
         public final ButtonBindType type;
+        /** Time since last update, in seconds. */
         public final float deltaTime;
+        /** Time since some epoch, in seconds. */
         public final float timestamp;
 
         public MouseButtonEvent(
@@ -59,10 +78,16 @@ public class MouseManager extends InputAdapter {
         }
     }
 
+    /** Represents a mouse scroll event. */
     public class MouseScrollEvent {
 
-        public final float scrollX, scrollY;
+        /** The amount scrolled in the x direction. */
+        public final float scrollX;
+        /** The amount scrolled in the y direction. */
+        public final float scrollY;
+        /** Time since last update, in seconds. */
         public final float deltaTime;
+        /** Time since some epoch, in seconds. */
         public final float timestamp;
 
         public MouseScrollEvent(
@@ -130,6 +155,7 @@ public class MouseManager extends InputAdapter {
         return true;
     }
 
+    /** Bind the given action to a button and event type. */
     public void bindButton(
         ButtonBindType type,
         int button,
@@ -138,6 +164,7 @@ public class MouseManager extends InputAdapter {
         buttonManager.bind(type, button, action);
     }
 
+    /** Unbind all instances of the given action from a button and event type. */
     public void unbindButton(
         ButtonBindType type,
         int button,
@@ -146,38 +173,52 @@ public class MouseManager extends InputAdapter {
         buttonManager.bind(type, button, action);
     }
 
+    /** Unbind all actions from the given button event type */
     public void unbindAllButton(ButtonBindType type) {
         buttonManager.unbindAll(type);
     }
 
+    /** Unbind all actions from the given button and event type. */
     public void unbindAllButton(ButtonBindType type, int button) {
         buttonManager.unbindAll(type, button);
     }
 
+    /** Bind the given action to mouse movement events. */
     public void bindMove(Action<MouseMoveEvent> action) {
         moveBindings.add(action);
     }
 
+    /** Unbind all instances of the given action from mouse movement events. */
     public void unbindMove(Action<MouseMoveEvent> action) {
         moveBindings.remove(action);
     }
 
+    /** Unbind all actions from mouse movement events. */
     public void unbindAllMove() {
         moveBindings.clear();
     }
 
+    /** Bind the given action to mouse scroll events. */
     public void bindScroll(Action<MouseScrollEvent> action) {
         scrollBindings.add(action);
     }
 
+    /** Unbind all instances of the given action from mouse scroll events. */
     public void unbindScroll(Action<MouseScrollEvent> action) {
         scrollBindings.remove(action);
     }
 
+    /** Unbind all actions from mouse scroll events. */
     public void unbindAllScroll() {
         scrollBindings.clear();
     }
 
+    /**
+     * Processes button state updates and invokes the appropriate actions.
+     *
+     * @param deltaTime The time elapsed since the last update, in seconds.
+     * @param timestamp The time since some epoch, in seconds.
+     */
     public void update(float deltaTime, float timestamp) {
         buttonManager.update((button, type, thisFrameButtons) ->
             new MouseButtonEvent(

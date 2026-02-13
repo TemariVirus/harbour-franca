@@ -2,6 +2,7 @@ package com.simpulator.engine;
 
 import java.util.List;
 
+/** Utilities for dealing with List<T>. */
 class ListUtil {
 
     /** Swap the position of the 2 indices. */

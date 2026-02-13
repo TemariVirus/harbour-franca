@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.math.collision.OrientedBoundingBox;
 
+/** Converts an oriented bounding box to the Polyhedron class. */
 public class Cuboid extends Polyhedron {
 
     private static final int[][] FACE_VERTEX_INDICES = new int[][] {

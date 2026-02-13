@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.Disposable;
 import java.util.Arrays;
 import java.util.Comparator;
 
+/** Manages rendering of entities and text. */
 public class GraphicsManager implements Disposable {
 
     protected SpriteBatch batch = new SpriteBatch();
@@ -20,6 +21,7 @@ public class GraphicsManager implements Disposable {
         isRendering = true;
     }
 
+    /** Render a single entity from the camera's perspective, on top of everything so far. */
     public void renderEntity(Entity entity, Camera camera) {
         if (entity == null) return;
         if (camera == null) throw new IllegalArgumentException(
@@ -30,6 +32,7 @@ public class GraphicsManager implements Disposable {
         entity.render(batch, camera);
     }
 
+    /** Render multiple entities from the camera's perspective. The entities are rendered back to front. */
     public void renderEntities(Entity[] entities, Camera camera) {
         if (entities == null) return;
         if (camera == null) throw new IllegalArgumentException(
@@ -67,6 +70,7 @@ public class GraphicsManager implements Disposable {
         }
     }
 
+    /** Render text at the given screen position, on top of everything so far. */
     public void renderText(
         BitmapFont font,
         CharSequence str,
@@ -77,6 +81,7 @@ public class GraphicsManager implements Disposable {
         font.draw(batch, str, x, y);
     }
 
+    /** Render text at the given screen position, on top of everything so far. */
     public void renderText(
         BitmapFont font,
         CharSequence str,
@@ -90,6 +95,7 @@ public class GraphicsManager implements Disposable {
         font.draw(batch, str, x, y, targetWidth, halign, wrap);
     }
 
+    /** Finish rendering and draw the result to the screen. */
     public void endRender() {
         if (!isRendering) return;
         batch.end();

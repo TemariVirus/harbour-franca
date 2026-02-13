@@ -3,6 +3,7 @@ package com.simpulator.engine;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 
+/** Manages loading and unloading of textures. */
 public class TextureManager extends ResourceCache<String, Texture> {
 
     @Override

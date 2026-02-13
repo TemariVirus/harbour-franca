@@ -5,11 +5,16 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+/** Invokes actions from button inputs. */
 public class ButtonManager<T> {
 
+    /** When to invoke the action. */
     public enum ButtonBindType {
+        /** When the button is just pressed. */
         DOWN,
+        /** When the button is held down. */
         HOLD,
+        /** When the button is just released. */
         UP,
     }
 
@@ -34,6 +39,10 @@ public class ButtonManager<T> {
 
     public ButtonManager() {}
 
+    /**
+     * Initialise with the state of the buttons from the previous and current frames.
+     * Useful for testing.
+     */
     public ButtonManager(
         Set<Integer> lastFrameButtons,
         Set<Integer> thisFrameButtons
@@ -59,10 +68,12 @@ public class ButtonManager<T> {
         }
     }
 
+    /** Returns whether the button is currently held down. */
     public boolean getButtonDown(int button) {
         return thisFrameButtons.contains(button);
     }
 
+    /** Set the button's current state to held down or not. */
     public void setButton(int button, boolean down) {
         if (down) {
             thisFrameButtons.add(button);
@@ -71,11 +82,13 @@ public class ButtonManager<T> {
         }
     }
 
+    /** Bind the given action to a button and event type. */
     public void bind(ButtonBindType type, int button, Action<T> action) {
         getBindings(type).putIfAbsent(button, new ArrayList<>());
         getBindings(type).get(button).add(action);
     }
 
+    /** Unbind all instances of the given action from a button and event type. */
     public void unbind(ButtonBindType type, int button, Action<T> action) {
         if (getBindings(type).containsKey(button)) {
             getBindings(type)
@@ -85,10 +98,12 @@ public class ButtonManager<T> {
         }
     }
 
+    /** Unbind all actions from the given event type */
     public void unbindAll(ButtonBindType type) {
         getBindings(type).clear();
     }
 
+    /** Unbind all actions from the given button and event type. */
     public void unbindAll(ButtonBindType type, int button) {
         getBindings(type).remove(button);
     }
@@ -97,13 +112,16 @@ public class ButtonManager<T> {
         HashSet<Integer> buttons = new HashSet<>();
         switch (type) {
             case DOWN:
+                // Just pressed
                 buttons.addAll(thisFrameButtons);
                 buttons.removeAll(lastFrameButtons);
                 break;
             case HOLD:
+                // Held down
                 buttons.addAll(thisFrameButtons);
                 break;
             case UP:
+                // Just released
                 buttons.addAll(lastFrameButtons);
                 buttons.removeAll(thisFrameButtons);
                 break;
@@ -113,6 +131,11 @@ public class ButtonManager<T> {
         return buttons;
     }
 
+    /**
+     * Processes button state updates and invokes the appropriate actions.
+     *
+     * @param constructor Creates events from the button, bind type, and current button states.
+     */
     public void update(EventConstructor<T> constructor) {
         for (ButtonBindType type : ButtonBindType.values()) {
             HashSet<Integer> buttons = computeButtons(type);

@@ -3,6 +3,7 @@ package com.simpulator.engine;
 import com.badlogic.gdx.utils.Disposable;
 import java.util.HashMap;
 
+/** A cache for resources that require disposal. */
 public abstract class ResourceCache<
     K,
     V extends Disposable
@@ -40,6 +41,7 @@ public abstract class ResourceCache<
     }
 
     /** Disposes of all items in the cache and clears it. */
+    @Override
     public void dispose() {
         for (V value : items.values()) {
             value.dispose();
