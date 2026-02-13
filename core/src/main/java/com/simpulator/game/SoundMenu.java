@@ -8,18 +8,21 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.simpulator.engine.GraphicsManager;
+import com.simpulator.engine.MusicManager;
 import com.simpulator.engine.Scene;
 import com.simpulator.engine.SceneManager;
 
 public class SoundMenu extends Scene {
 
     private SceneManager sceneManager;
+    private MusicManager musics;
     private SpriteBatch batch;
     private BitmapFont font;
 
-    public SoundMenu(SceneManager sceneManager) {
+    public SoundMenu(SceneManager sceneManager, MusicManager musicManager) {
         super();
         this.sceneManager = sceneManager;
+        musics = musicManager;
     }
 
     @Override
@@ -28,9 +31,6 @@ public class SoundMenu extends Scene {
         font = new BitmapFont();
         font.setColor(Color.YELLOW);
         font.getData().setScale(2);
-
-        sounds.setBgm("GameAudio.mp3");
-        sounds.startBgm();
     }
 
     @Override
@@ -69,6 +69,7 @@ public class SoundMenu extends Scene {
         target = Math.round(target * 10) / 10.0f;
 
         sounds.setVolume(target);
+        musics.setVolume(target);
     }
 
     @Override

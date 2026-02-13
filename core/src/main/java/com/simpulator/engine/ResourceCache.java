@@ -26,6 +26,11 @@ public abstract class ResourceCache<
         return value;
     }
 
+    /** Iterates over the cached items. */
+    protected Iterable<V> values() {
+        return items.values();
+    }
+
     /** Removes the item from the cache and disposes of it. */
     public void remove(K key) {
         V value = items.remove(key);
