@@ -8,6 +8,8 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.math.collision.BoundingBox;
+import com.badlogic.gdx.math.collision.OrientedBoundingBox;
 
 /**
  * A rectangular entity with 3D position, 2D size, and 3D rotation.
@@ -155,7 +157,7 @@ public class Entity implements Moveable, Renderable<SpriteBatch> {
     }
 
     public void update(float deltaTime) {}
-    
+
     @Override
     public void rotate(Vector3 axis, float radians) {
         transform.rotateRad(axis, radians);
@@ -165,9 +167,21 @@ public class Entity implements Moveable, Renderable<SpriteBatch> {
         this.transform.mul(transform);
     }
 
+    /** Returns whether the entity is currently in view of the given camera. */
+    public boolean isVisible(Camera camera) {
+        OrientedBoundingBox obb = new OrientedBoundingBox(
+            new BoundingBox(getLocalVertex(0), getLocalVertex(2)),
+            transform
+        );
+        return camera.frustum.boundsInFrustum(obb);
+    }
+
     @Override
     public void render(SpriteBatch batch, Camera camera) {
-        // TODO: frustum culling
+        if (!isVisible(camera)) {
+            return;
+        }
+
         float[] vertexData = new float[20];
         for (int i = 0; i < 4; i++) {
             boolean isLeft = i < 2;
