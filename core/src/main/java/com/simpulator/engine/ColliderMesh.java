@@ -3,19 +3,13 @@ package com.simpulator.engine;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 
-/** A mesh used for detecting collisions, made out of polyhedra. */
-public interface ColliderMesh extends Moveable {
-    /** Returns all polyhedra in the mesh. */
-    public Iterable<Polyhedron> getPolyhedra();
+/** A mesh used for detecting collisions, made out of GJKShapes. */
+public interface ColliderMesh {
+    /** Returns all convex shapes that make up the mesh. */
+    public Iterable<GJKShape> getShapes();
 
     /** Returns the bounding box of the entire mesh. */
-    public default BoundingBox getBounds() {
-        BoundingBox bounds = new BoundingBox();
-        for (Polyhedron polyhedron : getPolyhedra()) {
-            bounds.ext(polyhedron.getBounds());
-        }
-        return bounds;
-    }
+    public BoundingBox getBounds();
 
     /** Returns whether this mesh intersects with another mesh. */
     public default boolean intersects(ColliderMesh other) {
@@ -23,9 +17,9 @@ public interface ColliderMesh extends Moveable {
             return false;
         }
 
-        for (Polyhedron polyhedron1 : this.getPolyhedra()) {
-            for (Polyhedron polyhedron2 : other.getPolyhedra()) {
-                if (polyhedron1.intersects(polyhedron2)) {
+        for (GJKShape shape1 : this.getShapes()) {
+            for (GJKShape shape2 : other.getShapes()) {
+                if (CollisionManager.intersects(shape1, shape2)) {
                     return true;
                 }
             }
@@ -35,26 +29,34 @@ public interface ColliderMesh extends Moveable {
 
     /**
      * Returns whether this mesh intersects with another mesh.
-     * If they intersect, the minimum translation vector (moving this ColliderMesh)
-     * to separate them is stored in outMtv.
+     * If they intersect, a best-effort translation vector (moving this ColliderMesh)
+     * to separate them is stored in outPush.
      */
-    public default boolean intersects(ColliderMesh immovable, Vector3 outMtv) {
+    public default boolean intersects(ColliderMesh immovable, Vector3 outPush) {
         if (!this.getBounds().intersects(immovable.getBounds())) {
             return false;
         }
 
         float intersectCount = 0;
-        Vector3 mtv = new Vector3().setZero();
+        outPush.setZero();
         Vector3 tempMtv = new Vector3();
-        for (Polyhedron polyhedron1 : this.getPolyhedra()) {
-            for (Polyhedron polyhedron2 : immovable.getPolyhedra()) {
-                if (polyhedron1.intersects(polyhedron2, tempMtv)) {
+        for (GJKShape movableShape : this.getShapes()) {
+            for (GJKShape immovableShape : immovable.getShapes()) {
+                if (
+                    CollisionManager.intersects(
+                        movableShape,
+                        immovableShape,
+                        tempMtv
+                    )
+                ) {
                     intersectCount++;
-                    mtv.add(tempMtv);
+                    outPush.add(tempMtv);
                 }
             }
         }
-        outMtv.set(mtv).scl(1f / intersectCount);
+        if (intersectCount > 0) {
+            outPush.scl(1f / intersectCount);
+        }
         return intersectCount > 0;
     }
 }

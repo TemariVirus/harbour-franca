@@ -10,13 +10,13 @@ config:
 classDiagram
     Entity ..|> Renderable~T~: #60;#60;binds#62;#62; #60;T -> SpriteBatch#62;
     Entity --o EntityManager: aggregates
-    Entity ..|> Moveable
+    Entity ..|> Movable
     EntityManager --* Scene
     Cuboid --|> Polyhedron
-    Polyhedron ..|> GJKTarget
-    ColliderMesh --|> Moveable
+    Polyhedron ..|> GJKShape
+    ColliderMesh --|> Movable
     Polyhedron ..> CollisionManager: Uses
-    CollisionManager ..> GJKTarget: Uses
+    CollisionManager ..> GJKShape: Uses
     GraphicsManager --o SceneManager
     ResourceCache~K&comma; V: Disposable~ ..|> Disposable
     Scene --o SceneManager: aggregates
@@ -83,7 +83,7 @@ classDiagram
     class MouseScrollEvent {
        }
 
-    class Moveable {
+    class Movable {
         + translate(delta: Vector3) void
         + rotate(axis: Vector3, radians: float) void
       }
@@ -105,13 +105,13 @@ classDiagram
         }
 
     class SoundManager {
-      
+
     }
 
     class TextureManager {
     }
 
-    class GJKTarget {
+    class GJKShape {
         <<interface>>
 
     }

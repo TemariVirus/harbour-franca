@@ -3,7 +3,7 @@ package com.simpulator.engine;
 import com.badlogic.gdx.math.Vector3;
 
 /** An object that can be moved in 3D space. */
-public interface Moveable {
+public interface Movable {
     /** Translates the object by the given delta vector. */
     public void translate(Vector3 delta);
 

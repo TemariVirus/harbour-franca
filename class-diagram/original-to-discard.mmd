@@ -10,13 +10,13 @@ config:
 classDiagram
     Entity ..|> Renderable~T~: #60;#60;binds#62;#62; #60;T -> SpriteBatch#62;
     Entity --o EntityManager: aggregates
-    Entity ..|> Moveable
+    Entity ..|> Movable
     EntityManager --* Scene
     Cuboid --|> Polyhedron
-    Polyhedron ..|> GJKTarget
-    ColliderMesh --|> Moveable
+    Polyhedron ..|> GJKShape
+    ColliderMesh --|> Movable
     Polyhedron ..> CollisionManager: Uses
-    CollisionManager ..> GJKTarget: Uses
+    CollisionManager ..> GJKShape: Uses
     GraphicsManager --o SceneManager
     ResourceCache~K&comma; V: Disposable~ ..|> Disposable
     Scene --o SceneManager: aggregates
@@ -54,7 +54,7 @@ classDiagram
     class CollisionManager {
         + isSeperatingAxis(verts1: Vector3[], verts2: Vector3[], axis: Vector3)$ boolean
         + polygonIntersects(verts1: Vector3[], edges1: Vector3[], verts2: Vector3[], edges2: Vector3[])$ boolean
-        + intersects(movable: GJKTarget, immovable: GJKTarget, out outMtv: Vector3)$ boolean
+        + intersects(movable: GJKShape, immovable: GJKShape, out outMtv: Vector3)$ boolean
     }
 
     class Cuboid {
@@ -230,7 +230,7 @@ classDiagram
         + MouseScrollEvent(scrollX: float, scrollY: float, timestamp: float)
     }
 
-    class Moveable {
+    class Movable {
         <<interface>>
 
         + translate(delta: Vector3) void
@@ -303,7 +303,7 @@ classDiagram
         # load(path: String)* Texture
     }
 
-    class GJKTarget {
+    class GJKShape {
         <<interface>>
 
         + furthestPoint(direction: Vector3, reverse: boolean) Vector3

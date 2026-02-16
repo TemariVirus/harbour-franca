@@ -3,12 +3,12 @@ package com.simpulator.game;
 import com.badlogic.gdx.math.Vector3;
 import com.simpulator.engine.Action;
 import com.simpulator.engine.KeyboardManager;
-import com.simpulator.engine.Moveable;
+import com.simpulator.engine.Movable;
 
 public class MoveAction implements Action<KeyboardManager.KeyEvent> {
 
     /** The object this action acts on. */
-    protected Moveable target;
+    protected Movable target;
     /** Velocity in world units/s */
     private Vector3 velocity;
     /** Axis of rotation. */
@@ -17,7 +17,7 @@ public class MoveAction implements Action<KeyboardManager.KeyEvent> {
     private float rotationSpeed;
 
     public MoveAction(
-        Moveable target,
+        Movable target,
         Vector3 velocity,
         Vector3 rotationAxis,
         float rotationSpeed
@@ -28,7 +28,7 @@ public class MoveAction implements Action<KeyboardManager.KeyEvent> {
         this.rotationSpeed = rotationSpeed;
     }
 
-    public MoveAction(Moveable target, Vector3 velocity) {
+    public MoveAction(Movable target, Vector3 velocity) {
         this.target = target;
         setVelocity(velocity);
         this.rotationAxis = new Vector3();
@@ -36,7 +36,7 @@ public class MoveAction implements Action<KeyboardManager.KeyEvent> {
     }
 
     public MoveAction(
-        Moveable target,
+        Movable target,
         Vector3 rotationAxis,
         float rotationSpeed
     ) {

@@ -2,6 +2,7 @@ package com.simpulator.engine;
 
 import com.badlogic.gdx.math.Vector3;
 import java.util.ArrayList;
+import java.util.List;
 
 /** Collision detection and resolution. */
 public class CollisionManager {
@@ -9,8 +10,8 @@ public class CollisionManager {
     /**
      * Returns whether 2 convex shapes are intersecting using the GJK algorithm.
      */
-    public static boolean intersects(GJKTarget movable, GJKTarget immovable) {
-        return GJK.isIntersecting(movable, immovable, new ArrayList<>());
+    public static boolean intersects(GJKShape shape1, GJKShape shape2) {
+        return GJK.isIntersecting(shape1, shape2, new ArrayList<>());
     }
 
     /**
@@ -19,8 +20,8 @@ public class CollisionManager {
      * https://en.wikipedia.org/wiki/Gilbert%E2%80%93Johnson%E2%80%93Keerthi_distance_algorithm
      */
     public static boolean intersects(
-        GJKTarget movable,
-        GJKTarget immovable,
+        GJKShape movable,
+        GJKShape immovable,
         Vector3 outMtv
     ) {
         final int MAX_ITERATIONS = 500;
@@ -72,7 +73,7 @@ class GJK {
 
     /** Handles the case where the simplex is a line segment. */
     private static boolean handleLine(
-        ArrayList<Vector3> simplex,
+        List<Vector3> simplex,
         Vector3 direction
     ) {
         // Line segment AB
@@ -93,7 +94,7 @@ class GJK {
 
     /** Handles the case where the simplex is a triangle. */
     private static boolean handleTriangle(
-        ArrayList<Vector3> simplex,
+        List<Vector3> simplex,
         Vector3 direction
     ) {
         // Triangle ABC
@@ -133,7 +134,7 @@ class GJK {
 
     /** Handles the case where the simplex is a tetrahedron. */
     private static boolean handleTetrahedron(
-        ArrayList<Vector3> simplex,
+        List<Vector3> simplex,
         Vector3 direction
     ) {
         // Tetrahedron ABCD
@@ -173,7 +174,7 @@ class GJK {
      * Updates the simplex and the next direction to check if the origin is not contained.
      */
     private static boolean simplexContainsOrigin(
-        ArrayList<Vector3> simplex,
+        List<Vector3> simplex,
         Vector3 direction
     ) {
         switch (simplex.size()) {
@@ -200,9 +201,9 @@ class GJK {
      * The simplex containing the origin is stored in simplex.
      */
     public static boolean isIntersecting(
-        GJKTarget shape1,
-        GJKTarget shape2,
-        ArrayList<Vector3> simplex
+        GJKShape shape1,
+        GJKShape shape2,
+        List<Vector3> simplex
     ) {
         final int MAX_ITERATIONS = 100;
         Vector3 direction = new Vector3(1, 1, 1).nor();
@@ -244,15 +245,15 @@ class GJK {
 class Polytope {
 
     private ArrayList<Vector3> vertices;
-    private ArrayList<Face> faces;
+    private ArrayList<PolytopeFace> faces;
 
     /** An edge of the polytope, refering the vertices by index. */
-    private class Edge {
+    private class PolytopeEdge {
 
         public int p1Index;
         public int p2Index;
 
-        public Edge(int p1Index, int p2Index) {
+        public PolytopeEdge(int p1Index, int p2Index) {
             this.p1Index = p1Index;
             this.p2Index = p2Index;
         }
@@ -261,13 +262,13 @@ class Polytope {
         public boolean equals(Object obj) {
             if (this == obj) return true;
             if (obj == null || getClass() != obj.getClass()) return false;
-            Edge edge = (Edge) obj;
+            PolytopeEdge edge = (PolytopeEdge) obj;
             return p1Index == edge.p1Index && p2Index == edge.p2Index;
         }
     }
 
     /** A face of the polytope, refering the vertices by index. */
-    private class Face {
+    private class PolytopeFace {
 
         public int p1Index;
         public int p2Index;
@@ -275,8 +276,8 @@ class Polytope {
         public Vector3 normal;
         public float distance;
 
-        public Face(
-            ArrayList<Vector3> vertices,
+        public PolytopeFace(
+            List<Vector3> vertices,
             int p1Index,
             int p2Index,
             int p3Index
@@ -287,7 +288,7 @@ class Polytope {
             updateNormal(vertices);
         }
 
-        public void updateNormal(ArrayList<Vector3> vertices) {
+        public void updateNormal(List<Vector3> vertices) {
             Vector3 a = vertices.get(p1Index);
             Vector3 b = vertices.get(p2Index);
             Vector3 c = vertices.get(p3Index);
@@ -304,23 +305,23 @@ class Polytope {
     }
 
     /** Create a new polytope with the same shape as the given tetrahedron. */
-    public Polytope(ArrayList<Vector3> tetrahedron) {
+    public Polytope(List<Vector3> tetrahedron) {
         assert tetrahedron.size() == 4 : "Simplex must be a tetrahedron.";
 
         this.vertices = new ArrayList<>(tetrahedron);
         this.faces = new ArrayList<>();
 
-        faces.add(new Face(this.vertices, 0, 1, 2));
-        faces.add(new Face(this.vertices, 0, 3, 1));
-        faces.add(new Face(this.vertices, 0, 2, 3));
-        faces.add(new Face(this.vertices, 1, 3, 2));
+        faces.add(new PolytopeFace(this.vertices, 0, 1, 2));
+        faces.add(new PolytopeFace(this.vertices, 0, 3, 1));
+        faces.add(new PolytopeFace(this.vertices, 0, 2, 3));
+        faces.add(new PolytopeFace(this.vertices, 1, 3, 2));
     }
 
     /** Returns the polytope's face that is closest to the origin. */
     public Vector3 closestFaceNormalToOrigin() {
         float minDistance = Float.POSITIVE_INFINITY;
-        Face closestFace = null;
-        for (Face face : faces) {
+        PolytopeFace closestFace = null;
+        for (PolytopeFace face : faces) {
             if (face.distance < minDistance) {
                 minDistance = face.distance;
                 closestFace = face;
@@ -333,9 +334,9 @@ class Polytope {
     public void expand(Vector3 support) {
         // Remove faces that can "see" the support point
         // and collect their edges
-        ArrayList<Edge> uniqueEdgeIndices = new ArrayList<>();
+        ArrayList<PolytopeEdge> uniqueEdgeIndices = new ArrayList<>();
         for (int i = 0; i < faces.size(); i++) {
-            Face face = faces.get(i);
+            PolytopeFace face = faces.get(i);
             if (GJK.sameDirection(face.normal, support)) {
                 addIfUniqueEdge(uniqueEdgeIndices, face.p1Index, face.p2Index);
                 addIfUniqueEdge(uniqueEdgeIndices, face.p2Index, face.p3Index);
@@ -346,9 +347,9 @@ class Polytope {
 
         // Add new faces along the collected edges
         vertices.add(support);
-        for (Edge edge : uniqueEdgeIndices) {
+        for (PolytopeEdge edge : uniqueEdgeIndices) {
             faces.add(
-                new Face(
+                new PolytopeFace(
                     vertices,
                     edge.p1Index,
                     edge.p2Index,
@@ -359,13 +360,13 @@ class Polytope {
     }
 
     private void addIfUniqueEdge(
-        ArrayList<Edge> edges,
+        ArrayList<PolytopeEdge> edges,
         int p1Index,
         int p2Index
     ) {
-        int reverseIndex = edges.indexOf(new Edge(p2Index, p1Index));
+        int reverseIndex = edges.indexOf(new PolytopeEdge(p2Index, p1Index));
         if (reverseIndex < 0) {
-            edges.add(new Edge(p1Index, p2Index));
+            edges.add(new PolytopeEdge(p1Index, p2Index));
         } else {
             ListUtil.swapRemove(edges, reverseIndex);
         }

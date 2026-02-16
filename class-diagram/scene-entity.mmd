@@ -10,7 +10,7 @@ config:
 classDiagram
     Entity ..|> Renderable~T~: #60;#60;binds#62;#62; #60;T -> SpriteBatch#62;
     Entity --o EntityManager: aggregates
-    Entity ..|> Moveable
+    Entity ..|> Movable
     EntityManager --* Scene
     GraphicsManager --o SceneManager
     ResourceCache~K&comma; V: Disposable~ ..|> Disposable
@@ -19,7 +19,7 @@ classDiagram
     TextureManager --* Scene
     SoundManager --|> ResourceCache: #60;#60;bind#62;#62; #60;K -> String, V -> Sound#62;
     SoundManager --* Scene
-   
+
 
     class Entity {
         # transform: Matrix4
@@ -76,7 +76,7 @@ classDiagram
         + render(renderer: T, camera: Camera) void
     }
 
-    class Moveable {
+    class Movable {
         <<interface>>
 
         + translate(delta: Vector3) void
@@ -132,4 +132,3 @@ classDiagram
     class TextureManager {
         # load(path: String)* Texture
     }
-

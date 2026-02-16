@@ -2,13 +2,13 @@ package com.simpulator.game;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.Vector3;
-import com.simpulator.engine.Moveable;
+import com.simpulator.engine.Movable;
 
-public class MoveableCamera implements Moveable {
+public class MovableCamera implements Movable {
 
     private Camera camera;
 
-    public MoveableCamera(Camera camera) {
+    public MovableCamera(Camera camera) {
         this.camera = camera;
     }
 

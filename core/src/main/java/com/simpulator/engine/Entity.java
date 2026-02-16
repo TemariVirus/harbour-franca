@@ -15,7 +15,7 @@ import com.badlogic.gdx.math.collision.OrientedBoundingBox;
  * A rectangular entity with 3D position, 2D size, and 3D rotation.
  * The appearence is defined by a TextureRegion and tint.
  */
-public class Entity implements Moveable, Renderable<SpriteBatch> {
+public class Entity implements Movable, Renderable<SpriteBatch> {
 
     /** Position, size and rotation encoded in a 4x4 matrix, in world units. */
     protected Matrix4 transform;

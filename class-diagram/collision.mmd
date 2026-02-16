@@ -1,0 +1,106 @@
+---
+config:
+    theme: neutral
+    layout: elk
+    defaultRenderer: elk
+    elk:
+        nodePlacementStrategy: NETWORK_SIMPLEX
+---
+
+classDiagram
+    Cuboid --|> Polyhedron
+    Polyhedron ..|> GJKShape
+    ColliderMesh ..> GJKShape: Creates
+    ColliderMesh ..> CollisionManager: Uses
+    CollisionManager ..> GJK: Uses
+    CollisionManager ..> GJKShape: Uses
+    CollisionManager ..> Polytope: Uses
+    GJK ..> GJKShape: Uses
+    GJK ..> ListUtil: Uses
+    Polytope ..> ListUtil: Uses
+    Polytope ..> PolytopeEdge: Creates
+    PolytopeFace --* Polytope
+
+
+    class ColliderMesh {
+        <<interface>>
+
+        + getShapes() Iterable~GJKShape~
+        + getBounds() BoundingBox
+        + intersects(other: ColliderMesh) boolean
+        + intersects(immovable: ColliderMesh, out outPush: Vector3) boolean
+    }
+
+    class CollisionManager {
+        + intersects(shape1: GJKShape, shape2: GJKShape)$ boolean
+        + intersects(movable: GJKShape, immovable: GJKShape, out outMtv: Vector3)$ boolean
+    }
+
+    class GJK {
+        + sameDirection(a: Vector3, b: Vector3)$ boolean
+        - handleLine(simplex: List~Vector3~, direction: Vector3)$ boolean
+        - handleTriangle(simplex: List~Vector3~, direction: Vector3)$ boolean
+        - handleTetrahedron(simplex: List~Vector3~, direction: Vector3)$ boolean
+        - simplexContainsOrigin(simplex: List~Vector3~, direction: Vector3)$ boolean
+        + isIntersecting(shape1: GJKShape, shape2: GJKShape, simplex: List~Vector3~)$ boolean
+    }
+
+    class Polytope {
+        - vertices: ArrayList~Vector3~
+        - faces: ArrayList~PolytopeFace~
+
+        + Polytope(tetrahedron: List~Vector3~)
+        + closestFaceNormalToOrigin() Vector3
+        + expand(support: Vector3) void
+        - addIfUniqueEdge(edges: ArrayList<PolytopeEdge>, p1Index: int, p2Index: int) void
+    }
+
+    class PolytopeEdge {
+        <<dataType>>
+
+        + p1Index: int
+        + p2Index: int
+
+        + PolytopeEdge(p1Index: int, p2Index: int)
+        + equals(obj: Object) boolean
+    }
+
+    class PolytopeFace {
+        <<dataType>>
+
+        + p1Index: int
+        + p2Index: int
+        + p3Index: int
+        + normal: Vector3
+        + distance: float
+
+        + PolytopeFace(vertices: List~Vector3~, p1Index: int, p2Index: int, p3Index: int)
+        + updateNormal(vertices: List~Vector3~) void
+    }
+
+    class Cuboid {
+        - obb: OrientedBoundingBox
+
+        + Cuboid(obb: OrientedBoundingBox)
+        + getAllVertices() Iterable~Vector3~
+        + getBounds() BoundingBox
+    }
+
+    class GJKShape {
+        <<interface>>
+
+        + furthestPoint(direction: Vector3, reverse: boolean) Vector3
+    }
+
+    class Polyhedron {
+        <<abstract>>
+
+        + getAllVertices()* Iterable~Vector3~
+        + getBounds()* BoundingBox
+        + furthestPoint(direction: Vector3, reverse: boolean) Vector3
+    }
+
+    class ListUtil {
+        + swap(list: List~T~, i: int, j: int)$ void
+        + swapRemove(list: List~T~, i: int)$ void
+    }

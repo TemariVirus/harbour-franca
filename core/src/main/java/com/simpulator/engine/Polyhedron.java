@@ -4,7 +4,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 
 /** Represents a convex polyhedron. */
-public abstract class Polyhedron implements GJKTarget {
+public abstract class Polyhedron implements GJKShape {
 
     /** Returns all unique vertices of the polyhedron. */
     public abstract Iterable<Vector3> getAllVertices();
@@ -27,25 +27,5 @@ public abstract class Polyhedron implements GJKTarget {
             }
         }
         return furthest.cpy();
-    }
-
-    /** Returns whether this polyhedron intersects with another polyhedron. */
-    public boolean intersects(Polyhedron other) {
-        if (!this.getBounds().intersects(other.getBounds())) {
-            return false;
-        }
-        return CollisionManager.intersects(this, other);
-    }
-
-    /**
-     * Returns whether this polyhedron intersects with another polyhedron.
-     * If they intersect, the minimum translation vector (moving this polyhedron)
-     * to separate them is stored in outMtv.
-     */
-    public boolean intersects(Polyhedron immovable, Vector3 outMtv) {
-        if (!this.getBounds().intersects(immovable.getBounds())) {
-            return false;
-        }
-        return CollisionManager.intersects(this, immovable, outMtv);
     }
 }

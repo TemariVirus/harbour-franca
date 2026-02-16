@@ -59,13 +59,13 @@ public class MainGame extends SwitchableScene {
 
         km = new KeyboardManager();
 
-        MoveableCamera moveableCam = new MoveableCamera(playerCamera);
-        km.bind(ButtonBindType.HOLD, Keys.W, new MoveAction(moveableCam, new Vector3(0, 0, -100)));
-        km.bind(ButtonBindType.HOLD, Keys.A, new MoveAction(moveableCam, new Vector3(-100, 0, 0)));
-        km.bind(ButtonBindType.HOLD, Keys.S, new MoveAction(moveableCam, new Vector3(0, 0, 100)));
-        km.bind(ButtonBindType.HOLD, Keys.D, new MoveAction(moveableCam, new Vector3(100, 0, 0)));
-        km.bind(ButtonBindType.HOLD, Keys.SHIFT_LEFT, new MoveAction(moveableCam, new Vector3(0, -100, 0)));
-        km.bind(ButtonBindType.HOLD, Keys.SPACE, new MoveAction(moveableCam, new Vector3(0, 100, 0)));
+        MovableCamera movableCam = new MovableCamera(playerCamera);
+        km.bind(ButtonBindType.HOLD, Keys.W, new MoveAction(movableCam, new Vector3(0, 0, -100)));
+        km.bind(ButtonBindType.HOLD, Keys.A, new MoveAction(movableCam, new Vector3(-100, 0, 0)));
+        km.bind(ButtonBindType.HOLD, Keys.S, new MoveAction(movableCam, new Vector3(0, 0, 100)));
+        km.bind(ButtonBindType.HOLD, Keys.D, new MoveAction(movableCam, new Vector3(100, 0, 0)));
+        km.bind(ButtonBindType.HOLD, Keys.SHIFT_LEFT, new MoveAction(movableCam, new Vector3(0, -100, 0)));
+        km.bind(ButtonBindType.HOLD, Keys.SPACE, new MoveAction(movableCam, new Vector3(0, 100, 0)));
 
         km.bind(ButtonBindType.HOLD, Keys.R, new MoveAction(pushable, new Vector3(1, 0, 1), 4));
         km.bind(ButtonBindType.HOLD, Keys.LEFT, new MoveAction(playerEntity, new Vector3(-100, 0, 0)));
