@@ -26,17 +26,28 @@ public class MainMenu extends SwitchableScene {
         font.getData().setScale(2);
 
         km = new KeyboardManager();
-        km.bind(ButtonBindType.DOWN, Keys.ENTER, switchSceneAction(Scenes.MainGame));
-        km.bind(ButtonBindType.DOWN, Keys.G, switchSceneAction(Scenes.MainGame));
-        km.bind(ButtonBindType.DOWN, Keys.S, switchSceneAction(Scenes.SoundMenu));
+        km.bind(
+            ButtonBindType.DOWN,
+            Keys.ENTER,
+            switchSceneAction(Scenes.MainGame)
+        );
+        km.bind(
+            ButtonBindType.DOWN,
+            Keys.G,
+            switchSceneAction(Scenes.MainGame)
+        );
+        km.bind(
+            ButtonBindType.DOWN,
+            Keys.S,
+            switchSceneAction(Scenes.SoundMenu)
+        );
 
         Gdx.input.setInputProcessor(km);
     }
 
     @Override
     public void unload() {
-        super.unload();
-        font.dispose();
+        dispose();
         Gdx.input.setInputProcessor(null);
     }
 
@@ -50,9 +61,21 @@ public class MainMenu extends SwitchableScene {
     public void render(GraphicsManager graphics) {
         ScreenUtils.clear(0.2f, 0.2f, 0.2f, 1f);
 
-        graphics.renderText(font, "MAIN MENU", 100, 400);
-        graphics.renderText(font, "Press [ENTER] to Start Game", 100, 300);
-        graphics.renderText(font, "Press [S] for Sound Options", 100, 250);
+        graphics.render(new UIText(font, "MAIN MENU", 100, 400), null);
+        graphics.render(
+            new UIText(font, "Press [ENTER] to Start Game", 100, 300),
+            null
+        );
+        graphics.render(
+            new UIText(font, "Press [S] for Sound Options", 100, 250),
+            null
+        );
         graphics.endRender();
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        font.dispose();
     }
 }

@@ -30,15 +30,20 @@ public class SceneManager implements Disposable {
         scenes.put(name, scene);
     }
 
-    /** Unload the current scene, if any, and load the given scene. */
-    public void switchScene(String name) {
+    /** Unload the current scene, if any, and load and return the given scene. */
+    public Scene switchScene(String name) {
+        if (!scenes.containsKey(name)) {
+            throw new IllegalArgumentException(
+                "Scene with name " + name + " does not exist."
+            );
+        }
+
         if (currentScene != null) {
             currentScene.unload();
         }
         currentScene = scenes.get(name);
-        if (currentScene != null) {
-            currentScene.load();
-        }
+        currentScene.load();
+        return currentScene;
     }
 
     /** Update the current scene by the given delta time in seconds. */
@@ -46,14 +51,6 @@ public class SceneManager implements Disposable {
         if (currentScene != null) {
             currentScene.update(deltaTime);
         }
-    }
-
-    /** Play the given sound in the current scene. */
-    public long playSound(String path) {
-        if (currentScene != null) {
-            return currentScene.playSound(path);
-        }
-        return -1;
     }
 
     /** Render the current scene to the screen. */

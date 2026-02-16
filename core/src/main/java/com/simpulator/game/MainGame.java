@@ -81,7 +81,7 @@ public class MainGame extends SwitchableScene {
 
     @Override
     public void unload() {
-        super.unload();
+        dispose();
         Gdx.input.setInputProcessor(null);
     }
 
@@ -101,7 +101,7 @@ public class MainGame extends SwitchableScene {
     public void render(GraphicsManager graphics) {
         ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
 
-        graphics.renderEntities(
+        graphics.render(
             entityManager.getEntities().toArray(new Entity[0]),
             playerCamera
         );

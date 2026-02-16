@@ -65,8 +65,7 @@ public class SoundMenu extends SwitchableScene {
 
     @Override
     public void unload() {
-        super.unload();
-        font.dispose();
+        dispose();
         Gdx.input.setInputProcessor(null);
     }
 
@@ -80,15 +79,30 @@ public class SoundMenu extends SwitchableScene {
     public void render(GraphicsManager graphics) {
         ScreenUtils.clear(0.2f, 0.1f, 0.1f, 1f); // Dark Red background
 
-        graphics.renderText(font, "SOUND SETTINGS", 100, 450);
+        graphics.render(new UIText(font, "SOUND SETTINGS", 100, 450), null);
 
         // fix it from going to 79
         int percent = MathUtils.round(sounds.getVolume() * 100);
 
-        graphics.renderText(font, "Volume: " + percent + "%", 100, 350);
-        graphics.renderText(font, "[LEFT] / [RIGHT] to adjust", 100, 300);
+        graphics.render(
+            new UIText(font, "Volume: " + percent + "%", 100, 350),
+            null
+        );
+        graphics.render(
+            new UIText(font, "[LEFT] / [RIGHT] to adjust", 100, 300),
+            null
+        );
 
-        graphics.renderText(font, "Press [ESCAPE] to Return", 100, 200);
+        graphics.render(
+            new UIText(font, "Press [ESCAPE] to Return", 100, 200),
+            null
+        );
         graphics.endRender();
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        font.dispose();
     }
 }

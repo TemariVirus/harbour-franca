@@ -15,7 +15,7 @@ import com.badlogic.gdx.math.collision.OrientedBoundingBox;
  * A rectangular entity with 3D position, 2D size, and 3D rotation.
  * The appearence is defined by a TextureRegion and tint.
  */
-public class Entity implements Movable, Renderable<SpriteBatch> {
+public class Entity implements Movable, Renderable {
 
     /** Position, size and rotation encoded in a 4x4 matrix, in world units. */
     protected Matrix4 transform;
@@ -153,13 +153,6 @@ public class Entity implements Movable, Renderable<SpriteBatch> {
         transform.rotate(delta);
     }
 
-    /**
-     * Update the entity's state. Usually called once per frame.
-     *
-     * @param deltaTime The time elapsed since the last update, in seconds.
-     */
-    public void update(float deltaTime) {}
-
     @Override
     public void rotate(Vector3 axis, float radians) {
         transform.rotateRad(axis, radians);
@@ -170,7 +163,7 @@ public class Entity implements Movable, Renderable<SpriteBatch> {
         this.transform.mul(transform);
     }
 
-    /** Returns whether the entity is currently in view of the given camera. */
+    @Override
     public boolean isVisible(Camera camera) {
         OrientedBoundingBox obb = new OrientedBoundingBox(
             new BoundingBox(getLocalVertex(0), getLocalVertex(2)),
@@ -180,11 +173,21 @@ public class Entity implements Movable, Renderable<SpriteBatch> {
     }
 
     @Override
-    public void render(SpriteBatch batch, Camera camera) {
-        if (!isVisible(camera)) {
-            return;
-        }
+    public float getZOrder(Camera camera) {
+        Vector3 position = getPosition();
+        camera.project(position);
+        return position.z;
+    }
 
+    /**
+     * Update the entity's state. Usually called once per frame.
+     *
+     * @param deltaTime The time elapsed since the last update, in seconds.
+     */
+    public void update(float deltaTime) {}
+
+    @Override
+    public void render(SpriteBatch batch, Camera camera) {
         float[] vertexData = new float[20];
         for (int i = 0; i < 4; i++) {
             boolean isLeft = i < 2;

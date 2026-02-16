@@ -2,9 +2,10 @@ package com.simpulator.engine;
 
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.utils.Disposable;
 
 /** A scene encapsulates the state and business logic of a section of the simulation. */
-public abstract class Scene {
+public abstract class Scene implements Disposable {
 
     protected EntityManager entityManager;
     protected SoundManager sounds;
@@ -37,10 +38,7 @@ public abstract class Scene {
 
     /** Stop the scene and free all resources. */
     public void unload() {
-        // These fields can be safely reused in the next load()
-        entityManager.removeAll();
-        sounds.dispose();
-        textures.dispose();
+        dispose();
     }
 
     /** Update the scene's state by the given delta time in seconds. */
@@ -55,4 +53,12 @@ public abstract class Scene {
 
     /** Draw the scene to the screen. */
     public abstract void render(GraphicsManager graphics);
+
+    @Override
+    public void dispose() {
+        // These fields can be safely reused in the next load()
+        entityManager.removeAll();
+        sounds.dispose();
+        textures.dispose();
+    }
 }

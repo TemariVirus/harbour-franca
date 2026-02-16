@@ -8,13 +8,17 @@ config:
 ---
 
 classDiagram
-    Entity ..|> Renderable~T~: #60;#60;binds#62;#62; #60;T -> SpriteBatch#62;
-    Entity --o EntityManager: aggregates
     Entity ..|> Movable
-    EntityManager --* Scene
-    GraphicsManager --o SceneManager
+    Entity ..|> Renderable
+    Entity --o EntityManager: aggregates
+    GraphicsManager ..|> Disposable
+    GraphicsManager ..> Renderable: Uses
     ResourceCache~K&comma; V: Disposable~ ..|> Disposable
-    Scene --o SceneManager: aggregates
+    EntityManager --o Scene
+    Scene ..|> Disposable
+    Scene --o SceneManager
+    SceneManager ..|> Disposable
+    SceneManager ..* GraphicsManager
     TextureManager --|> ResourceCache: #60;#60;bind#62;#62; #60;K -> String, V -> Texture#62;
     TextureManager --* Scene
     SoundManager --|> ResourceCache: #60;#60;bind#62;#62; #60;K -> String, V -> Sound#62;
@@ -42,13 +46,15 @@ classDiagram
         + setTextureRegion(textureRegion: TextureRegion) void
         + getLocalVertex(index: int) Vector3
         + getVertex(index: int) Vector3
-        + getVertex(index: int, localZ: float) Vector3
         + getVertices() Vector3[]
         + translate(delta: Vector3) void
         + scale(scale: Vector2) void
         + rotate(delta: Quaternion) void
         + rotate(axis: Vector3, radians: float) void
-        + transform(Matrix4 transform) void
+        + transform(transform: Matrix4) void
+        + isVisible(camera: Camera) boolean
+        + getZOrder(camera: Camera) float
+        + update(deltaTime: float) void
         + render(batch: SpriteBatch, camera: Camera) void
     }
 
@@ -56,24 +62,23 @@ classDiagram
         - entities: ArrayList~Entity~
 
         + EntityManager()
+        + getEntities() ArrayList~Entity~
+        + add(entity: Entity) void
+        + remove(entity: Entity) void
+        + removeAll() void
         + update(deltaTime: float) void
-        + add(Entity: entity) void
     }
 
     class GraphicsManager {
         # batch: SpriteBatch
-        # isRendering: boolean
+        - isRendering: boolean
 
         + GraphicsManager()
-        + renderEntity(entity: Entity) void
-        + renderEntities(entities: Entity[]) void
+        # beginRender() void
+        + renderEntity(entity: Entity, camera: Camera) void
+        + renderEntities(entities: Entity[], camera: Camera) void
         + endRender() void
-    }
-
-    class Renderable~T~ {
-        <<interface>>
-
-        + render(renderer: T, camera: Camera) void
+        + dispose() void
     }
 
     class Movable {
@@ -82,6 +87,15 @@ classDiagram
         + translate(delta: Vector3) void
         + rotate(axis: Vector3, radians: float) void
     }
+
+    class Renderable {
+        <<interface>>
+
+        + isVisible(camera: Camera) boolean
+        + getZOrder(camera: Camera) float
+        + render(batch: SpriteBatch, camera: Camera) void
+    }
+
     class ResourceCache~K&comma; V: Disposable~ {
         <<abstract>>
 
@@ -89,23 +103,27 @@ classDiagram
 
         # load(key: K)* V
         + get(key: K) V
+        # values() Iterable~V~
         + remove(key: K) void
         + dispose() void
     }
 
     class Scene {
-        - camera: Camera
+        <<abstract>>
+
         # entityManager: EntityManager
         # sounds: SoundManager
         # textures: TextureManager
 
         + Scene()
-        + load() void
-        + unload() void
+        + getEntityManager() EntityManager
         + getSound(path: String) Sound
         + getTexture(path: String) Texture
+        + load()* void
+        + unload() void
         + update(deltaTime: float) void
-        + render(graphics: GraphicsManager) void
+        + playSound(path: String) long
+        + render(graphics: GraphicsManager)* void
     }
 
     class SceneManager {
@@ -113,22 +131,23 @@ classDiagram
         - scenes: HashMap~String&comma; Scene~
         - graphics: GraphicsManager
 
+        + SceneManager()
         + addScene(name: String, scene: Scene) void
-        + switchScene(name: String) void
+        + switchScene(name: String) Scene
         + update(deltaTime: float) void
         + render() void
         + dispose() void
     }
 
     class SoundManager {
-        - globalVolume: float
-        + backgroundMusic: Music
-        # load(path: String)* Sound
-        + setGlobalVolume() void
-        + getGlobalVolume() float
-        + play(path: String)* Sound
+        - volume: float
+
+        + getVolume() float
+        + setVolume(volume: float) void
+        # load(path: String) Sound
+        + play(path: String) long
     }
 
     class TextureManager {
-        # load(path: String)* Texture
+        # load(path: String) Texture
     }

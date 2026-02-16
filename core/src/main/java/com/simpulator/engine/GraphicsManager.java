@@ -12,87 +12,52 @@ import java.util.Comparator;
 public class GraphicsManager implements Disposable {
 
     protected SpriteBatch batch = new SpriteBatch();
-    protected boolean isRendering = false;
+    private boolean isRendering = false;
 
-    private void beginRender() {
+    protected void beginRender() {
         if (isRendering) return;
 
         batch.begin();
         isRendering = true;
     }
 
-    /** Render a single entity from the camera's perspective, on top of everything so far. */
-    public void renderEntity(Entity entity, Camera camera) {
-        if (entity == null) return;
-        if (camera == null) throw new IllegalArgumentException(
-            "camera cannot be null"
-        );
+    /** Render a single object from the camera's perspective, on top of everything so far. */
+    public void render(Renderable renderable, Camera camera) {
+        if (renderable == null) return;
 
         beginRender();
-        entity.render(batch, camera);
+        if (renderable.isVisible(camera)) {
+            renderable.render(batch, camera);
+        }
     }
 
     /** Render multiple entities from the camera's perspective. The entities are rendered back to front. */
-    public void renderEntities(Entity[] entities, Camera camera) {
-        if (entities == null) return;
-        if (camera == null) throw new IllegalArgumentException(
-            "camera cannot be null"
-        );
+    public void render(Renderable[] renderables, Camera camera) {
+        if (renderables == null) return;
 
         Arrays.sort(
-            entities,
-            new Comparator<Entity>() {
-                // Needed to not allocate a new vector for every calculation
-                Vector3 tmp = new Vector3();
-
-                float getZ(Entity entity) {
-                    tmp.set(entity.getPosition());
-                    camera.project(tmp);
-                    return tmp.z;
-                }
-
+            renderables,
+            new Comparator<Renderable>() {
                 @Override
-                public int compare(Entity a, Entity b) {
+                public int compare(Renderable a, Renderable b) {
                     if (a == null && b == null) return 0;
                     if (a == null) return 1;
                     if (b == null) return -1;
 
-                    return Float.compare(getZ(b), getZ(a));
+                    return Float.compare(
+                        b.getZOrder(camera),
+                        a.getZOrder(camera)
+                    );
                 }
             }
         );
 
         beginRender();
-        for (Entity e : entities) {
-            if (e != null) {
-                e.render(batch, camera);
+        for (Renderable r : renderables) {
+            if (r != null && r.isVisible(camera)) {
+                r.render(batch, camera);
             }
         }
-    }
-
-    /** Render text at the given screen position, on top of everything so far. */
-    public void renderText(
-        BitmapFont font,
-        CharSequence str,
-        float x,
-        float y
-    ) {
-        beginRender();
-        font.draw(batch, str, x, y);
-    }
-
-    /** Render text at the given screen position, on top of everything so far. */
-    public void renderText(
-        BitmapFont font,
-        CharSequence str,
-        float x,
-        float y,
-        float targetWidth,
-        int halign,
-        boolean wrap
-    ) {
-        beginRender();
-        font.draw(batch, str, x, y, targetWidth, halign, wrap);
     }
 
     /** Finish rendering and draw the result to the screen. */
