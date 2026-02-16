@@ -9,13 +9,13 @@ config:
 
 classDiagram
     Cuboid --|> Polyhedron
-    Polyhedron ..|> GJKShape
+    GJKShape <|.. Polyhedron
     ColliderMesh ..> GJKShape: Creates
     ColliderMesh ..> CollisionManager: Uses
     CollisionManager ..> GJK: Uses
     CollisionManager ..> GJKShape: Uses
     CollisionManager ..> Polytope: Uses
-    GJK ..> GJKShape: Uses
+    GJKShape <.. GJK: Uses
     GJK ..> ListUtil: Uses
     Polytope ..> ListUtil: Uses
     Polytope ..> PolytopeEdge: Creates

@@ -8,22 +8,22 @@ config:
 ---
 
 classDiagram
-    Entity ..|> Movable
-    Entity ..|> Renderable
-    Entity --o EntityManager
+    TextureManager --* Scene
     GraphicsManager ..|> Disposable
-    GraphicsManager ..> Renderable: Uses
-    ResourceCache~K&comma; V: Disposable~ ..|> Disposable
+    Renderable <.. GraphicsManager: Uses
+    Disposable <|.. ResourceCache~K&comma; V: Disposable~
     Scene --o SceneManager
     SceneManager ..|> Disposable
     GraphicsManager --* SceneManager
-    MusicCache --|> ResourceCache: #60;#60;bind#62;#62; #60;K -> String, V -> Music#62;
-    MusicCache --* MusicManager
-    MusicManager ..|> Disposable
+    ResourceCache <|-- MusicCache: #60;#60;bind#62;#62; #60;K -> String, V -> Music#62;
+    Entity ..|> Movable
+    Entity ..|> Renderable
+    Entity --o EntityManager
+    MusicManager *-- MusicCache
+    Disposable <|.. MusicManager
     TextureManager --|> ResourceCache: #60;#60;bind#62;#62; #60;K -> String, V -> Texture#62;
-    TextureManager --* Scene
     SoundManager --|> ResourceCache: #60;#60;bind#62;#62; #60;K -> String, V -> Sound#62;
-    SoundManager --* Scene
+    Scene *-- SoundManager
 
 
     class Entity {

@@ -8,13 +8,14 @@ config:
 ---
 
 classDiagram
-    ButtonBindType --* KeyEvent
+    KeyEvent *-- ButtonBindType
     ButtonBindType --* MouseButtonEvent
     Action~T~ --o ButtonManager~T~
     ButtonManager~T~ ..> ButtonBindType: Creates
-    ButtonManager~T~ ..> ButtonEventConstructor~T~: Uses
+    ButtonEventConstructor~T~ <.. ButtonManager~T~: Uses
     ButtonManager~T~ --* KeyboardManager: #60;#60;binds#62;#62; #60;T -> KeyEvent#62;
     KeyboardManager --|> InputAdapter
+    MouseManager --|> InputAdapter
     KeyboardManager ..> KeyEvent: Creates
     Action~T~ --o MouseManager: #60;#60;binds#62;#62; #60;T -> MouseMoveEvent#62;
     Action~T~ --o MouseManager: #60;#60;binds#62;#62; #60;T -> MouseScrollEvent#62;
@@ -22,7 +23,6 @@ classDiagram
     MouseManager ..> MouseButtonEvent: Creates
     MouseManager ..> MouseMoveEvent: Creates
     MouseManager ..> MouseScrollEvent: Creates
-    MouseManager --|> InputAdapter
 
 
     class Action~T~ {
