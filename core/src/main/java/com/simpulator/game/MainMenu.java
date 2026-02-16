@@ -47,13 +47,13 @@ public class MainMenu extends SwitchableScene {
 
     @Override
     public void unload() {
-        dispose();
+        super.unload();
+        font.dispose();
         Gdx.input.setInputProcessor(null);
     }
 
     @Override
     public void update(float deltaTime) {
-        super.update(deltaTime);
         km.update(deltaTime, Float.NaN);
     }
 
@@ -71,11 +71,5 @@ public class MainMenu extends SwitchableScene {
             null
         );
         graphics.endRender();
-    }
-
-    @Override
-    public void dispose() {
-        super.dispose();
-        font.dispose();
     }
 }

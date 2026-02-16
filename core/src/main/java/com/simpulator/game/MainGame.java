@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.simpulator.engine.ButtonManager.ButtonBindType;
 import com.simpulator.engine.Entity;
+import com.simpulator.engine.EntityManager;
 import com.simpulator.engine.GraphicsManager;
 import com.simpulator.engine.KeyboardManager;
 import com.simpulator.engine.SceneManager;
@@ -17,12 +18,14 @@ public class MainGame extends SwitchableScene {
 
     private final Clock clock = new Clock(0);
     private PerspectiveCamera playerCamera;
+    private EntityManager entityManager;
     private KeyboardManager km;
     private CollidableEntity pushable;
     private CollidableEntity playerEntity;
 
     public MainGame(SceneManager sceneManager) {
         super(sceneManager);
+        entityManager = new EntityManager();
     }
 
     @Override
@@ -81,7 +84,8 @@ public class MainGame extends SwitchableScene {
 
     @Override
     public void unload() {
-        dispose();
+        super.unload();
+        entityManager.removeAll();
         Gdx.input.setInputProcessor(null);
     }
 

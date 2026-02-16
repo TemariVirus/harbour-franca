@@ -14,11 +14,12 @@ classDiagram
     GraphicsManager ..|> Disposable
     GraphicsManager ..> Renderable: Uses
     ResourceCache~K&comma; V: Disposable~ ..|> Disposable
-    EntityManager --o Scene
-    Scene ..|> Disposable
     Scene --o SceneManager
     SceneManager ..|> Disposable
-    SceneManager ..* GraphicsManager
+    GraphicsManager --* SceneManager
+    MusicCache --|> ResourceCache: #60;#60;bind#62;#62; #60;K -> String, V -> Music#62;
+    MusicCache --* MusicManager
+    MusicManager ..|> Disposable
     TextureManager --|> ResourceCache: #60;#60;bind#62;#62; #60;K -> String, V -> Texture#62;
     TextureManager --* Scene
     SoundManager --|> ResourceCache: #60;#60;bind#62;#62; #60;K -> String, V -> Sound#62;
@@ -111,18 +112,13 @@ classDiagram
     class Scene {
         <<abstract>>
 
-        # entityManager: EntityManager
         # sounds: SoundManager
         # textures: TextureManager
 
         + Scene()
-        + getEntityManager() EntityManager
-        + getSound(path: String) Sound
-        + getTexture(path: String) Texture
         + load()* void
         + unload() void
-        + update(deltaTime: float) void
-        + playSound(path: String) long
+        + update(deltaTime: float)* void
         + render(graphics: GraphicsManager)* void
     }
 
@@ -136,6 +132,26 @@ classDiagram
         + switchScene(name: String) Scene
         + update(deltaTime: float) void
         + render() void
+        + dispose() void
+    }
+
+    class MusicCache {
+        + MusicCache()
+        # load(path: String) Music
+        + dispose() void
+    }
+
+    class MusicManager {
+        - musicCache: MusicCache
+        - volume: float
+
+        + MusicManager()
+        + getVolume() float
+        + setVolume(volume: float) void
+        + isMusicPlaying(path: String) boolean
+        + startMusic(path: String) void
+        + pauseMusic(path: String) void
+        + stopMusic(path: String) void
         + dispose() void
     }
 
