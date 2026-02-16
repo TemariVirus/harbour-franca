@@ -1,0 +1,159 @@
+---
+config:
+    theme: neutral
+    layout: elk
+    defaultRenderer: elk
+    elk:
+        nodePlacementStrategy: NETWORK_SIMPLEX
+---
+
+classDiagram
+    ButtonBindType --* KeyEvent
+    ButtonBindType --* MouseButtonEvent
+    Action~T~ --o ButtonManager~T~
+    ButtonManager~T~ ..> ButtonBindType: Creates
+    ButtonManager~T~ ..> ButtonEventConstructor~T~: Uses
+    ButtonManager~T~ --* KeyboardManager: #60;#60;binds#62;#62; #60;T -> KeyEvent#62;
+    KeyboardManager --|> InputAdapter
+    KeyboardManager ..> KeyEvent: Creates
+    Action~T~ --o MouseManager: #60;#60;binds#62;#62; #60;T -> MouseMoveEvent#62;
+    Action~T~ --o MouseManager: #60;#60;binds#62;#62; #60;T -> MouseScrollEvent#62;
+    ButtonManager~T~ --* MouseManager: #60;#60;binds#62;#62; #60;T -> MouseButtonEvent#62;
+    MouseManager ..> MouseButtonEvent: Creates
+    MouseManager ..> MouseMoveEvent: Creates
+    MouseManager ..> MouseScrollEvent: Creates
+    MouseManager --|> InputAdapter
+
+    class Action~T~ {
+        <<interface>>
+
+        + act(data: T) void
+    }
+
+    class ButtonBindType {
+        <<enumeration>>
+
+        DOWN
+        HOLD
+        UP
+    }
+
+    class ButtonEventConstructor~T~ {
+        <<functionalInterface>>
+
+        + apply(button: int, type: ButtonBindType, thisFrameButtons: Set~Integer~) T
+    }
+
+    class ButtonManager~T~ {
+        - lastFrameButtons: HashSet~Integer~
+        - thisFrameButtons: HashSet~Integer~
+        - downBindings: HashMap~Integer&comma; ArrayList~Action~T~~~
+        - holdBindings: HashMap~Integer&comma; ArrayList~Action~T~~~
+        - upBindings: HashMap~Integer&comma; ArrayList~Action~T~~~
+
+        + ButtonManager()
+        + ButtonManager(lastFrameButtons: Set~Integer~, lastFrameButtons: Set~Integer~)
+        - getBindings(type: ButtonBindType) HashMap~Integer&comma; ArrayList~Action~T~~~
+        + getButtonDown(button: int) boolean
+        + setButton(button: int, down: boolean) void
+        + bind(type: ButtonBindType, button: int, action: Action~T~) void
+        + unbind(type: ButtonBindType, button: int, action: Action~T~) void
+        + unbindAll(type: ButtonBindType) void
+        + unbindAll(type: ButtonBindType, button: int) void
+        - computeButtons(type: ButtonBindType) HashSet~Integer~
+        + update(ButtonEventConstructor~T~ constructor) void
+    }
+
+    class KeyboardManager {
+        - buttonManager: ButtonManager~KeyEvent~
+
+        + KeyboardManager()
+        + KeyboardManager(lastFrameKeys: Set~Integer~, thisFrameKeys: Set~Integer~)
+        + keyDown(keycode: int) boolean
+        + keyUp(keycode: int) boolean
+        + bind(type: ButtonBindType, keycode: int, action: Action~KeyEvent~) void
+        + unbind(type: ButtonBindType, keycode: int, action: Action~KeyEvent~) void
+        + unbindAll(type: ButtonBindType) void
+        + unbindAll(type: ButtonBindType, keycode: int) void
+        + update(deltatime: float, timestamp: float) void
+    }
+
+    class KeyEvent {
+        <<dataType>>
+
+        + keycode: int
+        + type: ButtonBindType
+        + deltaTime: float
+        + timestamp: float
+        + isShiftPressed: boolean
+        + isCtrlPressed: boolean
+        + isAltPressed: boolean
+
+        + KeyEvent(keycode: int, type: ButtonBindType, deltaTime: float, timestamp: float, pressedKeys: Set~Integer~)
+    }
+
+    class MouseButtonEvent {
+        <<dataType>>
+
+        + x: int
+        + y: int
+        + button: int
+        + type: ButtonBindType
+        + deltaTime: float
+        + timestamp: float
+
+        + MouseButtonEvent(x: int, y: int, button: int, type: ButtonBindType, deltaTime: float, timestamp: float)
+    }
+
+    class MouseManager {
+        - lastFrameX: int
+        - lastFrameY: int
+        - thisFrameX: int
+        - thisFrameY: int
+        - scrolledX: float
+        - scrolledY: float
+        - buttonManager: ButtonManager~MouseButtonEvent~
+        - moveBindings: ArrayList~Action~MouseMoveEvent~~
+        - scrollBindings: ArrayList~Action~MouseScrollEvent~~
+
+        + MouseManager()
+        + mouseMoved(screenX: int, screenY: int) boolean
+        + touchDown(screenX: int, screenY: int, pointer: int, button: int) boolean
+        + touchUp(screenX: int, screenY: int, pointer: int, button: int) boolean
+        + scrolled(amountX: float, amountY: float) boolean
+        + bindButton(type: ButtonBindType, button: int, action: Action~MouseButtonEvent~) void
+        + unbindButton(type: ButtonBindType, button: int, action: Action~MouseButtonEvent~) void
+        + unbindAllButton(type: ButtonBindType) void
+        + unbindAllButton(type: ButtonBindType, button: int) void
+        + bindMove(action: Action~MouseMoveEvent~) void
+        + unbindMove(action: Action~MouseMoveEvent~) void
+        + unbindAllMove() void
+        + bindScroll(action: Action~MouseScrollEvent~) void
+        + unbindScroll(action: Action~MouseScrollEvent~) void
+        + unbindAllScroll() void
+        + update(deltaTime: float, timestamp: float) void
+    }
+
+    class MouseMoveEvent {
+        <<dataType>>
+
+        + x: int
+        + y: int
+        + deltaX: int
+        + deltaY: int
+        + deltaTime: float
+        + timestamp: float
+
+        + MouseMoveEvent(x: int, y: int, deltaX: int, deltaY: int, deltaTime: float, timestamp: float)
+    }
+
+    class MouseScrollEvent {
+        <<dataType>>
+
+        + scrollX: float
+        + scrollY: float
+        + deltaTime: float
+        + timestamp: float
+
+        + MouseScrollEvent(scrollX: float, scrollY: float, deltaTime: float, timestamp: float)
+    }

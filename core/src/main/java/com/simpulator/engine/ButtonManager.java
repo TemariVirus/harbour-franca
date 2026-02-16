@@ -19,11 +19,11 @@ public class ButtonManager<T> {
     }
 
     @FunctionalInterface
-    public interface EventConstructor<T> {
+    public interface ButtonEventConstructor<T> {
         public T apply(
             int button,
             ButtonBindType type,
-            Set<Integer> thiFrameButtons
+            Set<Integer> thisFrameButtons
         );
     }
 
@@ -136,7 +136,7 @@ public class ButtonManager<T> {
      *
      * @param constructor Creates events from the button, bind type, and current button states.
      */
-    public void update(EventConstructor<T> constructor) {
+    public void update(ButtonEventConstructor<T> constructor) {
         for (ButtonBindType type : ButtonBindType.values()) {
             HashSet<Integer> buttons = computeButtons(type);
             HashMap<Integer, ArrayList<Action<T>>> bindings = getBindings(type);

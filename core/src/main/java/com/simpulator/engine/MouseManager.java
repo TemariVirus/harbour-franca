@@ -48,8 +48,6 @@ public class MouseManager extends InputAdapter {
         public final int x;
         /** The y position of the mouse, in pixels */
         public final int y;
-        /** The pointer that the button belongs to. */
-        public final int pointer;
         /** The relevant button. */
         public final int button;
         /** Whether the button was pressed, held, or released. */
@@ -62,7 +60,6 @@ public class MouseManager extends InputAdapter {
         public MouseButtonEvent(
             int x,
             int y,
-            int pointer,
             int button,
             ButtonBindType type,
             float deltaTime,
@@ -70,7 +67,6 @@ public class MouseManager extends InputAdapter {
         ) {
             this.x = x;
             this.y = y;
-            this.pointer = pointer;
             this.button = button;
             this.type = type;
             this.deltaTime = deltaTime;
@@ -224,7 +220,6 @@ public class MouseManager extends InputAdapter {
             new MouseButtonEvent(
                 thisFrameX,
                 thisFrameY,
-                0,
                 button,
                 type,
                 deltaTime,
