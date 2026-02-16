@@ -8,110 +8,111 @@ config:
 ---
 
 classDiagram
-    Entity ..|> Renderable~T~: #60;#60;binds#62;#62; #60;T -> SpriteBatch#62;
-    Entity --o EntityManager: aggregates
     Entity ..|> Movable
-    EntityManager --* Scene
-    Cuboid --|> Polyhedron
-    Polyhedron ..|> GJKShape
-    ColliderMesh --|> Movable
-    Polyhedron ..> CollisionManager: Uses
-    CollisionManager ..> GJKShape: Uses
-    GraphicsManager --o SceneManager
+    Entity ..|> Renderable
+    Entity --o EntityManager
+    GraphicsManager ..|> Disposable
+    Renderable <.. GraphicsManager: Uses
     ResourceCache~K&comma; V: Disposable~ ..|> Disposable
-    Scene --o SceneManager: aggregates
-    TextureManager --|> ResourceCache: #60;#60;bind#62;#62; #60;K -> String, V -> Texture#62;
-    TextureManager --* Scene
-    MouseManager ..> MouseMoveEvent: Creates
-    SoundManager --|> ResourceCache: #60;#60;bind#62;#62; #60;K -> String, V -> Sound#62;
-    SoundManager --* Scene
+    MusicCache --|> ResourceCache~K&comma; V: Disposable~: #60;#60;bind#62;#62; #60;K -> String, V -> Music#62;
+    MusicCache --* MusicManager
+    Scene --o SceneManager
+    SceneManager ..|> Disposable
+    SceneManager *-- GraphicsManager
+    MusicManager ..|> Disposable
+    TextureManager --|> ResourceCache~K&comma; V: Disposable~: #60;#60;bind#62;#62; #60;K -> String, V -> Texture#62;
+    Scene *-- TextureManager
+    SoundManager --|> ResourceCache~K&comma; V: Disposable~: #60;#60;bind#62;#62; #60;K -> String, V -> Sound#62;
+    Scene *-- SoundManager
+    KeyEvent *-- ButtonBindType
+    ButtonBindType --* MouseButtonEvent
+    Action~T~ --o ButtonManager~T~
+    ButtonManager~T~ ..> ButtonEventConstructor~T~: Uses
+    ButtonManager~T~ ..> ButtonBindType: Creates
+    ButtonManager~T~ --* KeyboardManager: #60;#60;binds#62;#62; #60;T -> KeyEvent#62;
     KeyboardManager --|> InputAdapter
     KeyboardManager ..> KeyEvent: Creates
-    KeyboardManager --* ButtonManager~T~: #60;#60;binds#62;#62; #60;T -> KeyEvent#62;
-    KeyEvent --* ButtonBindType
-    MouseButtonEvent --* ButtonBindType
-    MouseManager --* ButtonManager~T~: #60;#60;binds#62;#62; #60;T -> MouseButtonEvent#62;
+    Action~T~ --o MouseManager: #60;#60;binds#62;#62; #60;T -> MouseMoveEvent#62;
+    Action~T~ --o MouseManager: #60;#60;binds#62;#62; #60;T -> MouseScrollEvent#62;
+    ButtonManager~T~ --* MouseManager: #60;#60;binds#62;#62; #60;T -> MouseButtonEvent#62;
     MouseManager ..> MouseButtonEvent: Creates
+    MouseManager ..> MouseMoveEvent: Creates
     MouseManager ..> MouseScrollEvent: Creates
     MouseManager --|> InputAdapter
+    Cuboid --|> Polyhedron
+    GJKShape <|.. Polyhedron
+    ColliderMesh ..> GJKShape: Creates
+    CollisionManager ..> GJK: Uses
+    CollisionManager ..> GJKShape: Uses
+    CollisionManager <.. ColliderMesh: Uses
+    CollisionManager ..> Polytope: Uses
+    GJK ..> GJKShape: Uses
+    GJK ..> ListUtil: Uses
+    Polytope ..> ListUtil: Uses
+    Polytope ..> PolytopeEdge: Creates
+    PolytopeFace --* Polytope
+
 
     class Action~T~ {
         <<interface>>
     }
 
+    class Movable {
+        <<interface>>
+    }
+
     class ColliderMesh {
         <<interface>>
-
-       }
-
-    class CollisionManager {
-       }
-
-    class Cuboid {
-        }
-
-    class Entity {
-        }
-
-    class EntityManager {
-         }
-
-    class ButtonBindType {
-         }
-
-    class ButtonManager~T~ {
-       }
-
-    class GraphicsManager {
-       }
-
-    class KeyboardManager {
-       }
-
-    class KeyEvent {
-       }
-
-    class MouseButtonEvent {
-       }
-
-    class MouseManager {
-       }
-
-    class MouseMoveEvent {
-       }
-
-    class MouseScrollEvent {
-       }
-
-    class Movable {
-        + translate(delta: Vector3) void
-        + rotate(axis: Vector3, radians: float) void
-      }
-
-    class Polyhedron {
-        }
+    }
 
     class Renderable~T~ {
         <<interface>>
     }
 
-    class ResourceCache~K&comma; V: Disposable~ {
-        }
-
-    class Scene {
-       }
-
-    class SceneManager {
-        }
-
-    class SoundManager {
-
-    }
-
-    class TextureManager {
-    }
-
     class GJKShape {
         <<interface>>
+    }
 
+    class PolytopeEdge {
+        <<dataType>>
+    }
+
+    class PolytopeFace {
+        <<dataType>>
+    }
+
+    class Polyhedron {
+        <<abstract>>
+    }
+
+    class ResourceCache~K&comma; V: Disposable~ {
+        <<abstract>>
+    }
+
+    class Scene {
+        <<abstract>>
+    }
+
+    class ButtonBindType {
+        <<enumeration>>
+    }
+
+    class ButtonEventConstructor~T~ {
+        <<functionalInterface>>
+    }
+
+    class KeyEvent {
+        <<dataType>>
+    }
+
+    class MouseButtonEvent {
+        <<dataType>>
+    }
+
+    class MouseMoveEvent {
+        <<dataType>>
+    }
+
+    class MouseScrollEvent {
+        <<dataType>>
     }

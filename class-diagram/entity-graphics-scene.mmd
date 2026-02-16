@@ -10,7 +10,7 @@ config:
 classDiagram
     Entity ..|> Movable
     Entity ..|> Renderable
-    Entity --o EntityManager: aggregates
+    Entity --o EntityManager
     GraphicsManager ..|> Disposable
     GraphicsManager ..> Renderable: Uses
     ResourceCache~K&comma; V: Disposable~ ..|> Disposable
