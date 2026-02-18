@@ -1,9 +1,11 @@
 package com.simpulator.game;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -22,8 +24,8 @@ public class MainGame extends SwitchableScene {
     private PerspectiveCamera playerCamera;
     private EntityManager entityManager;
     private InputMultiplexer inputMux;
-    private KeyboardManager km;
-    private MouseManager mm;
+    private KeyboardManager keyboard;
+    private MouseManager mouse;
     private CollidableEntity pushable;
     private CollidableEntity playerEntity;
 
@@ -42,8 +44,8 @@ public class MainGame extends SwitchableScene {
             Gdx.graphics.getHeight()
         );
         playerCamera.position.set(0, 0, 0);
-        playerCamera.lookAt(0, 0, 0);
-        playerCamera.near = 10f;
+        playerCamera.lookAt(0, 0, -1);
+        playerCamera.near = 50f;
         playerCamera.far = 3000f;
         playerCamera.update();
 
@@ -66,33 +68,43 @@ public class MainGame extends SwitchableScene {
         entityManager.add(pushable);
         entityManager.add(playerEntity);
 
-        km = new KeyboardManager();
+        keyboard = new KeyboardManager();
 
         // @formatter:off
-        km.bind(ButtonBindType.HOLD, Keys.W, new TranslateCameraAction(playerCamera, new Vector3(0, 0, -100)));
-        km.bind(ButtonBindType.HOLD, Keys.A, new TranslateCameraAction(playerCamera, new Vector3(-100, 0, 0)));
-        km.bind(ButtonBindType.HOLD, Keys.S, new TranslateCameraAction(playerCamera, new Vector3(0, 0, 100)));
-        km.bind(ButtonBindType.HOLD, Keys.D, new TranslateCameraAction(playerCamera, new Vector3(100, 0, 0)));
-        km.bind(ButtonBindType.HOLD, Keys.SHIFT_LEFT, new TranslateCameraAction(playerCamera, new Vector3(0, -100, 0)));
-        km.bind(ButtonBindType.HOLD, Keys.SPACE, new TranslateCameraAction(playerCamera, new Vector3(0, 100, 0)));
+        keyboard.bind(ButtonBindType.HOLD, Keys.W, new TranslateCameraAction(playerCamera, new Vector3(0, 0, -100)));
+        keyboard.bind(ButtonBindType.HOLD, Keys.A, new TranslateCameraAction(playerCamera, new Vector3(-100, 0, 0)));
+        keyboard.bind(ButtonBindType.HOLD, Keys.S, new TranslateCameraAction(playerCamera, new Vector3(0, 0, 100)));
+        keyboard.bind(ButtonBindType.HOLD, Keys.D, new TranslateCameraAction(playerCamera, new Vector3(100, 0, 0)));
+        keyboard.bind(ButtonBindType.HOLD, Keys.SHIFT_LEFT, new TranslateCameraAction(playerCamera, new Vector3(0, -100, 0)));
+        keyboard.bind(ButtonBindType.HOLD, Keys.SPACE, new TranslateCameraAction(playerCamera, new Vector3(0, 100, 0)));
 
-        km.bind(ButtonBindType.HOLD, Keys.R, new MoveAction(pushable, new Vector3(1, 0, 1), 4));
-        km.bind(ButtonBindType.HOLD, Keys.LEFT, new MoveAction(playerEntity, new Vector3(-100, 0, 0)));
-        km.bind(ButtonBindType.HOLD, Keys.RIGHT, new MoveAction(playerEntity, new Vector3(100, 0, 0)));
-        km.bind(ButtonBindType.HOLD, Keys.UP, new MoveAction(playerEntity, new Vector3(0, 0, -100)));
-        km.bind(ButtonBindType.HOLD, Keys.DOWN, new MoveAction(playerEntity, new Vector3(0, 0, 100)));
+        keyboard.bind(ButtonBindType.HOLD, Keys.R, new MoveAction(pushable, new Vector3(1, 0, 1), 4));
+        keyboard.bind(ButtonBindType.HOLD, Keys.LEFT, new MoveAction(playerEntity, new Vector3(-100, 0, 0)));
+        keyboard.bind(ButtonBindType.HOLD, Keys.RIGHT, new MoveAction(playerEntity, new Vector3(100, 0, 0)));
+        keyboard.bind(ButtonBindType.HOLD, Keys.UP, new MoveAction(playerEntity, new Vector3(0, 0, -100)));
+        keyboard.bind(ButtonBindType.HOLD, Keys.DOWN, new MoveAction(playerEntity, new Vector3(0, 0, 100)));
 
-        km.bind(ButtonBindType.DOWN, Keys.ESCAPE, switchSceneAction(Scenes.MainMenu));
+        keyboard.bind(ButtonBindType.DOWN, Keys.ESCAPE, switchSceneAction(Scenes.MainMenu));
         // @formatter:on
 
-        mm = new MouseManager();
+        mouse = new MouseManager();
         // TODO: add sensitivity to settings
-        mm.bindMove(new RotateCameraAction(playerCamera, 0.15f));
+        mouse.bindMove(new RotateCameraAction(playerCamera, 0.15f));
+        mouse.bindButton(
+            ButtonBindType.HOLD,
+            Buttons.LEFT,
+            new SpawnBulletAction(
+                entityManager,
+                new TextureRegion(textures.get("droplet.png")),
+                playerCamera,
+                0.5f,
+                500f
+            )
+        );
 
-        // TODO: shoot droplets on mouse click. dropplets will delete entities and make sound on contact
         inputMux = new InputMultiplexer();
-        inputMux.addProcessor(km);
-        inputMux.addProcessor(mm);
+        inputMux.addProcessor(keyboard);
+        inputMux.addProcessor(mouse);
         Gdx.input.setInputProcessor(inputMux);
     }
 
@@ -107,8 +119,8 @@ public class MainGame extends SwitchableScene {
     @Override
     public void update(float deltaTime) {
         clock.forward(deltaTime);
-        km.update(deltaTime, clock.getSeconds());
-        mm.update(deltaTime, clock.getSeconds());
+        keyboard.update(deltaTime, clock.getSeconds());
+        mouse.update(deltaTime, clock.getSeconds());
         entityManager.update(deltaTime);
 
         Vector3 mtv = new Vector3().setZero();
