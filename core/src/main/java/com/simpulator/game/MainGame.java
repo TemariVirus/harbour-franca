@@ -126,9 +126,14 @@ public class MainGame extends SwitchableScene {
         entityManager.update(deltaTime);
         entityRemover.update();
 
-        Vector3 mtv = new Vector3().setZero();
-        if (pushable.intersects(playerEntity, mtv)) {
-            pushable.translate(mtv);
+        if (
+            entityManager.getEntities().contains(pushable) &&
+            entityManager.getEntities().contains(playerEntity)
+        ) {
+            Vector3 mtv = new Vector3();
+            if (pushable.intersects(playerEntity, mtv)) {
+                pushable.translate(mtv);
+            }
         }
     }
 
