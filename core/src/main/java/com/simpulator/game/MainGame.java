@@ -68,15 +68,13 @@ public class MainGame extends SwitchableScene {
 
         km = new KeyboardManager();
 
-        // TODO: move according to rotation
-        MovableCamera movableCam = new MovableCamera(playerCamera);
         // @formatter:off
-        km.bind(ButtonBindType.HOLD, Keys.W, new MoveAction(movableCam, new Vector3(0, 0, -100)));
-        km.bind(ButtonBindType.HOLD, Keys.A, new MoveAction(movableCam, new Vector3(-100, 0, 0)));
-        km.bind(ButtonBindType.HOLD, Keys.S, new MoveAction(movableCam, new Vector3(0, 0, 100)));
-        km.bind(ButtonBindType.HOLD, Keys.D, new MoveAction(movableCam, new Vector3(100, 0, 0)));
-        km.bind(ButtonBindType.HOLD, Keys.SHIFT_LEFT, new MoveAction(movableCam, new Vector3(0, -100, 0)));
-        km.bind(ButtonBindType.HOLD, Keys.SPACE, new MoveAction(movableCam, new Vector3(0, 100, 0)));
+        km.bind(ButtonBindType.HOLD, Keys.W, new TranslateCameraAction(playerCamera, new Vector3(0, 0, -100)));
+        km.bind(ButtonBindType.HOLD, Keys.A, new TranslateCameraAction(playerCamera, new Vector3(-100, 0, 0)));
+        km.bind(ButtonBindType.HOLD, Keys.S, new TranslateCameraAction(playerCamera, new Vector3(0, 0, 100)));
+        km.bind(ButtonBindType.HOLD, Keys.D, new TranslateCameraAction(playerCamera, new Vector3(100, 0, 0)));
+        km.bind(ButtonBindType.HOLD, Keys.SHIFT_LEFT, new TranslateCameraAction(playerCamera, new Vector3(0, -100, 0)));
+        km.bind(ButtonBindType.HOLD, Keys.SPACE, new TranslateCameraAction(playerCamera, new Vector3(0, 100, 0)));
 
         km.bind(ButtonBindType.HOLD, Keys.R, new MoveAction(pushable, new Vector3(1, 0, 1), 4));
         km.bind(ButtonBindType.HOLD, Keys.LEFT, new MoveAction(playerEntity, new Vector3(-100, 0, 0)));
@@ -88,7 +86,8 @@ public class MainGame extends SwitchableScene {
         // @formatter:on
 
         mm = new MouseManager();
-        mm.bindMove(new FirstPersonCameraAction(playerCamera, 0.15f));
+        // TODO: add sensitivity to settings
+        mm.bindMove(new RotateCameraAction(playerCamera, 0.15f));
 
         // TODO: shoot droplets on mouse click. dropplets will delete entities and make sound on contact
         inputMux = new InputMultiplexer();

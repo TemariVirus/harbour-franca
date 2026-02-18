@@ -5,14 +5,12 @@ import com.badlogic.gdx.math.Vector3;
 import com.simpulator.engine.Action;
 import com.simpulator.engine.MouseManager;
 
-public class FirstPersonCameraAction
-    implements Action<MouseManager.MouseMoveEvent>
-{
+public class RotateCameraAction implements Action<MouseManager.MouseMoveEvent> {
 
     private Camera camera;
     private float sensitivity;
 
-    public FirstPersonCameraAction(Camera camera, float sensitivity) {
+    public RotateCameraAction(Camera camera, float sensitivity) {
         this.camera = camera;
         this.sensitivity = sensitivity;
     }
