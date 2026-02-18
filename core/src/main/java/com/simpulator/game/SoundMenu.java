@@ -24,6 +24,7 @@ public class SoundMenu extends SwitchableScene {
         musics = musicManager;
     }
 
+    // TODO: add separate volume for sounds and maintain it across scenes
     private <T> Action<T> changeVolumeAction(float amount) {
         return new Action<T>() {
             public void act(T data) {
