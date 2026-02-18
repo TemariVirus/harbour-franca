@@ -1,0 +1,15 @@
+flowchart TB
+    Start([Start]) --> Enum[Enumerate scenes]
+    Enum --> Load[Load scene]
+    Load --> Res[Load sounds and textures]
+    Res --> Input[Initialise input managers and action bindings]
+    Input --> Wait[Wait for next frame]
+    Unload --> Load
+    Poll --> Unload[Unload scene and free resources]
+
+subgraph Frame[Frame loop]
+    Wait --> Poll[Apply events from input managers]
+    Poll --> Update[Update entities]
+    Update --> Render[Render scene]
+    Render --> Wait
+end
