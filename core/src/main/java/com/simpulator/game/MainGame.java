@@ -2,6 +2,7 @@ package com.simpulator.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector2;
@@ -12,6 +13,7 @@ import com.simpulator.engine.Entity;
 import com.simpulator.engine.EntityManager;
 import com.simpulator.engine.GraphicsManager;
 import com.simpulator.engine.KeyboardManager;
+import com.simpulator.engine.MouseManager;
 import com.simpulator.engine.SceneManager;
 
 public class MainGame extends SwitchableScene {
@@ -19,7 +21,9 @@ public class MainGame extends SwitchableScene {
     private final Clock clock = new Clock(0);
     private PerspectiveCamera playerCamera;
     private EntityManager entityManager;
+    private InputMultiplexer inputMux;
     private KeyboardManager km;
+    private MouseManager mm;
     private CollidableEntity pushable;
     private CollidableEntity playerEntity;
 
@@ -62,6 +66,7 @@ public class MainGame extends SwitchableScene {
 
         km = new KeyboardManager();
 
+        // TODO: move according to rotation
         MovableCamera movableCam = new MovableCamera(playerCamera);
         km.bind(ButtonBindType.HOLD, Keys.W, new MoveAction(movableCam, new Vector3(0, 0, -100)));
         km.bind(ButtonBindType.HOLD, Keys.A, new MoveAction(movableCam, new Vector3(-100, 0, 0)));
@@ -78,8 +83,14 @@ public class MainGame extends SwitchableScene {
 
         km.bind(ButtonBindType.DOWN, Keys.ESCAPE, switchSceneAction(Scenes.MainMenu));
 
+        mm = new MouseManager();
+        mm.bindMove(new FirstPersonCameraAction(playerCamera, 0.15f));
+        
         // TODO: add input processor to abstract engine that has all input managers
-        Gdx.input.setInputProcessor(km);
+        inputMux = new InputMultiplexer();
+        inputMux.addProcessor(km);
+        inputMux.addProcessor(mm);
+        Gdx.input.setInputProcessor(inputMux);
     }
 
     @Override
@@ -93,6 +104,7 @@ public class MainGame extends SwitchableScene {
     public void update(float deltaTime) {
         clock.forward(deltaTime);
         km.update(deltaTime, clock.getSeconds());
+        mm.update(deltaTime, clock.getSeconds());
         entityManager.update(deltaTime);
 
         Vector3 mtv = new Vector3().setZero();
