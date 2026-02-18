@@ -34,6 +34,8 @@ public class MainGame extends SwitchableScene {
 
     @Override
     public void load() {
+        Gdx.input.setCursorCatched(true);
+
         playerCamera = new PerspectiveCamera(
             70,
             Gdx.graphics.getWidth(),
@@ -68,6 +70,7 @@ public class MainGame extends SwitchableScene {
 
         // TODO: move according to rotation
         MovableCamera movableCam = new MovableCamera(playerCamera);
+        // @formatter:off
         km.bind(ButtonBindType.HOLD, Keys.W, new MoveAction(movableCam, new Vector3(0, 0, -100)));
         km.bind(ButtonBindType.HOLD, Keys.A, new MoveAction(movableCam, new Vector3(-100, 0, 0)));
         km.bind(ButtonBindType.HOLD, Keys.S, new MoveAction(movableCam, new Vector3(0, 0, 100)));
@@ -82,11 +85,12 @@ public class MainGame extends SwitchableScene {
         km.bind(ButtonBindType.HOLD, Keys.DOWN, new MoveAction(playerEntity, new Vector3(0, 0, 100)));
 
         km.bind(ButtonBindType.DOWN, Keys.ESCAPE, switchSceneAction(Scenes.MainMenu));
+        // @formatter:on
 
         mm = new MouseManager();
         mm.bindMove(new FirstPersonCameraAction(playerCamera, 0.15f));
-        
-        // TODO: add input processor to abstract engine that has all input managers
+
+        // TODO: shoot droplets on mouse click. dropplets will delete entities and make sound on contact
         inputMux = new InputMultiplexer();
         inputMux.addProcessor(km);
         inputMux.addProcessor(mm);
@@ -98,6 +102,7 @@ public class MainGame extends SwitchableScene {
         super.unload();
         entityManager.removeAll();
         Gdx.input.setInputProcessor(null);
+        Gdx.input.setCursorCatched(false);
     }
 
     @Override
