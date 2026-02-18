@@ -1,26 +1,35 @@
 package com.simpulator.game;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.simpulator.engine.ColliderMesh;
 import com.simpulator.engine.Entity;
 
-public class BulletEntity extends Entity {
+public class BulletEntity extends CollidableEntity {
 
+    private EntityRemover entityRemover;
+    private Sound hitSound;
     /** The remaining lifetime of this bullet, in seconds. */
     private float lifetime;
     private Vector3 velocity;
 
     public BulletEntity(
+        EntityRemover entityRemover,
         Vector3 position,
         Vector2 size,
+        float thickness,
         Quaternion rotation,
-        TextureRegion textureRegion,
+        Texture texture,
+        Sound hitSound,
         float lifetime,
         float speed
     ) {
-        super(position, size, rotation, textureRegion);
+        super(position, size, thickness, rotation, texture);
+        this.entityRemover = entityRemover;
+        this.hitSound = hitSound;
         this.lifetime = lifetime;
         this.velocity = new Vector3(0, 0, -speed).mul(rotation);
     }
@@ -29,10 +38,21 @@ public class BulletEntity extends Entity {
     public void update(float deltaTime) {
         lifetime -= deltaTime;
         if (lifetime < 0) {
-            // TODO: delete dead bullets
+            entityRemover.markForRemoval(this);
             return;
         }
         translate(velocity.cpy().scl(deltaTime));
-        // TODO: delete entities and make sound on contact
+
+        for (Entity entity : entityRemover.getEntityManager().getEntities()) {
+            if (entity == this) continue;
+            if (entity instanceof ColliderMesh) {
+                if (intersects((ColliderMesh) entity)) {
+                    entityRemover.markForRemoval(this);
+                    entityRemover.markForRemoval(entity);
+                    hitSound.play();
+                    break;
+                }
+            }
+        }
     }
 }

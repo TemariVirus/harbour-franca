@@ -5,7 +5,6 @@ import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -23,6 +22,7 @@ public class MainGame extends SwitchableScene {
     private final Clock clock = new Clock(0);
     private PerspectiveCamera playerCamera;
     private EntityManager entityManager;
+    private EntityRemover entityRemover;
     private InputMultiplexer inputMux;
     private KeyboardManager keyboard;
     private MouseManager mouse;
@@ -37,6 +37,7 @@ public class MainGame extends SwitchableScene {
     @Override
     public void load() {
         Gdx.input.setCursorCatched(true);
+        entityRemover = new EntityRemover(entityManager);
 
         playerCamera = new PerspectiveCamera(
             70,
@@ -94,8 +95,9 @@ public class MainGame extends SwitchableScene {
             ButtonBindType.HOLD,
             Buttons.LEFT,
             new SpawnBulletAction(
-                entityManager,
-                new TextureRegion(textures.get("droplet.png")),
+                entityRemover,
+                textures.get("droplet.png"),
+                sounds.get("pop.mp3"),
                 playerCamera,
                 0.5f,
                 500f
@@ -122,6 +124,7 @@ public class MainGame extends SwitchableScene {
         keyboard.update(deltaTime, clock.getSeconds());
         mouse.update(deltaTime, clock.getSeconds());
         entityManager.update(deltaTime);
+        entityRemover.update();
 
         Vector3 mtv = new Vector3().setZero();
         if (pushable.intersects(playerEntity, mtv)) {

@@ -1,33 +1,36 @@
 package com.simpulator.game;
 
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector2;
 import com.simpulator.engine.Action;
-import com.simpulator.engine.EntityManager;
 import com.simpulator.engine.MouseManager;
 
 public class SpawnBulletAction
     implements Action<MouseManager.MouseButtonEvent>
 {
 
-    private EntityManager entityManager;
-    private TextureRegion bulletTexture;
+    private EntityRemover entityRemover;
+    private Texture bulletTexture;
+    private Sound hitSound;
     private Camera player;
     private float cooldown;
     private float speed;
     private float lastSpawnTime;
 
     public SpawnBulletAction(
-        EntityManager entityManager,
-        TextureRegion bulletTexture,
+        EntityRemover entityRemover,
+        Texture bulletTexture,
+        Sound hitSound,
         Camera player,
         float cooldown,
         float speed
     ) {
-        this.entityManager = entityManager;
+        this.entityRemover = entityRemover;
         this.bulletTexture = bulletTexture;
+        this.hitSound = hitSound;
         this.player = player;
         this.cooldown = cooldown;
         this.speed = speed;
@@ -41,19 +44,24 @@ public class SpawnBulletAction
             return;
         }
 
-        entityManager.add(
-            new BulletEntity(
-                player.position.cpy(),
-                new Vector2(
-                    bulletTexture.getRegionWidth(),
-                    bulletTexture.getRegionHeight()
-                ),
-                player.view.getRotation(new Quaternion()).conjugate(),
-                bulletTexture,
-                5000f / speed,
-                speed
-            )
-        );
+        entityRemover
+            .getEntityManager()
+            .add(
+                new BulletEntity(
+                    entityRemover,
+                    player.position.cpy(),
+                    new Vector2(
+                        bulletTexture.getWidth(),
+                        bulletTexture.getHeight()
+                    ),
+                    5f,
+                    player.view.getRotation(new Quaternion()).conjugate(),
+                    bulletTexture,
+                    hitSound,
+                    5000f / speed,
+                    speed
+                )
+            );
         lastSpawnTime = event.timestamp;
     }
 }
