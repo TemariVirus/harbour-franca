@@ -17,42 +17,42 @@ public class FirstPersonCameraAction
         this.sensitivity = sensitivity;
     }
 
+    private float clamp(float value, float min, float max) {
+        return Math.max(min, Math.min(max, value));
+    }
+
     @Override
     public void act(MouseManager.MouseMoveEvent event) {
-        // TODO: verify
-        // https://stackoverflow.com/questions/21825959/libgdx-first-person-camera-controll
         boolean cameraMoved = false;
-        int magX = Math.abs(event.deltaX);
-        int magY = Math.abs(event.deltaY);
 
-        // TODO: allow mouse to move indefinitely
         if (event.deltaX != 0) {
             camera.rotate(Vector3.Y, -event.deltaX * sensitivity);
             cameraMoved = true;
         }
-        // if (mouseX > screenX) {
-        //     camera.rotate(Vector3.Y, 1 * magX * sensitivity);
-        //     cameraMoved = true;
-        // }
 
-        // if (mouseX < screenX) {
-        //     camera.rotate(Vector3.Y, -1 * magX * sensitivity);
-        //     cameraMoved = true;
-        // }
-
-        if (event.deltaY > 0 && camera.direction.y > -0.965) {
-            camera.rotate(
-                camera.direction.cpy().crs(Vector3.Y),
-                -magY * sensitivity
+        // Prevent camera from going too close to the poles to avoid gimbal lock
+        if (
+            (event.deltaY > 0 && camera.direction.y > -0.99f) ||
+            (event.deltaY < 0 && camera.direction.y < 0.99f)
+        ) {
+            Vector3 axis = camera.direction.cpy().crs(Vector3.Y);
+            float currentAngle = (float) Math.acos(
+                camera.direction.dot(Vector3.Y)
             );
-            cameraMoved = true;
-        }
-
-        if (event.deltaY < 0 && camera.direction.y < 0.965) {
-            camera.rotate(
-                camera.direction.cpy().crs(Vector3.Y),
-                magY * sensitivity
+            float rotateAmount =
+                -event.deltaY *
+                sensitivity *
+                // Convert to radians
+                ((float) Math.PI / 180f);
+            float newAngle = clamp(
+                currentAngle + rotateAmount,
+                0.005f,
+                (float) Math.PI - 0.005f
             );
+            rotateAmount = newAngle - currentAngle;
+
+            // Convert back to degrees
+            camera.rotate(axis, rotateAmount * (180f / (float) Math.PI));
             cameraMoved = true;
         }
 
