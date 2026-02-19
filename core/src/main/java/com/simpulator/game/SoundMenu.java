@@ -32,22 +32,16 @@ public class SoundMenu extends SwitchableScene {
         musics = musicManager;
     }
 
-    // TODO: add separate volume for sounds and maintain it across scenes
-    private <T> Action<T> changeVolumeAction(float amount) {
+    private <T> Action<T> changeVolumeAction(int amount) {
         return new Action<T>() {
             public void act(T data) {
-                float current = sounds.getVolume();
-                float target = current + amount;
+                Config.volume = MathUtils.clamp(Config.volume + amount, 0, 100);
 
-                // TODO: store volume as an int
-                // fix float pt error
-                target = Math.round(target * 10) / 10.0f;
-
-                sounds.setVolume(target);
-                musics.setVolume(target);
-
+                float volume = Config.volume * 0.01f;
+                sounds.setVolume(volume);
+                musics.setVolume(volume);
                 if (volumeSlider != null) {
-                    volumeSlider.setValue(target);
+                    volumeSlider.setValue(Config.volume);
                 }
             }
         };
@@ -70,25 +64,24 @@ public class SoundMenu extends SwitchableScene {
             Keys.BACKSPACE,
             switchSceneAction(Scenes.MainMenu)
         );
-        km.bind(ButtonBindType.DOWN, Keys.LEFT, changeVolumeAction(-0.1f));
-        km.bind(ButtonBindType.DOWN, Keys.RIGHT, changeVolumeAction(0.1f));
+        km.bind(ButtonBindType.DOWN, Keys.LEFT, changeVolumeAction(-10));
+        km.bind(ButtonBindType.DOWN, Keys.RIGHT, changeVolumeAction(10));
 
         stage = new Stage();
         Table table = new Table();
         table.setFillParent(true);
         stage.addActor(table);
 
-        volumeSlider = new Slider(0f, 1f, 0.1f, false, SimpleSkin.getSkin());
-        volumeSlider.setValue(sounds.getVolume());
+        volumeSlider = new Slider(0, 100, 10, false, SimpleSkin.getSkin());
+        volumeSlider.setValue(Config.volume);
 
         volumeSlider.addListener(
             new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    float target = volumeSlider.getValue();
-                    target = Math.round(target * 10) / 10.0f;
-                    sounds.setVolume(target);
-                    musics.setVolume(target);
+                    Config.volume = Math.round(volumeSlider.getValue());
+                    sounds.setVolume(Config.volume * 0.01f);
+                    musics.setVolume(Config.volume * 0.01f);
                 }
             }
         );
@@ -121,11 +114,8 @@ public class SoundMenu extends SwitchableScene {
 
         graphics.render(new UIText(font, "SOUND SETTINGS", 100, 450), null);
 
-        // fix it from going to 79
-        int percent = MathUtils.round(sounds.getVolume() * 100);
-
         graphics.render(
-            new UIText(font, "Volume: " + percent + "%", 100, 350),
+            new UIText(font, "Volume: " + Config.volume + "%", 100, 350),
             null
         );
         graphics.render(

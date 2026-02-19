@@ -21,6 +21,8 @@ public class MainMenu extends SwitchableScene {
 
     @Override
     public void load() {
+        sounds.setVolume(Config.volume * 0.01f);
+
         font = new BitmapFont();
         font.setColor(Color.WHITE);
         font.getData().setScale(2);

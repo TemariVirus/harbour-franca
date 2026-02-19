@@ -1,6 +1,7 @@
 package com.simpulator.game;
 
 import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.simpulator.engine.Action;
 import com.simpulator.engine.MouseManager;
@@ -13,10 +14,6 @@ public class RotateCameraAction implements Action<MouseManager.MouseMoveEvent> {
     public RotateCameraAction(Camera camera, float sensitivity) {
         this.camera = camera;
         this.sensitivity = sensitivity;
-    }
-
-    private float clamp(float value, float min, float max) {
-        return Math.max(min, Math.min(max, value));
     }
 
     @Override
@@ -42,7 +39,7 @@ public class RotateCameraAction implements Action<MouseManager.MouseMoveEvent> {
                 sensitivity *
                 // Convert to radians
                 ((float) Math.PI / 180f);
-            float newAngle = clamp(
+            float newAngle = MathUtils.clamp(
                 currentAngle + rotateAmount,
                 0.005f,
                 (float) Math.PI - 0.005f

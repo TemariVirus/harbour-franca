@@ -53,6 +53,8 @@ public class MainGame extends SwitchableScene {
         playerCamera.far = 3000f;
         playerCamera.update();
 
+        sounds.setVolume(Config.volume * 0.01f);
+
         playerEntity = new CollidableEntity(
             entityManager,
             new Vector3(0, 0, -200),
@@ -106,7 +108,6 @@ public class MainGame extends SwitchableScene {
         // @formatter:on
 
         mouse = new MouseManager();
-        // TODO: add sensitivity to settings
         mouse.bindMove(new RotateCameraAction(playerCamera, 0.15f));
         mouse.bindButton(
             ButtonBindType.HOLD,
@@ -114,7 +115,7 @@ public class MainGame extends SwitchableScene {
             new SpawnBulletAction(
                 entityRemover,
                 textures.get(BULLET_IMG),
-                sounds.get(POP_SFX),
+                new SoundPlayer(sounds, POP_SFX),
                 playerCamera,
                 0.5f,
                 500f
@@ -148,7 +149,7 @@ public class MainGame extends SwitchableScene {
             for (Entity entity : entityManager.getEntities()) {
                 if (entity instanceof RoamingEntity) {
                     if (playerEntity.intersects((RoamingEntity) entity)) {
-                        sounds.get(POP_SFX).play();
+                        sounds.play(POP_SFX);
                         break;
                     }
                 }

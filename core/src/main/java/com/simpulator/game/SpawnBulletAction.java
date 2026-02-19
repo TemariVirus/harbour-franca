@@ -1,6 +1,5 @@
 package com.simpulator.game;
 
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Quaternion;
@@ -14,7 +13,7 @@ public class SpawnBulletAction
 
     private EntityRemover entityRemover;
     private Texture bulletTexture;
-    private Sound hitSound;
+    private SoundPlayer hitSound;
     private Camera player;
     private float cooldown;
     private float speed;
@@ -23,7 +22,7 @@ public class SpawnBulletAction
     public SpawnBulletAction(
         EntityRemover entityRemover,
         Texture bulletTexture,
-        Sound hitSound,
+        SoundPlayer hitSound,
         Camera player,
         float cooldown,
         float speed

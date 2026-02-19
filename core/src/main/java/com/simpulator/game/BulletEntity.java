@@ -1,6 +1,5 @@
 package com.simpulator.game;
 
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector2;
@@ -11,7 +10,7 @@ import com.simpulator.engine.Entity;
 public class BulletEntity extends CollidableEntity {
 
     private EntityRemover entityRemover;
-    private Sound hitSound;
+    private SoundPlayer hitSound;
     /** The remaining lifetime of this bullet, in seconds. */
     private float lifetime;
     private Vector3 velocity;
@@ -23,7 +22,7 @@ public class BulletEntity extends CollidableEntity {
         float thickness,
         Quaternion rotation,
         Texture texture,
-        Sound hitSound,
+        SoundPlayer hitSound,
         float lifetime,
         float speed
     ) {
