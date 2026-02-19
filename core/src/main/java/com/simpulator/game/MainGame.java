@@ -28,6 +28,7 @@ public class MainGame extends SwitchableScene {
     private MouseManager mouse;
     private CollidableEntity pushable;
     private CollidableEntity playerEntity;
+    private RoamingEntity enemy;
 
     public MainGame(SceneManager sceneManager) {
         super(sceneManager);
@@ -65,6 +66,10 @@ public class MainGame extends SwitchableScene {
             new Quaternion().idt(),
             textures.get("libgdx.png")
         );
+
+        enemy = new RoamingEntity(new Vector3(-200, 0, -100), new Vector2(100, 100), 10, textures.get("libgdx.png"));
+        enemy.setTint(com.badlogic.gdx.graphics.Color.RED); 
+        entityManager.add(enemy);
 
         entityManager.add(pushable);
         entityManager.add(playerEntity);
@@ -134,6 +139,11 @@ public class MainGame extends SwitchableScene {
             if (pushable.intersects(playerEntity, mtv)) {
                 pushable.translate(mtv);
             }
+            Vector3 mtvEnemy = new Vector3().setZero();
+            if (playerEntity.intersects(enemy, mtvEnemy)) {
+                playerEntity.translate(mtvEnemy);
+            
+                sounds.get("pop.mp3").play(); 
         }
     }
 
