@@ -2,16 +2,16 @@ package com.simpulator.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.utils.ScreenUtils;
 import com.simpulator.engine.Action;
 import com.simpulator.engine.ButtonManager.ButtonBindType;
 import com.simpulator.engine.GraphicsManager;
@@ -47,7 +47,7 @@ public class SoundMenu extends SwitchableScene {
                 musics.setVolume(target);
 
                 if (volumeSlider != null) {
-                    volumeSlider.setValue(target); 
+                    volumeSlider.setValue(target);
                 }
             }
         };
@@ -80,23 +80,25 @@ public class SoundMenu extends SwitchableScene {
 
         volumeSlider = new Slider(0f, 1f, 0.1f, false, SimpleSkin.getSkin());
         volumeSlider.setValue(sounds.getVolume());
-        
-        volumeSlider.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                float target = volumeSlider.getValue();
-                target = Math.round(target * 10) / 10.0f;
-                sounds.setVolume(target);
-                musics.setVolume(target);
+
+        volumeSlider.addListener(
+            new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    float target = volumeSlider.getValue();
+                    target = Math.round(target * 10) / 10.0f;
+                    sounds.setVolume(target);
+                    musics.setVolume(target);
+                }
             }
-        });
+        );
 
         table.add(volumeSlider).width(300).height(50).padTop(50);
 
         InputMultiplexer multiplexer = new InputMultiplexer();
-        multiplexer.addProcessor(stage); 
-        multiplexer.addProcessor(km);   
-        
+        multiplexer.addProcessor(stage);
+        multiplexer.addProcessor(km);
+
         Gdx.input.setInputProcessor(multiplexer);
     }
 
@@ -104,10 +106,7 @@ public class SoundMenu extends SwitchableScene {
     public void unload() {
         super.unload();
         font.dispose();
-        
-        if (stage != null) {
-            stage.dispose(); 
-        }
+        stage.dispose();
         Gdx.input.setInputProcessor(null);
     }
 
@@ -140,9 +139,7 @@ public class SoundMenu extends SwitchableScene {
         );
         graphics.endRender();
 
-        if (stage != null) {
-            stage.act(Gdx.graphics.getDeltaTime());
-            stage.draw();
-        }
+        stage.act(Gdx.graphics.getDeltaTime());
+        stage.draw();
     }
 }

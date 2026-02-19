@@ -19,6 +19,10 @@ import com.simpulator.engine.SceneManager;
 
 public class MainGame extends SwitchableScene {
 
+    private static final String BULLET_IMG = "droplet.png";
+    private static final String ENTITY_IMG = "libgdx.png";
+    private static final String POP_SFX = "pop.mp3";
+
     private final Clock clock = new Clock(0);
     private PerspectiveCamera playerCamera;
     private EntityManager entityManager;
@@ -56,7 +60,7 @@ public class MainGame extends SwitchableScene {
             new Vector2(200, 100),
             0,
             new Quaternion().idt(),
-            textures.get("libgdx.png")
+            textures.get(ENTITY_IMG)
         );
 
         playerEntity = new CollidableEntity(
@@ -64,11 +68,16 @@ public class MainGame extends SwitchableScene {
             new Vector2(200, 200),
             10,
             new Quaternion().idt(),
-            textures.get("libgdx.png")
+            textures.get(ENTITY_IMG)
         );
 
-        enemy = new RoamingEntity(new Vector3(-200, 0, -100), new Vector2(100, 100), 10, textures.get("libgdx.png"));
-        enemy.setTint(com.badlogic.gdx.graphics.Color.RED); 
+        enemy = new RoamingEntity(
+            new Vector3(-200, 0, -100),
+            new Vector2(100, 100),
+            10,
+            textures.get(ENTITY_IMG)
+        );
+        enemy.setTint(com.badlogic.gdx.graphics.Color.RED);
         entityManager.add(enemy);
 
         entityManager.add(pushable);
@@ -101,8 +110,8 @@ public class MainGame extends SwitchableScene {
             Buttons.LEFT,
             new SpawnBulletAction(
                 entityRemover,
-                textures.get("droplet.png"),
-                sounds.get("pop.mp3"),
+                textures.get(BULLET_IMG),
+                sounds.get(POP_SFX),
                 playerCamera,
                 0.5f,
                 500f
@@ -143,7 +152,7 @@ public class MainGame extends SwitchableScene {
             if (playerEntity.intersects(enemy, mtvEnemy)) {
                 playerEntity.translate(mtvEnemy);
 
-                sounds.get("pop.mp3").play();
+                sounds.get(POP_SFX).play();
             }
         }
     }

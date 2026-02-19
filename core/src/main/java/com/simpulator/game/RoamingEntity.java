@@ -7,48 +7,49 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
 public class RoamingEntity extends CollidableEntity {
-    
-    private float speed = 100f; 
+
+    private float speed = 100f;
     private Vector3 targetPosition;
     private Vector3 moveDirection;
 
     // Adjust values to size of playable game area
-    private final float minX = -500f;
-    private final float maxX = 500f;
-    private final float minZ = -500f;
-    private final float maxZ = 100f;
+    private static final float MIN_X = -500f;
+    private static final float MAX_X = 500f;
+    private static final float MIN_Z = -500f;
+    private static final float MAX_Z = 100f;
 
-    public RoamingEntity(Vector3 position, Vector2 size, float thickness, Texture texture) {
+    public RoamingEntity(
+        Vector3 position,
+        Vector2 size,
+        float thickness,
+        Texture texture
+    ) {
         super(position, size, thickness, new Quaternion().idt(), texture);
-        
         this.targetPosition = new Vector3();
         this.moveDirection = new Vector3();
-        
-        pickNewWaypoint(); 
+
+        pickNewWaypoint();
     }
 
     private void pickNewWaypoint() {
-        float randomX = MathUtils.random(minX, maxX);
-        float randomZ = MathUtils.random(minZ, maxZ);
-        
+        float randomX = MathUtils.random(MIN_X, MAX_X);
+        float randomZ = MathUtils.random(MIN_Z, MAX_Z);
+
         targetPosition.set(randomX, getPosition().y, randomZ);
     }
 
     @Override
     public void update(float deltaTime) {
-        super.update(deltaTime);
-        
         Vector3 currentPos = getPosition();
-        
         float distanceToTarget = currentPos.dst(targetPosition);
-        
+
         if (distanceToTarget < 10f) {
             pickNewWaypoint();
         } else {
-            moveDirection.set(targetPosition).sub(currentPos).nor(); 
-            
-            Vector3 velocity = moveDirection.scl(speed * deltaTime);
-            this.translate(velocity);
+            moveDirection.set(targetPosition).sub(currentPos).nor();
+
+            Vector3 step = moveDirection.scl(speed * deltaTime);
+            this.translate(step);
         }
     }
 }
