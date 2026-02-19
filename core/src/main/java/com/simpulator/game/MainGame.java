@@ -30,9 +30,7 @@ public class MainGame extends SwitchableScene {
     private InputMultiplexer inputMux;
     private KeyboardManager keyboard;
     private MouseManager mouse;
-    private CollidableEntity pushable;
     private CollidableEntity playerEntity;
-    private RoamingEntity enemy;
 
     public MainGame(SceneManager sceneManager) {
         super(sceneManager);
@@ -55,33 +53,38 @@ public class MainGame extends SwitchableScene {
         playerCamera.far = 3000f;
         playerCamera.update();
 
-        pushable = new CollidableEntity(
-            new Vector3(100, 100, -200),
-            new Vector2(200, 100),
-            0,
-            new Quaternion().idt(),
-            textures.get(ENTITY_IMG)
-        );
-
         playerEntity = new CollidableEntity(
+            entityManager,
             new Vector3(0, 0, -200),
             new Vector2(200, 200),
             10,
             new Quaternion().idt(),
-            textures.get(ENTITY_IMG)
+            textures.get(ENTITY_IMG),
+            false
         );
 
-        enemy = new RoamingEntity(
+        CollidableEntity pushable = new CollidableEntity(
+            entityManager,
+            new Vector3(100, 100, -200),
+            new Vector2(200, 100),
+            0,
+            new Quaternion().idt(),
+            textures.get(ENTITY_IMG),
+            true
+        );
+
+        RoamingEntity enemy = new RoamingEntity(
+            entityManager,
             new Vector3(-200, 0, -100),
             new Vector2(100, 100),
             10,
             textures.get(ENTITY_IMG)
         );
         enemy.setTint(com.badlogic.gdx.graphics.Color.RED);
-        entityManager.add(enemy);
 
-        entityManager.add(pushable);
         entityManager.add(playerEntity);
+        entityManager.add(pushable);
+        entityManager.add(enemy);
 
         keyboard = new KeyboardManager();
 
@@ -140,19 +143,15 @@ public class MainGame extends SwitchableScene {
         entityManager.update(deltaTime);
         entityRemover.update();
 
-        if (
-            entityManager.getEntities().contains(pushable) &&
-            entityManager.getEntities().contains(playerEntity)
-        ) {
-            Vector3 mtv = new Vector3();
-            if (pushable.intersects(playerEntity, mtv)) {
-                pushable.translate(mtv);
-            }
-            Vector3 mtvEnemy = new Vector3().setZero();
-            if (playerEntity.intersects(enemy, mtvEnemy)) {
-                playerEntity.translate(mtvEnemy);
-
-                sounds.get(POP_SFX).play();
+        // Special case for player entity
+        if (entityManager.getEntities().contains(playerEntity)) {
+            for (Entity entity : entityManager.getEntities()) {
+                if (entity instanceof RoamingEntity) {
+                    if (playerEntity.intersects((RoamingEntity) entity)) {
+                        sounds.get(POP_SFX).play();
+                        break;
+                    }
+                }
             }
         }
     }

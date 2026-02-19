@@ -27,7 +27,15 @@ public class BulletEntity extends CollidableEntity {
         float lifetime,
         float speed
     ) {
-        super(position, size, thickness, rotation, texture);
+        super(
+            entityRemover.getEntityManager(),
+            position,
+            size,
+            thickness,
+            rotation,
+            texture,
+            false
+        );
         this.entityRemover = entityRemover;
         this.hitSound = hitSound;
         this.lifetime = lifetime;

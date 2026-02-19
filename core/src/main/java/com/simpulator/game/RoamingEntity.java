@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.simpulator.engine.EntityManager;
 
 public class RoamingEntity extends CollidableEntity {
 
@@ -19,12 +20,21 @@ public class RoamingEntity extends CollidableEntity {
     private static final float MAX_Z = 100f;
 
     public RoamingEntity(
+        EntityManager entityManager,
         Vector3 position,
         Vector2 size,
         float thickness,
         Texture texture
     ) {
-        super(position, size, thickness, new Quaternion().idt(), texture);
+        super(
+            entityManager,
+            position,
+            size,
+            thickness,
+            new Quaternion().idt(),
+            texture,
+            false
+        );
         this.targetPosition = new Vector3();
         this.moveDirection = new Vector3();
 
@@ -40,6 +50,8 @@ public class RoamingEntity extends CollidableEntity {
 
     @Override
     public void update(float deltaTime) {
+        super.update(deltaTime);
+
         Vector3 currentPos = getPosition();
         float distanceToTarget = currentPos.dst(targetPosition);
 

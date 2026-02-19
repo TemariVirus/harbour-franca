@@ -10,22 +10,29 @@ import com.badlogic.gdx.math.collision.OrientedBoundingBox;
 import com.simpulator.engine.ColliderMesh;
 import com.simpulator.engine.Cuboid;
 import com.simpulator.engine.Entity;
+import com.simpulator.engine.EntityManager;
 import com.simpulator.engine.GJKShape;
 import java.util.Arrays;
 
 public class CollidableEntity extends Entity implements ColliderMesh {
 
+    private EntityManager entityManager;
     private float thickness;
+    private boolean isMovable;
 
     public CollidableEntity(
+        EntityManager entityManager,
         Vector3 position,
         Vector2 size,
         float thickness,
         Quaternion rotation,
-        Texture texture
+        Texture texture,
+        boolean isMovable
     ) {
         super(position, size, rotation, new TextureRegion(texture));
+        this.entityManager = entityManager;
         this.thickness = Math.abs(thickness);
+        this.isMovable = isMovable;
     }
 
     public float getThickness() {
@@ -34,6 +41,14 @@ public class CollidableEntity extends Entity implements ColliderMesh {
 
     public void setThickness(float thickness) {
         this.thickness = Math.abs(thickness);
+    }
+
+    public boolean getMovable() {
+        return isMovable;
+    }
+
+    public void setMovable(boolean isMovable) {
+        isMovable = isMovable;
     }
 
     public OrientedBoundingBox getOrientedBoundingBox() {
@@ -55,5 +70,25 @@ public class CollidableEntity extends Entity implements ColliderMesh {
     @Override
     public BoundingBox getBounds() {
         return getOrientedBoundingBox().getBounds();
+    }
+
+    @Override
+    public void update(float deltaTime) {
+        if (!isMovable) {
+            return;
+        }
+
+        for (Entity other : entityManager.getEntities()) {
+            if (other == this) continue;
+            if (other instanceof ColliderMesh) {
+                Vector3 mtv = new Vector3();
+                ColliderMesh otherMesh = (ColliderMesh) other;
+                if (intersects(otherMesh, mtv)) {
+                    // Move ourselves outside of the colliding mesh
+                    translate(mtv);
+                    break;
+                }
+            }
+        }
     }
 }
