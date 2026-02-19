@@ -142,8 +142,9 @@ public class MainGame extends SwitchableScene {
             Vector3 mtvEnemy = new Vector3().setZero();
             if (playerEntity.intersects(enemy, mtvEnemy)) {
                 playerEntity.translate(mtvEnemy);
-            
-                sounds.get("pop.mp3").play(); 
+
+                sounds.get("pop.mp3").play();
+            }
         }
     }
 
