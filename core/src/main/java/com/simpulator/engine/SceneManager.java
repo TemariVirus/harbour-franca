@@ -31,7 +31,7 @@ public class SceneManager implements Disposable {
     }
 
     /** Unload the current scene, if any, and load and return the given scene. */
-    public Scene switchScene(String name) {
+    public void switchScene(String name) {
         if (!scenes.containsKey(name)) {
             throw new IllegalArgumentException(
                 "Scene with name " + name + " does not exist."
@@ -43,7 +43,6 @@ public class SceneManager implements Disposable {
         }
         currentScene = scenes.get(name);
         currentScene.load();
-        return currentScene;
     }
 
     /** Update the current scene by the given delta time in seconds. */
