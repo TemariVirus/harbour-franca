@@ -10,7 +10,13 @@ public abstract class Polyhedron implements GJKShape {
     public abstract Iterable<Vector3> getAllVertices();
 
     /** Returns a bounding box containing the polyhedron. */
-    public abstract BoundingBox getBounds();
+    public BoundingBox getBounds() {
+        BoundingBox bounds = new BoundingBox();
+        for (Vector3 vert : getAllVertices()) {
+            bounds.ext(vert);
+        }
+        return bounds;
+    }
 
     @Override
     public Vector3 furthestPoint(Vector3 direction, boolean reverse) {
