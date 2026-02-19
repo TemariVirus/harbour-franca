@@ -56,7 +56,7 @@ configure(subprojects) {
 
 subprojects {
   version = "$projectVersion"
-  ext.appName = 'LibGdxSample'
+  ext.appName = 'Simpulator'
   repositories {
     mavenCentral()
     // You may want to remove the following line if you have errors downloading dependencies.
@@ -66,4 +66,4 @@ subprojects {
   }
 }
 
-eclipse.project.name = 'LibGdxSample' + '-parent'
+eclipse.project.name = 'Simpulator' + '-parent'
