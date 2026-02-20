@@ -108,7 +108,7 @@ public class KeyboardManager extends InputAdapter {
     }
 
     /**
-     * Processes button state updates and invokes the appropriate actions.
+     * Processes key state updates and invokes the appropriate actions.
      *
      * @param deltaTime The time elapsed since the last update, in seconds.
      * @param timestamp The time since some epoch, in seconds.
