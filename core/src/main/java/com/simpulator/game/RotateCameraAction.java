@@ -25,29 +25,29 @@ public class RotateCameraAction implements Action<MouseManager.MouseMoveEvent> {
             cameraMoved = true;
         }
 
-        // Prevent camera from going too close to the poles to avoid gimbal lock
+        // Camera direction is sometimes not properly normalised
+        Vector3 camDirection = camera.direction.cpy().nor();
         if (
-            (event.deltaY > 0 && camera.direction.y > -0.99f) ||
-            (event.deltaY < 0 && camera.direction.y < 0.99f)
+            (event.deltaY > 0 && camDirection.y > -1f) ||
+            (event.deltaY < 0 && camDirection.y < 1f)
         ) {
-            Vector3 axis = camera.direction.cpy().crs(Vector3.Y);
-            float currentAngle = (float) Math.acos(
-                camera.direction.dot(Vector3.Y)
-            );
-            float rotateAmount =
-                -event.deltaY *
-                sensitivity *
-                // Convert to radians
-                ((float) Math.PI / 180f);
-            float newAngle = MathUtils.clamp(
-                currentAngle + rotateAmount,
-                0.005f,
-                (float) Math.PI - 0.005f
-            );
-            rotateAmount = newAngle - currentAngle;
+            Vector3 axis = camDirection.cpy().crs(Vector3.Y);
+            if (axis.isZero()) {
+                // If axis is zero, it means we are looking straight up or down
+                // Use a default axis to prevent gimbal lock
+                axis.set(Vector3.X);
+            }
 
-            // Convert back to degrees
-            camera.rotate(axis, rotateAmount * (180f / (float) Math.PI));
+            float currentAngle = (float) Math.acos(
+                MathUtils.clamp(camDirection.dot(Vector3.Y), -1, 1)
+            );
+            float rotateAmount = -event.deltaY * sensitivity;
+
+            // Prevent camera from going too close to the poles to avoid gimbal lock
+            float maxAngle = (float) Math.toDegrees(currentAngle) - 0.01f;
+            float minAngle = (float) Math.toDegrees(currentAngle) - 179.99f;
+            rotateAmount = MathUtils.clamp(rotateAmount, minAngle, maxAngle);
+            camera.rotate(axis, rotateAmount);
             cameraMoved = true;
         }
 
