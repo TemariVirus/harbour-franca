@@ -48,7 +48,7 @@ public class CollidableEntity extends Entity implements ColliderMesh {
     }
 
     public void setMovable(boolean isMovable) {
-        isMovable = isMovable;
+        this.isMovable = isMovable;
     }
 
     public OrientedBoundingBox getOrientedBoundingBox() {

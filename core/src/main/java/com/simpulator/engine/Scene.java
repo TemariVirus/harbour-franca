@@ -1,9 +1,5 @@
 package com.simpulator.engine;
 
-import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.utils.Disposable;
-
 /** A scene encapsulates the state and business logic of a section of the simulation. */
 public abstract class Scene {
 
