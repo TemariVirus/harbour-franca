@@ -34,7 +34,7 @@ public class CollisionManager {
             return false;
         }
 
-        // Collision detected; Expand Polytope Algorithm to find MTV
+        // Collision detected; Expanding Polytope Algorithm to find MTV
         Polytope polytope = new Polytope(simplex);
         for (int iters = 0; iters < MAX_ITERATIONS; iters++) {
             Vector3 faceNormal = polytope.closestFaceNormalToOrigin();
