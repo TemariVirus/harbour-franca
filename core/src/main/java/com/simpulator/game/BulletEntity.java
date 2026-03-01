@@ -4,10 +4,9 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.simpulator.engine.ColliderMesh;
-import com.simpulator.engine.Entity;
+import com.simpulator.engine.CollidableEntity;
 
-public class BulletEntity extends CollidableEntity {
+public class BulletEntity extends CuboidEntity {
 
     private EntityRemover entityRemover;
     private SoundPlayer hitSound;
@@ -26,19 +25,18 @@ public class BulletEntity extends CollidableEntity {
         float lifetime,
         float speed
     ) {
-        super(
-            entityRemover.getEntityManager(),
-            position,
-            size,
-            thickness,
-            rotation,
-            texture,
-            false
-        );
+        super(position, size, thickness, rotation, texture, false);
         this.entityRemover = entityRemover;
         this.hitSound = hitSound;
         this.lifetime = lifetime;
         this.velocity = new Vector3(0, 0, -speed).mul(rotation);
+    }
+
+    @Override
+    public void onCollision(CollidableEntity other) {
+        entityRemover.markForRemoval(this);
+        entityRemover.markForRemoval(other);
+        hitSound.play();
     }
 
     @Override
@@ -49,17 +47,5 @@ public class BulletEntity extends CollidableEntity {
             return;
         }
         translate(velocity.cpy().scl(deltaTime));
-
-        for (Entity entity : entityRemover.getEntityManager().getEntities()) {
-            if (entity == this) continue;
-            if (entity instanceof ColliderMesh) {
-                if (intersects((ColliderMesh) entity)) {
-                    entityRemover.markForRemoval(this);
-                    entityRemover.markForRemoval(entity);
-                    hitSound.play();
-                    break;
-                }
-            }
-        }
     }
 }

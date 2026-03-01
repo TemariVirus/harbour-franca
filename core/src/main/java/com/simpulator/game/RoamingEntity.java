@@ -5,9 +5,8 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.simpulator.engine.EntityManager;
 
-public class RoamingEntity extends CollidableEntity {
+public class RoamingEntity extends CuboidEntity {
 
     private float speed = 100f;
     private Vector3 targetPosition;
@@ -20,14 +19,12 @@ public class RoamingEntity extends CollidableEntity {
     private static final float MAX_Z = 100f;
 
     public RoamingEntity(
-        EntityManager entityManager,
         Vector3 position,
         Vector2 size,
         float thickness,
         Texture texture
     ) {
         super(
-            entityManager,
             position,
             size,
             thickness,

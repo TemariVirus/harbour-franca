@@ -7,21 +7,17 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.math.collision.OrientedBoundingBox;
-import com.simpulator.engine.ColliderMesh;
+import com.simpulator.engine.CollidableEntity;
 import com.simpulator.engine.Cuboid;
-import com.simpulator.engine.Entity;
-import com.simpulator.engine.EntityManager;
 import com.simpulator.engine.GJKShape;
 import java.util.Arrays;
 
-public class CollidableEntity extends Entity implements ColliderMesh {
+public class CuboidEntity extends CollidableEntity {
 
-    private EntityManager entityManager;
     private float thickness;
     private boolean isMovable;
 
-    public CollidableEntity(
-        EntityManager entityManager,
+    public CuboidEntity(
         Vector3 position,
         Vector2 size,
         float thickness,
@@ -30,7 +26,6 @@ public class CollidableEntity extends Entity implements ColliderMesh {
         boolean isMovable
     ) {
         super(position, size, rotation, new TextureRegion(texture));
-        this.entityManager = entityManager;
         this.thickness = Math.abs(thickness);
         this.isMovable = isMovable;
     }
@@ -73,22 +68,15 @@ public class CollidableEntity extends Entity implements ColliderMesh {
     }
 
     @Override
-    public void update(float deltaTime) {
+    public void onCollision(CollidableEntity other) {
         if (!isMovable) {
             return;
         }
 
-        for (Entity other : entityManager.getEntities()) {
-            if (other == this) continue;
-            if (other instanceof ColliderMesh) {
-                Vector3 mtv = new Vector3();
-                ColliderMesh otherMesh = (ColliderMesh) other;
-                if (intersects(otherMesh, mtv)) {
-                    // Move ourselves outside of the colliding mesh
-                    translate(mtv);
-                    break;
-                }
-            }
+        Vector3 mtv = new Vector3();
+        if (intersects(other, mtv)) {
+            // Move ourselves outside of the colliding mesh
+            translate(mtv);
         }
     }
 }

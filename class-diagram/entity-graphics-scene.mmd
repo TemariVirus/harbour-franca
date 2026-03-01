@@ -19,6 +19,8 @@ classDiagram
     Entity ..|> Movable
     Entity ..|> Renderable
     Entity --o EntityManager
+    CollidableEntity --|> Entity
+    CollidableEntity ..|> ColliderMesh
     MusicManager *-- MusicCache
     Disposable <|.. MusicManager
     TextureManager --|> ResourceCache: #60;#60;bind#62;#62; #60;K -> String, V -> Texture#62;
@@ -59,6 +61,13 @@ classDiagram
         + render(batch: SpriteBatch, camera: Camera) void
     }
 
+    class CollidableEntity {
+        <<abstract>>
+
+        + CollidableEntity(position: Vector3, size: Vector2, rotation: Quaternion, textureRegion: TextureRegion)
+        + onCollision(other: CollidableEntity)* void
+    }
+
     class EntityManager {
         - entities: ArrayList~Entity~
 
@@ -67,6 +76,7 @@ classDiagram
         + add(entity: Entity) void
         + remove(entity: Entity) void
         + removeAll() void
+        + updateCollisions() void
         + update(deltaTime: float) void
     }
 

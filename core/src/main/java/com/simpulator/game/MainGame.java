@@ -30,7 +30,6 @@ public class MainGame extends SwitchableScene {
     private InputMultiplexer inputMux;
     private KeyboardManager keyboard;
     private MouseManager mouse;
-    private CollidableEntity playerEntity;
 
     public MainGame(SceneManager sceneManager) {
         super(sceneManager);
@@ -55,18 +54,18 @@ public class MainGame extends SwitchableScene {
 
         sounds.setVolume(Config.volume * 0.01f);
 
-        playerEntity = new CollidableEntity(
-            entityManager,
+        PlayerEntity playerEntity = new PlayerEntity(
+            sounds,
             new Vector3(0, 0, -200),
             new Vector2(200, 200),
             10,
             new Quaternion().idt(),
             textures.get(ENTITY_IMG),
-            false
+            false,
+            POP_SFX
         );
 
-        CollidableEntity pushable = new CollidableEntity(
-            entityManager,
+        CuboidEntity pushable = new CuboidEntity(
             new Vector3(100, 100, -200),
             new Vector2(200, 100),
             0,
@@ -76,7 +75,6 @@ public class MainGame extends SwitchableScene {
         );
 
         RoamingEntity enemy = new RoamingEntity(
-            entityManager,
             new Vector3(-200, 0, -100),
             new Vector2(100, 100),
             10,
@@ -141,20 +139,9 @@ public class MainGame extends SwitchableScene {
         clock.forward(deltaTime);
         keyboard.update(deltaTime, clock.getSeconds());
         mouse.update(deltaTime, clock.getSeconds());
+        entityManager.updateCollisions();
         entityManager.update(deltaTime);
         entityRemover.update();
-
-        // Special case for player entity
-        if (entityManager.getEntities().contains(playerEntity)) {
-            for (Entity entity : entityManager.getEntities()) {
-                if (entity instanceof RoamingEntity) {
-                    if (playerEntity.intersects((RoamingEntity) entity)) {
-                        sounds.play(POP_SFX);
-                        break;
-                    }
-                }
-            }
-        }
     }
 
     @Override
