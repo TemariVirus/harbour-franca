@@ -3,7 +3,9 @@ package com.simpulator.engine;
 import java.util.List;
 
 /** Utilities for dealing with List<T>. */
-class ListUtil {
+final class ListUtil {
+
+    private ListUtil() {}
 
     /** Swap the position of the 2 indices. */
     public static <T> void swap(List<T> list, int i, int j) {
