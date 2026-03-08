@@ -17,10 +17,12 @@ import com.simpulator.engine.ButtonManager.ButtonBindType;
 import com.simpulator.engine.GraphicsManager;
 import com.simpulator.engine.KeyboardManager;
 import com.simpulator.engine.MusicManager;
+import com.simpulator.engine.Scene;
 import com.simpulator.engine.SceneManager;
 
-public class SoundMenu extends SwitchableScene {
+public class SoundMenu extends Scene {
 
+    private SceneManager sceneManager;
     private MusicManager musics;
     private KeyboardManager km;
     private BitmapFont font;
@@ -28,8 +30,8 @@ public class SoundMenu extends SwitchableScene {
     private Slider volumeSlider;
 
     public SoundMenu(SceneManager sceneManager, MusicManager musicManager) {
-        super(sceneManager);
-        musics = musicManager;
+        this.sceneManager = sceneManager;
+        this.musics = musicManager;
     }
 
     private <T> Action<T> changeVolumeAction(int amount) {
@@ -57,12 +59,12 @@ public class SoundMenu extends SwitchableScene {
         km.bind(
             ButtonBindType.DOWN,
             Keys.ESCAPE,
-            switchSceneAction(Scenes.MainMenu)
+            ActionHelper.switchSceneAction(sceneManager, Scenes.MainMenu)
         );
         km.bind(
             ButtonBindType.DOWN,
             Keys.BACKSPACE,
-            switchSceneAction(Scenes.MainMenu)
+            ActionHelper.switchSceneAction(sceneManager, Scenes.MainMenu)
         );
         km.bind(ButtonBindType.DOWN, Keys.LEFT, changeVolumeAction(-10));
         km.bind(ButtonBindType.DOWN, Keys.RIGHT, changeVolumeAction(10));

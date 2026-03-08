@@ -8,15 +8,17 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.simpulator.engine.ButtonManager.ButtonBindType;
 import com.simpulator.engine.GraphicsManager;
 import com.simpulator.engine.KeyboardManager;
+import com.simpulator.engine.Scene;
 import com.simpulator.engine.SceneManager;
 
-public class MainMenu extends SwitchableScene {
+public class MainMenu extends Scene {
 
+    private SceneManager sceneManager;
     private KeyboardManager km;
     private BitmapFont font;
 
     public MainMenu(SceneManager sceneManager) {
-        super(sceneManager);
+        this.sceneManager = sceneManager;
     }
 
     @Override
@@ -31,17 +33,17 @@ public class MainMenu extends SwitchableScene {
         km.bind(
             ButtonBindType.DOWN,
             Keys.ENTER,
-            switchSceneAction(Scenes.MainGame)
+            ActionHelper.switchSceneAction(sceneManager, Scenes.MainGame)
         );
         km.bind(
             ButtonBindType.DOWN,
             Keys.G,
-            switchSceneAction(Scenes.MainGame)
+            ActionHelper.switchSceneAction(sceneManager, Scenes.MainGame)
         );
         km.bind(
             ButtonBindType.DOWN,
             Keys.S,
-            switchSceneAction(Scenes.SoundMenu)
+            ActionHelper.switchSceneAction(sceneManager, Scenes.SoundMenu)
         );
 
         Gdx.input.setInputProcessor(km);

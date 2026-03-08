@@ -15,9 +15,10 @@ import com.simpulator.engine.EntityManager;
 import com.simpulator.engine.GraphicsManager;
 import com.simpulator.engine.KeyboardManager;
 import com.simpulator.engine.MouseManager;
+import com.simpulator.engine.Scene;
 import com.simpulator.engine.SceneManager;
 
-public class MainGame extends SwitchableScene {
+public class MainGame extends Scene {
 
     private static final String BULLET_IMG = "droplet.png";
     private static final String ENTITY_IMG = "libgdx.png";
@@ -25,6 +26,8 @@ public class MainGame extends SwitchableScene {
 
     private final Clock clock = new Clock(0);
     private PerspectiveCamera playerCamera;
+
+    private SceneManager sceneManager;
     private EntityManager entityManager;
     private EntityRemover entityRemover;
     private InputMultiplexer inputMux;
@@ -32,7 +35,7 @@ public class MainGame extends SwitchableScene {
     private MouseManager mouse;
 
     public MainGame(SceneManager sceneManager) {
-        super(sceneManager);
+        this.sceneManager = sceneManager;
         entityManager = new EntityManager();
     }
 
@@ -102,7 +105,7 @@ public class MainGame extends SwitchableScene {
         keyboard.bind(ButtonBindType.HOLD, Keys.UP, new MoveAction(playerEntity, new Vector3(0, 0, -100)));
         keyboard.bind(ButtonBindType.HOLD, Keys.DOWN, new MoveAction(playerEntity, new Vector3(0, 0, 100)));
 
-        keyboard.bind(ButtonBindType.DOWN, Keys.ESCAPE, switchSceneAction(Scenes.MainMenu));
+        keyboard.bind(ButtonBindType.DOWN, Keys.ESCAPE, ActionHelper.switchSceneAction(sceneManager, Scenes.MainMenu));
         // @formatter:on
 
         mouse = new MouseManager();
