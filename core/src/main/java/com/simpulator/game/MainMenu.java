@@ -33,12 +33,12 @@ public class MainMenu extends Scene {
         km.bind(
             ButtonBindType.DOWN,
             Keys.ENTER,
-            ActionHelper.switchSceneAction(sceneManager, Scenes.MainGame)
+            ActionHelper.switchSceneAction(sceneManager, Scenes.Explore)
         );
         km.bind(
             ButtonBindType.DOWN,
             Keys.G,
-            ActionHelper.switchSceneAction(sceneManager, Scenes.MainGame)
+            ActionHelper.switchSceneAction(sceneManager, Scenes.Explore)
         );
         km.bind(
             ButtonBindType.DOWN,

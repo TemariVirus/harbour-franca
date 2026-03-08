@@ -17,11 +17,11 @@ public class GameMaster extends ApplicationAdapter {
 
         MainMenu mainMenu = new MainMenu(sceneManager);
         SoundMenu soundMenu = new SoundMenu(sceneManager, musics);
-        MainGame mainGame = new MainGame(sceneManager);
+        ExploreScene mainGame = new ExploreScene(sceneManager);
 
         sceneManager.addScene(Scenes.MainMenu, mainMenu);
         sceneManager.addScene(Scenes.SoundMenu, soundMenu);
-        sceneManager.addScene(Scenes.MainGame, mainGame);
+        sceneManager.addScene(Scenes.Explore, mainGame);
 
         sceneManager.switchScene(Scenes.MainMenu);
         musics.startMusic("GameAudio.mp3");
