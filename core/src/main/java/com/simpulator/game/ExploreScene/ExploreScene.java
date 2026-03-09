@@ -6,6 +6,7 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Quaternion;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.simpulator.engine.ButtonManager.ButtonBindType;
@@ -13,7 +14,6 @@ import com.simpulator.engine.EntityManager;
 import com.simpulator.engine.GraphicsManager;
 import com.simpulator.engine.KeyboardManager;
 import com.simpulator.engine.MouseManager;
-import com.simpulator.engine.RectangleRenderer;
 import com.simpulator.engine.Scene;
 import com.simpulator.engine.SceneManager;
 import com.simpulator.game.ActionHelper;
@@ -21,6 +21,7 @@ import com.simpulator.game.Clock;
 import com.simpulator.game.Config;
 import com.simpulator.game.CuboidEntity;
 import com.simpulator.game.Scenes;
+import com.simpulator.game.TiledRenderer;
 
 public class ExploreScene extends Scene {
 
@@ -45,9 +46,9 @@ public class ExploreScene extends Scene {
         final int WIDTH = 5;
         final int HEIGHT = 3;
 
-        // TODO: create tiled entity for rendering
-        RectangleRenderer renderer = new RectangleRenderer(
-            new TextureRegion(textures.get(BRICK_IMG))
+        TiledRenderer renderer = new TiledRenderer(
+            new TextureRegion(textures.get(BRICK_IMG)),
+            new Vector2(1, 1)
         );
         entityManager.add(
             new CuboidEntity(
@@ -58,7 +59,6 @@ public class ExploreScene extends Scene {
                 false
             )
         );
-
         entityManager.add(
             new CuboidEntity(
                 new Vector3(0, 0, -WIDTH),
