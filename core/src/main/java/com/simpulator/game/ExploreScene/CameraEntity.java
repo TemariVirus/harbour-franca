@@ -1,15 +1,14 @@
 package com.simpulator.game.ExploreScene;
 
 import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Quaternion;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.math.collision.OrientedBoundingBox;
 import com.simpulator.engine.CollidableEntity;
 import com.simpulator.engine.Cuboid;
 import com.simpulator.engine.GJKShape;
+import com.simpulator.game.EmptyRenerer;
 import java.util.Arrays;
 
 public class CameraEntity extends CollidableEntity {
@@ -22,16 +21,17 @@ public class CameraEntity extends CollidableEntity {
         Quaternion rotation,
         Camera camera
     ) {
-        super(position, Vector2.Zero, rotation, null);
-        this.transform.setToTranslationAndScaling(position, size);
+        super(position, size, rotation, new EmptyRenerer());
         camera.position.set(position);
         camera.lookAt(
             position.cpy().add(rotation.transform(new Vector3(0, 0, -1)))
         );
+        camera.update();
         this.camera = camera;
     }
 
     public Camera getCamera() {
+        camera.update();
         return camera;
     }
 
@@ -73,20 +73,5 @@ public class CameraEntity extends CollidableEntity {
             // Move ourselves outside of the colliding mesh
             translate(mtv);
         }
-    }
-
-    @Override
-    public void update(float deltaTime) {
-        camera.update();
-    }
-
-    @Override
-    public boolean isVisible(Camera camera) {
-        return false;
-    }
-
-    @Override
-    public void render(SpriteBatch batch, Camera camera) {
-        // Don't render the camera
     }
 }

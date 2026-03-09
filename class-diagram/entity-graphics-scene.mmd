@@ -21,6 +21,8 @@ classDiagram
     Entity --o EntityManager
     CollidableEntity --|> Entity
     CollidableEntity ..|> ColliderMesh
+    EntityRenderer --o Entity
+    RectangleRenderer ..|> EntityRenderer
     MusicManager *-- MusicCache
     Disposable <|.. MusicManager
     TextureManager --|> ResourceCache: #60;#60;bind#62;#62; #60;K -> String, V -> Texture#62;
@@ -29,42 +31,37 @@ classDiagram
 
 
     class Entity {
-        # transform: Matrix4
-        # tint: Color
-        # textureRegion: TextureRegion
+        <<abstract>>
 
-        # Entity(transform: Matrix4, textureRegion: TextureRegion)
-        + Entity(position: Vector3, size: Vector2, rotation: Quaternion, textureRegion: TextureRegion)
+        # transform: Matrix4
+
+        # Entity(transform: Matrix4, renderer: EntityRenderer)
+        # Entity(position: Vector3, size: Vector3, rotation: Quaternion, renderer: EntityRenderer)
         + getPosition() Vector3
         + setPosition(position: Vector3) void
-        + getSize() Vector2
-        + setSize(size: Vector2) void
+        + getSize() Vector3
+        + setSize(size: Vector3) void
         + getRotation() Quaternion
         + setRotation(rotation: Quaternion) void
         + setRotation(axis: Vector3, radians: float) void
         + getTransform() Matrix4
-        + getTint() Color
-        + setTint(tint: Color) void
-        + getTextureRegion() TextureRegion
-        + setTextureRegion(textureRegion: TextureRegion) void
-        + getLocalVertex(index: int) Vector3
-        + getVertex(index: int) Vector3
-        + getVertices() Vector3[]
+        + getRenderer() EntityRenderer
+        + setRenderer(renderer: EntityRenderer) void
         + translate(delta: Vector3) void
-        + scale(scale: Vector2) void
+        + scale(scale: Vector3) void
         + rotate(delta: Quaternion) void
         + rotate(axis: Vector3, radians: float) void
         + transform(transform: Matrix4) void
         + isVisible(camera: Camera) boolean
         + getZOrder(camera: Camera) float
-        + update(deltaTime: float) void
         + render(batch: SpriteBatch, camera: Camera) void
+        + update(deltaTime: float) void
     }
 
     class CollidableEntity {
         <<abstract>>
 
-        + CollidableEntity(position: Vector3, size: Vector2, rotation: Quaternion, textureRegion: TextureRegion)
+        # CollidableEntity(position: Vector3, size: Vector3, rotation: Quaternion, renderer: EntityRenderer)
         + onCollision(other: CollidableEntity)* void
     }
 
@@ -72,12 +69,37 @@ classDiagram
         - entities: ArrayList~Entity~
 
         + EntityManager()
-        + getEntities() ArrayList~Entity~
+        + getEntities() Entity[]
         + add(entity: Entity) void
+        + addAll(entity: List~Entity~) void
         + remove(entity: Entity) void
         + removeAll() void
         + updateCollisions() void
         + update(deltaTime: float) void
+    }
+
+    class EntityRenderer {
+        <<interface>>
+
+        + isVisible(camera: Camera, entity: Entity) boolean
+        + getZOrder(camera: Camera, entity: Entity) float
+        + render(batch: SpriteBatch, camera: Camera, entity: Entity) void
+    }
+
+    class RectangleRenderer {
+        - textureRegion: TextureRegion
+        - tint: Color
+
+        + RectangleRenderer(textureRegion: TextureRegion)
+        + RectangleRenderer(textureRegion: TextureRegion, tint: Color)
+        + getTint() Color
+        + setTint(tint: Color) void
+        + getTextureRegion() TextureRegion
+        + setTextureRegion(textureRegion: TextureRegion) void
+        - getVertex(index: int) Vector3
+        + isVisible(camera: Camera, entity: Entity) boolean
+        + getZOrder(camera: Camera, entity: Entity) float
+        + render(batch: SpriteBatch, camera: Camera, entity: Entity) void
     }
 
     class GraphicsManager {

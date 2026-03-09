@@ -1,41 +1,28 @@
 package com.simpulator.game;
 
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Quaternion;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.math.collision.OrientedBoundingBox;
 import com.simpulator.engine.CollidableEntity;
 import com.simpulator.engine.Cuboid;
+import com.simpulator.engine.EntityRenderer;
 import com.simpulator.engine.GJKShape;
 import java.util.Arrays;
 
 public class CuboidEntity extends CollidableEntity {
 
-    private float thickness;
     private boolean isMovable;
 
     public CuboidEntity(
         Vector3 position,
-        Vector2 size,
-        float thickness,
+        Vector3 size,
         Quaternion rotation,
-        Texture texture,
+        EntityRenderer renderer,
         boolean isMovable
     ) {
-        super(position, size, rotation, new TextureRegion(texture));
-        this.thickness = Math.abs(thickness);
+        super(position, size, rotation, renderer);
         this.isMovable = isMovable;
-    }
-
-    public float getThickness() {
-        return thickness;
-    }
-
-    public void setThickness(float thickness) {
-        this.thickness = Math.abs(thickness);
     }
 
     public boolean getMovable() {
@@ -47,10 +34,8 @@ public class CuboidEntity extends CollidableEntity {
     }
 
     public OrientedBoundingBox getOrientedBoundingBox() {
-        Vector3 minCorner = getLocalVertex(0);
-        minCorner.z = -thickness;
-        Vector3 maxCorner = getLocalVertex(2);
-        maxCorner.z = thickness;
+        Vector3 minCorner = new Vector3(-0.5f, -0.5f, -0.5f);
+        Vector3 maxCorner = new Vector3(0.5f, 0.5f, 0.5f);
 
         BoundingBox box = new BoundingBox(minCorner, maxCorner);
         return new OrientedBoundingBox(box, transform);

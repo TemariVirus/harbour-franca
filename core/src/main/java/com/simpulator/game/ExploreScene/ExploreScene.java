@@ -4,16 +4,16 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Quaternion;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.simpulator.engine.ButtonManager.ButtonBindType;
-import com.simpulator.engine.Entity;
 import com.simpulator.engine.EntityManager;
 import com.simpulator.engine.GraphicsManager;
 import com.simpulator.engine.KeyboardManager;
 import com.simpulator.engine.MouseManager;
+import com.simpulator.engine.RectangleRenderer;
 import com.simpulator.engine.Scene;
 import com.simpulator.engine.SceneManager;
 import com.simpulator.game.ActionHelper;
@@ -43,50 +43,49 @@ public class ExploreScene extends Scene {
 
     private void createLevelLayout() {
         final int WIDTH = 5;
-        for (int y = 0; y < 3; y++) {
-            for (int i = -WIDTH; i <= WIDTH; i++) {
-                entityManager.add(
-                    new CuboidEntity(
-                        new Vector3(i, y, WIDTH + 0.5f),
-                        new Vector2(1, 1),
-                        1,
-                        new Quaternion().setFromAxis(Vector3.Y, 0),
-                        textures.get(BRICK_IMG),
-                        false
-                    )
-                );
-                entityManager.add(
-                    new CuboidEntity(
-                        new Vector3(-i, y, -WIDTH - 0.5f),
-                        new Vector2(1, 1),
-                        1,
-                        new Quaternion().setFromAxis(Vector3.Y, 0),
-                        textures.get(BRICK_IMG),
-                        false
-                    )
-                );
-                entityManager.add(
-                    new CuboidEntity(
-                        new Vector3(WIDTH + 0.5f, y, i),
-                        new Vector2(1, 1),
-                        1,
-                        new Quaternion().setFromAxis(Vector3.Y, 90),
-                        textures.get(BRICK_IMG),
-                        false
-                    )
-                );
-                entityManager.add(
-                    new CuboidEntity(
-                        new Vector3(-WIDTH - 0.5f, y, -i),
-                        new Vector2(1, 1),
-                        1,
-                        new Quaternion().setFromAxis(Vector3.Y, 90),
-                        textures.get(BRICK_IMG),
-                        false
-                    )
-                );
-            }
-        }
+        final int HEIGHT = 3;
+
+        // TODO: create tiled entity for rendering
+        RectangleRenderer renderer = new RectangleRenderer(
+            new TextureRegion(textures.get(BRICK_IMG))
+        );
+        entityManager.add(
+            new CuboidEntity(
+                new Vector3(0, 0, WIDTH),
+                new Vector3(WIDTH * 2, HEIGHT, 1),
+                new Quaternion().setFromAxis(Vector3.Y, 0),
+                renderer,
+                false
+            )
+        );
+
+        entityManager.add(
+            new CuboidEntity(
+                new Vector3(0, 0, -WIDTH),
+                new Vector3(WIDTH * 2, HEIGHT, 1),
+                new Quaternion().setFromAxis(Vector3.Y, 0),
+                renderer,
+                false
+            )
+        );
+        entityManager.add(
+            new CuboidEntity(
+                new Vector3(WIDTH, 0, 0),
+                new Vector3(WIDTH * 2, HEIGHT, 1),
+                new Quaternion().setFromAxis(Vector3.Y, 90),
+                renderer,
+                false
+            )
+        );
+        entityManager.add(
+            new CuboidEntity(
+                new Vector3(-WIDTH, 0, 0),
+                new Vector3(WIDTH * 2, HEIGHT, 1),
+                new Quaternion().setFromAxis(Vector3.Y, 90),
+                renderer,
+                false
+            )
+        );
     }
 
     @Override
@@ -152,10 +151,7 @@ public class ExploreScene extends Scene {
     public void render(GraphicsManager graphics) {
         ScreenUtils.clear(0f, 0f, 0f, 1f);
 
-        graphics.render(
-            entityManager.getEntities().toArray(new Entity[0]),
-            playerCamera.getCamera()
-        );
+        graphics.render(entityManager.getEntities(), playerCamera.getCamera());
         graphics.endRender();
     }
 }

@@ -10,7 +10,11 @@ config:
 classDiagram
     Entity ..|> Movable
     Entity ..|> Renderable
+    EntityRenderer --o Entity
+    RectangleRenderer ..|> EntityRenderer
     Entity --o EntityManager
+    CollidableEntity --|> Entity
+    CollidableEntity ..|> ColliderMesh
     GraphicsManager ..|> Disposable
     Renderable <.. GraphicsManager: Uses
     ResourceCache~K&comma; V: Disposable~ ..|> Disposable
@@ -53,6 +57,14 @@ classDiagram
     PolytopeFace --* Polytope
 
 
+    class Entity {
+        <<abstract>>
+    }
+
+    class CollidableEntity {
+        <<abstract>>
+    }
+
     class Action~T~ {
         <<interface>>
     }
@@ -65,7 +77,11 @@ classDiagram
         <<interface>>
     }
 
-    class Renderable~T~ {
+    class Renderable {
+        <<interface>>
+    }
+
+    class EntityRenderer {
         <<interface>>
     }
 

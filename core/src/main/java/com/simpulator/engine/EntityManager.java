@@ -1,6 +1,7 @@
 package com.simpulator.engine;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /** Manages multiple entities. */
 public class EntityManager {
@@ -13,13 +14,17 @@ public class EntityManager {
     }
 
     /** Returns a copy of the list of entities. */
-    public ArrayList<Entity> getEntities() {
-        return new ArrayList<>(entities);
+    public Entity[] getEntities() {
+        return entities.toArray(new Entity[0]);
     }
 
     /** Adds an entity to be tracked. */
     public void add(Entity entity) {
         this.entities.add(entity);
+    }
+
+    public void addAll(List<Entity> entities) {
+        this.entities.addAll(entities);
     }
 
     /** Removes an entity. */

@@ -1,46 +1,34 @@
 package com.simpulator.engine;
 
 import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.math.collision.BoundingBox;
-import com.badlogic.gdx.math.collision.OrientedBoundingBox;
 
 /**
- * A rectangular entity with 3D position, 2D size, and 3D rotation.
- * The appearence is defined by a TextureRegion and tint.
+ * An entity with 3D position, 2D size, and 3D rotation.
  */
-public class Entity implements Movable, Renderable {
+public abstract class Entity implements Movable, Renderable {
 
     /** Position, size and rotation encoded in a 4x4 matrix, in world units. */
     protected Matrix4 transform;
-    /** The tint color applied when rendering the entity. */
-    protected Color tint = Color.WHITE.cpy();
-    /** The texture region used to render the entity. */
-    protected TextureRegion textureRegion;
+    /** Controls how the entity is rendered. */
+    protected EntityRenderer renderer;
 
-    protected Entity(Matrix4 transform, TextureRegion textureRegion) {
+    protected Entity(Matrix4 transform, EntityRenderer renderer) {
         this.transform = transform;
-        this.textureRegion = textureRegion;
+        this.renderer = renderer;
     }
 
-    public Entity(
+    protected Entity(
         Vector3 position,
-        Vector2 size,
+        Vector3 size,
         Quaternion rotation,
-        TextureRegion textureRegion
+        EntityRenderer renderer
     ) {
-        this.transform = new Matrix4(
-            position,
-            rotation.nor(),
-            new Vector3(size.x, size.y, 1)
-        );
-        this.textureRegion = textureRegion;
+        this.transform = new Matrix4(position, rotation.nor(), size);
+        this.renderer = renderer;
     }
 
     /** Returns the center of the entity in world space. */
@@ -55,14 +43,17 @@ public class Entity implements Movable, Renderable {
         transform.setTranslation(position);
     }
 
-    public Vector2 getSize() {
+    public Vector3 getSize() {
         Vector3 scale = new Vector3();
-        transform.getScale(scale);
-        return new Vector2(scale.x, scale.y);
+        return transform.getScale(scale);
     }
 
-    public void setSize(Vector2 size) {
-        transform.setToScaling(size.x, size.y, 1);
+    public void setSize(Vector3 size) {
+        Vector3 position = new Vector3();
+        transform.getTranslation(position);
+        Quaternion rotation = new Quaternion();
+        transform.getRotation(rotation);
+        transform.set(position, rotation, size);
     }
 
     public Quaternion getRotation() {
@@ -81,7 +72,12 @@ public class Entity implements Movable, Renderable {
 
     /** Sets the rotation of the entity in world space. */
     public void setRotation(Vector3 axis, float radians) {
-        transform.setToRotationRad(axis, radians);
+        Vector3 scale = new Vector3();
+        transform.getScale(scale);
+        Vector3 position = new Vector3();
+        transform.getTranslation(position);
+        Quaternion rotation = new Quaternion().setFromAxis(axis, radians);
+        transform.set(position, rotation.nor(), scale);
     }
 
     /** Returns the entity's world space transform. */
@@ -89,53 +85,12 @@ public class Entity implements Movable, Renderable {
         return transform.cpy();
     }
 
-    public Color getTint() {
-        return tint.cpy();
+    public EntityRenderer getRenderer() {
+        return renderer;
     }
 
-    public void setTint(Color tint) {
-        this.tint = tint.cpy();
-    }
-
-    public TextureRegion getTextureRegion() {
-        return textureRegion;
-    }
-
-    public void setTextureRegion(TextureRegion textureRegion) {
-        this.textureRegion = textureRegion;
-    }
-
-    /** Returns the vertex in local space, indexed in clockwise order. */
-    public Vector3 getLocalVertex(int index) {
-        switch (index) {
-            case 0:
-                return new Vector3(-0.5f, -0.5f, 0); // Bottom left
-            case 1:
-                return new Vector3(-0.5f, 0.5f, 0); // Top left
-            case 2:
-                return new Vector3(0.5f, 0.5f, 0); // Top right
-            case 3:
-                return new Vector3(0.5f, -0.5f, 0); // Bottom right
-            default:
-                throw new IllegalArgumentException(
-                    "Index must be in range [0, 3]"
-                );
-        }
-    }
-
-    /** Returns the vertex in world space, indexed in clockwise order. */
-    public Vector3 getVertex(int index) {
-        return getLocalVertex(index).mul(transform);
-    }
-
-    /** Returns all vertices in world space in clockwise order. */
-    public Vector3[] getVertices() {
-        return new Vector3[] {
-            getVertex(0),
-            getVertex(1),
-            getVertex(2),
-            getVertex(3),
-        };
+    public void setRenderer(EntityRenderer renderer) {
+        this.renderer = renderer;
     }
 
     @Override
@@ -145,8 +100,8 @@ public class Entity implements Movable, Renderable {
         transform.val[Matrix4.M23] += delta.z;
     }
 
-    public void scale(Vector2 scale) {
-        transform.scale(scale.x, scale.y, 1);
+    public void scale(Vector3 scale) {
+        transform.scale(scale.x, scale.y, scale.z);
     }
 
     public void rotate(Quaternion delta) {
@@ -165,18 +120,17 @@ public class Entity implements Movable, Renderable {
 
     @Override
     public boolean isVisible(Camera camera) {
-        OrientedBoundingBox obb = new OrientedBoundingBox(
-            new BoundingBox(getLocalVertex(0), getLocalVertex(2)),
-            transform
-        );
-        return camera.frustum.boundsInFrustum(obb);
+        return renderer.isVisible(camera, this);
     }
 
     @Override
     public float getZOrder(Camera camera) {
-        Vector3 position = getPosition();
-        camera.project(position);
-        return position.z;
+        return renderer.getZOrder(camera, this);
+    }
+
+    @Override
+    public void render(SpriteBatch batch, Camera camera) {
+        renderer.render(batch, camera, this);
     }
 
     /**
@@ -185,25 +139,4 @@ public class Entity implements Movable, Renderable {
      * @param deltaTime The time elapsed since the last update, in seconds.
      */
     public void update(float deltaTime) {}
-
-    @Override
-    public void render(SpriteBatch batch, Camera camera) {
-        float[] vertexData = new float[20];
-        for (int i = 0; i < 4; i++) {
-            boolean isLeft = i < 2;
-            boolean isBottom = (i == 0) || (i == 3);
-
-            float u = isLeft ? textureRegion.getU() : textureRegion.getU2();
-            float v = isBottom ? textureRegion.getV2() : textureRegion.getV();
-            Vector3 vertPos = getVertex(i); // World space
-            camera.project(vertPos); // Screen space
-
-            vertexData[i * 5 + 0] = vertPos.x;
-            vertexData[i * 5 + 1] = vertPos.y;
-            vertexData[i * 5 + 2] = tint.toFloatBits();
-            vertexData[i * 5 + 3] = u;
-            vertexData[i * 5 + 4] = v;
-        }
-        batch.draw(textureRegion.getTexture(), vertexData, 0, 20);
-    }
 }
