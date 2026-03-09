@@ -8,7 +8,7 @@ import com.badlogic.gdx.math.collision.OrientedBoundingBox;
 import com.simpulator.engine.CollidableEntity;
 import com.simpulator.engine.Cuboid;
 import com.simpulator.engine.GJKShape;
-import com.simpulator.game.EmptyRenerer;
+import com.simpulator.game.EmptyRenderer;
 import java.util.Arrays;
 
 public class CameraEntity extends CollidableEntity {
@@ -21,11 +21,9 @@ public class CameraEntity extends CollidableEntity {
         Quaternion rotation,
         Camera camera
     ) {
-        super(position, size, rotation, new EmptyRenerer());
+        super(position, size, rotation, new EmptyRenderer());
         camera.position.set(position);
-        camera.lookAt(
-            position.cpy().add(rotation.transform(new Vector3(0, 0, -1)))
-        );
+        camera.lookAt(rotation.transform(new Vector3(0, 0, -1)).add(position));
         camera.update();
         this.camera = camera;
     }

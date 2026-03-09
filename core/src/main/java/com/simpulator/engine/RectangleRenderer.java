@@ -25,20 +25,20 @@ public class RectangleRenderer implements EntityRenderer {
         this.tint.set(tint);
     }
 
-    public Color getTint() {
-        return tint.cpy();
-    }
-
-    public void setTint(Color tint) {
-        this.tint = tint.cpy();
-    }
-
     public TextureRegion getTextureRegion() {
         return textureRegion;
     }
 
     public void setTextureRegion(TextureRegion textureRegion) {
         this.textureRegion = textureRegion;
+    }
+
+    public Color getTint() {
+        return tint.cpy();
+    }
+
+    public void setTint(Color tint) {
+        this.tint.set(tint);
     }
 
     /** Returns the vertex in local space, indexed in clockwise order. */

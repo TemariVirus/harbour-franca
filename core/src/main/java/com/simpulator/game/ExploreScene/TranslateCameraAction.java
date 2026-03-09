@@ -4,13 +4,13 @@ import com.badlogic.gdx.math.Vector3;
 import com.simpulator.engine.Action;
 import com.simpulator.engine.KeyboardManager;
 
-public class TrnaslateCameraAction implements Action<KeyboardManager.KeyEvent> {
+public class TranslateCameraAction implements Action<KeyboardManager.KeyEvent> {
 
     private CameraEntity entity;
     /** Velocity in world units/s */
     private Vector3 velocity;
 
-    public TrnaslateCameraAction(CameraEntity entity, Vector3 velocity) {
+    public TranslateCameraAction(CameraEntity entity, Vector3 velocity) {
         this.entity = entity;
         this.velocity = velocity;
     }

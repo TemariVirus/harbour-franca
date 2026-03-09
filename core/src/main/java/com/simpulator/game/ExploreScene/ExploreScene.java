@@ -113,10 +113,10 @@ public class ExploreScene extends Scene {
 
         keyboard = new KeyboardManager();
         // @formatter:off
-        keyboard.bind(ButtonBindType.HOLD, Keys.W, new TrnaslateCameraAction(playerCamera, new Vector3(0, 0, -PLAYER_SPEED)));
-        keyboard.bind(ButtonBindType.HOLD, Keys.A, new TrnaslateCameraAction(playerCamera, new Vector3(-PLAYER_SPEED, 0, 0)));
-        keyboard.bind(ButtonBindType.HOLD, Keys.S, new TrnaslateCameraAction(playerCamera, new Vector3(0, 0, PLAYER_SPEED)));
-        keyboard.bind(ButtonBindType.HOLD, Keys.D, new TrnaslateCameraAction(playerCamera, new Vector3(PLAYER_SPEED, 0, 0)));
+        keyboard.bind(ButtonBindType.HOLD, Keys.W, new TranslateCameraAction(playerCamera, new Vector3(0, 0, -PLAYER_SPEED)));
+        keyboard.bind(ButtonBindType.HOLD, Keys.A, new TranslateCameraAction(playerCamera, new Vector3(-PLAYER_SPEED, 0, 0)));
+        keyboard.bind(ButtonBindType.HOLD, Keys.S, new TranslateCameraAction(playerCamera, new Vector3(0, 0, PLAYER_SPEED)));
+        keyboard.bind(ButtonBindType.HOLD, Keys.D, new TranslateCameraAction(playerCamera, new Vector3(PLAYER_SPEED, 0, 0)));
 
         keyboard.bind(ButtonBindType.DOWN, Keys.ESCAPE, ActionHelper.switchSceneAction(sceneManager, Scenes.MainMenu));
         // @formatter:on
