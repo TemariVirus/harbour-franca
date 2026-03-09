@@ -1,4 +1,4 @@
-package com.simpulator.game;
+package com.simpulator.game.ExploreScene;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -16,6 +16,11 @@ import com.simpulator.engine.KeyboardManager;
 import com.simpulator.engine.MouseManager;
 import com.simpulator.engine.Scene;
 import com.simpulator.engine.SceneManager;
+import com.simpulator.game.ActionHelper;
+import com.simpulator.game.Clock;
+import com.simpulator.game.Config;
+import com.simpulator.game.CuboidEntity;
+import com.simpulator.game.Scenes;
 
 public class ExploreScene extends Scene {
 
@@ -23,7 +28,7 @@ public class ExploreScene extends Scene {
     private static final float PLAYER_SPEED = 3f;
 
     private final Clock clock = new Clock(0);
-    private PerspectiveCamera playerCamera;
+    private CameraEntity playerCamera;
 
     private SceneManager sceneManager;
     private EntityManager entityManager;
@@ -88,16 +93,20 @@ public class ExploreScene extends Scene {
     public void load() {
         Gdx.input.setCursorCatched(true);
 
-        playerCamera = new PerspectiveCamera(
+        PerspectiveCamera camera = new PerspectiveCamera(
             70,
             Gdx.graphics.getWidth(),
             Gdx.graphics.getHeight()
         );
-        playerCamera.position.set(0, 1, 0);
-        playerCamera.lookAt(0, 0, 1);
-        playerCamera.near = 0.05f;
-        playerCamera.far = 100f;
-        playerCamera.update();
+        camera.near = 0.05f;
+        camera.far = 100f;
+        playerCamera = new CameraEntity(
+            new Vector3(0, 1, 0),
+            new Vector3(1, 2, 1),
+            new Quaternion().setFromAxis(Vector3.Y, 0),
+            camera
+        );
+        entityManager.add(playerCamera);
 
         sounds.setVolume(Config.volume * 0.01f);
 
@@ -105,10 +114,10 @@ public class ExploreScene extends Scene {
 
         keyboard = new KeyboardManager();
         // @formatter:off
-        keyboard.bind(ButtonBindType.HOLD, Keys.W, new TranslateCameraAction(playerCamera, new Vector3(0, 0, -PLAYER_SPEED)));
-        keyboard.bind(ButtonBindType.HOLD, Keys.A, new TranslateCameraAction(playerCamera, new Vector3(-PLAYER_SPEED, 0, 0)));
-        keyboard.bind(ButtonBindType.HOLD, Keys.S, new TranslateCameraAction(playerCamera, new Vector3(0, 0, PLAYER_SPEED)));
-        keyboard.bind(ButtonBindType.HOLD, Keys.D, new TranslateCameraAction(playerCamera, new Vector3(PLAYER_SPEED, 0, 0)));
+        keyboard.bind(ButtonBindType.HOLD, Keys.W, new TrnaslateCameraAction(playerCamera, new Vector3(0, 0, -PLAYER_SPEED)));
+        keyboard.bind(ButtonBindType.HOLD, Keys.A, new TrnaslateCameraAction(playerCamera, new Vector3(-PLAYER_SPEED, 0, 0)));
+        keyboard.bind(ButtonBindType.HOLD, Keys.S, new TrnaslateCameraAction(playerCamera, new Vector3(0, 0, PLAYER_SPEED)));
+        keyboard.bind(ButtonBindType.HOLD, Keys.D, new TrnaslateCameraAction(playerCamera, new Vector3(PLAYER_SPEED, 0, 0)));
 
         keyboard.bind(ButtonBindType.DOWN, Keys.ESCAPE, ActionHelper.switchSceneAction(sceneManager, Scenes.MainMenu));
         // @formatter:on
@@ -145,7 +154,7 @@ public class ExploreScene extends Scene {
 
         graphics.render(
             entityManager.getEntities().toArray(new Entity[0]),
-            playerCamera
+            playerCamera.getCamera()
         );
         graphics.endRender();
     }

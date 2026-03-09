@@ -4,6 +4,7 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.simpulator.engine.MusicManager;
 import com.simpulator.engine.SceneManager;
+import com.simpulator.game.ExploreScene.ExploreScene;
 
 public class GameMaster extends ApplicationAdapter {
 

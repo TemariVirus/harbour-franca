@@ -1,6 +1,5 @@
-package com.simpulator.game;
+package com.simpulator.game.ExploreScene;
 
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.simpulator.engine.Action;
@@ -8,25 +7,25 @@ import com.simpulator.engine.MouseManager;
 
 public class RotateCameraAction implements Action<MouseManager.MouseMoveEvent> {
 
-    private Camera camera;
+    private CameraEntity entity;
     private float sensitivity;
 
-    public RotateCameraAction(Camera camera, float sensitivity) {
-        this.camera = camera;
+    public RotateCameraAction(CameraEntity entity, float sensitivity) {
+        this.entity = entity;
         this.sensitivity = sensitivity;
     }
 
     @Override
     public void act(MouseManager.MouseMoveEvent event) {
-        boolean cameraMoved = false;
-
         if (event.deltaX != 0) {
-            camera.rotate(Vector3.Y, -event.deltaX * sensitivity);
-            cameraMoved = true;
+            entity.rotate(
+                Vector3.Y,
+                (float) Math.toRadians(-event.deltaX * sensitivity)
+            );
         }
 
         // Camera direction is sometimes not properly normalised
-        Vector3 camDirection = camera.direction.cpy().nor();
+        Vector3 camDirection = entity.getCamera().direction.cpy().nor();
         if (
             (event.deltaY > 0 && camDirection.y > -1f) ||
             (event.deltaY < 0 && camDirection.y < 1f)
@@ -41,18 +40,15 @@ public class RotateCameraAction implements Action<MouseManager.MouseMoveEvent> {
             float currentAngle = (float) Math.acos(
                 MathUtils.clamp(camDirection.dot(Vector3.Y), -1, 1)
             );
-            float rotateAmount = -event.deltaY * sensitivity;
+            float rotateAmount = (float) Math.toRadians(
+                -event.deltaY * sensitivity
+            );
 
-            // Prevent camera from going too close to the poles to avoid gimbal lock
-            float maxAngle = (float) Math.toDegrees(currentAngle) - 0.01f;
-            float minAngle = (float) Math.toDegrees(currentAngle) - 179.99f;
+            // Prevent going too close to the poles to avoid gimbal lock
+            float maxAngle = currentAngle - 0.001f;
+            float minAngle = currentAngle - 3.141f;
             rotateAmount = MathUtils.clamp(rotateAmount, minAngle, maxAngle);
-            camera.rotate(axis, rotateAmount);
-            cameraMoved = true;
-        }
-
-        if (cameraMoved) {
-            camera.update();
+            entity.rotate(axis, rotateAmount);
         }
     }
 }
