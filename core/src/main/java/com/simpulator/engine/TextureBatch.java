@@ -27,7 +27,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Affine2;
@@ -40,6 +39,7 @@ import java.nio.Buffer;
 public class TextureBatch implements Batch {
 
     private static final int SPRITE_SIZE = 24;
+    /** Z value of 2D sprites. Set to 0 to put them above everything else. */
     private static final float Z_2D = 0;
 
     private VertexDataType currentDataType;
@@ -144,7 +144,7 @@ public class TextureBatch implements Batch {
         mesh.setIndices(indices);
 
         if (defaultShader == null) {
-            shader = SpriteBatch.createDefaultShader();
+            shader = createDefaultShader();
             ownsShader = true;
         } else shader = defaultShader;
 
@@ -155,13 +155,61 @@ public class TextureBatch implements Batch {
         }
     }
 
+    public static ShaderProgram createDefaultShader() {
+        // @formatter:off
+        String vertexShader =
+              "attribute vec4 " + ShaderProgram.POSITION_ATTRIBUTE + ";\n"
+			+ "attribute vec4 " + ShaderProgram.COLOR_ATTRIBUTE + ";\n"
+			+ "attribute vec2 " + ShaderProgram.TEXCOORD_ATTRIBUTE + "0;\n"
+			+ "uniform mat4 u_projTrans;\n"
+			+ "varying vec4 v_color;\n"
+			+ "varying vec2 v_texCoords;\n"
+			+ "\n"
+			+ "void main()\n"
+			+ "{\n"
+			+ "   v_color = " + ShaderProgram.COLOR_ATTRIBUTE + ";\n"
+			+ "   v_color.a = v_color.a * (255.0/254.0);\n"
+			+ "   v_texCoords = " + ShaderProgram.TEXCOORD_ATTRIBUTE + "0;\n"
+			+ "   gl_Position =  u_projTrans * " + ShaderProgram.POSITION_ATTRIBUTE + ";\n"
+			+ "}\n";
+        String fragmentShader =
+              "#ifdef GL_ES\n"
+			+ "#define LOWP lowp\n"
+			+ "precision mediump float;\n"
+			+ "#else\n"
+			+ "#define LOWP \n"
+			+ "#endif\n"
+			+ "varying LOWP vec4 v_color;\n"
+			+ "varying vec2 v_texCoords;\n"
+			+ "uniform sampler2D u_texture;\n"
+			+ "void main()\n"
+			+ "{\n"
+			+ "  vec4 texColor = v_color * texture2D(u_texture, v_texCoords);\n"
+			+ "  if(texColor.a < 0.01)\n" // Discard low alpha pixels to make them transparent
+			+ "      discard;\n"
+			+ "  gl_FragColor = texColor;\n"
+			+ "}";
+        // @formatter:on
+
+        ShaderProgram shader = new ShaderProgram(vertexShader, fragmentShader);
+        if (!shader.isCompiled()) throw new IllegalArgumentException(
+            "Error compiling shader: " + shader.getLog()
+        );
+        return shader;
+    }
+
     @Override
     public void begin() {
         if (drawing) throw new IllegalStateException(
             "end must be called before begin."
         );
 
+        Gdx.gl.glClear(GL20.GL_DEPTH_BUFFER_BIT);
+        Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
         Gdx.gl.glDepthMask(true);
+        Gdx.gl.glDepthFunc(GL20.GL_LEQUAL);
+        Gdx.gl.glDepthRangef(0f, 1f);
+
         if (customShader != null) customShader.bind();
         else shader.bind();
         setupMatrices();
@@ -179,6 +227,8 @@ public class TextureBatch implements Batch {
         drawing = false;
 
         if (isBlendingEnabled()) Gdx.gl.glDisable(GL20.GL_BLEND);
+
+        Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
     }
 
     @Override
@@ -216,8 +266,8 @@ public class TextureBatch implements Batch {
      *
      * The quad is a unit square [-0.5, 0.5] in local X/Y, Z=0.
      */
-    public void draw(TextureRegion region, Matrix4 transform) {
-        draw(region, transform, -0.5f, -0.5f, 0.5f, 0.5f);
+    public void draw3D(TextureRegion region, Matrix4 transform) {
+        draw3D(region, transform, -0.5f, -0.5f, 0.5f, 0.5f);
     }
 
     /**
@@ -227,7 +277,7 @@ public class TextureBatch implements Batch {
      *
      * The quad is defined by the given left, bottom, right, and top coordinates in local space, with Z=0.
      */
-    public void draw(
+    public void draw3D(
         TextureRegion region,
         Matrix4 transform,
         float left,

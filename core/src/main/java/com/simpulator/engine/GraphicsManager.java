@@ -77,6 +77,23 @@ public class GraphicsManager implements Disposable {
         }
     }
 
+    /**
+     * Renders multiple 3D entities, ignoring their z order.
+     * A depth buffer is used to render them correctly.
+     * They should use the TextureBatch.draw3D methods to render themselves.
+     */
+    public void render3D(Renderable[] renderables, Camera camera) {
+        if (renderables == null) return;
+        beginRender();
+
+        setCamera(camera);
+        for (Renderable r : renderables) {
+            if (r != null && r.isVisible(camera)) {
+                r.render(batch, camera);
+            }
+        }
+    }
+
     /** Finish rendering and draw the result to the screen. */
     public void endRender() {
         if (!isRendering) return;

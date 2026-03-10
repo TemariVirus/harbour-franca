@@ -3,6 +3,7 @@ package com.simpulator.game;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
@@ -56,23 +57,34 @@ public class TiledRenderer implements EntityRenderer {
         this.tint.set(tint);
     }
 
-    @Override
-    public boolean isVisible(Camera camera, Entity entity) {
+    protected boolean isPortionVisible(
+        Camera camera,
+        Matrix4 modelTransform,
+        float x,
+        float y,
+        float width,
+        float height
+    ) {
         OrientedBoundingBox obb = new OrientedBoundingBox(
             new BoundingBox(
-                new Vector3(-0.5f, -0.5f, 0),
-                new Vector3(0.5f, 0.5f, 0)
+                new Vector3(x, y, 0),
+                new Vector3(x + width, y + height, 0)
             ),
-            entity.getTransform()
+            modelTransform
         );
         return camera.frustum.boundsInFrustum(obb);
     }
 
     @Override
-    public float getZOrder(Camera camera, Entity entity) {
-        Vector3 position = entity.getPosition();
-        camera.project(position);
-        return position.z;
+    public boolean isVisible(Camera camera, Entity entity) {
+        return isPortionVisible(
+            camera,
+            entity.getTransform(),
+            -0.5f,
+            -0.5f,
+            1,
+            1
+        );
     }
 
     @Override
@@ -81,25 +93,21 @@ public class TiledRenderer implements EntityRenderer {
         float xStep = tileSize.x / size.x;
         float yStep = tileSize.y / size.y;
 
-        float[] vertexData = new float[20];
-        for (int i = 0; i < 4; i++) {
-            boolean isLeft = i < 2;
-            boolean isBottom = (i == 0) || (i == 3);
-            float u = isLeft ? textureRegion.getU() : textureRegion.getU2();
-            float v = isBottom ? textureRegion.getV2() : textureRegion.getV();
-
-            vertexData[i * 5 + 2] = tint.toFloatBits();
-            vertexData[i * 5 + 3] = u;
-            vertexData[i * 5 + 4] = v;
-        }
-        Vector3[] verts = new Vector3[4];
-        for (int i = 0; i < 4; i++) {
-            verts[i] = new Vector3();
-        }
-
         for (float x = -0.5f; x + xStep <= 0.5f; x += xStep) {
             for (float y = -0.5f; y + yStep <= 0.5f; y += yStep) {
-                batch.draw(
+                if (
+                    !isPortionVisible(
+                        camera,
+                        entity.getTransform(),
+                        x,
+                        y,
+                        xStep,
+                        yStep
+                    )
+                ) {
+                    continue;
+                }
+                batch.draw3D(
                     textureRegion,
                     entity.getTransform(),
                     x,

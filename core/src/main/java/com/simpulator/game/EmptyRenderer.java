@@ -14,10 +14,5 @@ public class EmptyRenderer implements EntityRenderer {
     }
 
     @Override
-    public float getZOrder(Camera camera, Entity entity) {
-        return Float.MIN_VALUE;
-    }
-
-    @Override
     public void render(TextureBatch batch, Camera camera, Entity entity) {}
 }

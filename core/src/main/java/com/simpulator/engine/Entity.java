@@ -116,11 +116,6 @@ public abstract class Entity implements Movable, Renderable {
     }
 
     @Override
-    public float getZOrder(Camera camera) {
-        return renderer.getZOrder(camera, this);
-    }
-
-    @Override
     public void render(TextureBatch batch, Camera camera) {
         renderer.render(batch, camera, this);
     }

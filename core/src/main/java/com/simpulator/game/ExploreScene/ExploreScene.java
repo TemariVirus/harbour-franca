@@ -151,7 +151,10 @@ public class ExploreScene extends Scene {
     public void render(GraphicsManager graphics) {
         ScreenUtils.clear(0f, 0f, 0f, 1f);
 
-        graphics.render(entityManager.getEntities(), playerCamera.getCamera());
+        graphics.render3D(
+            entityManager.getEntities(),
+            playerCamera.getCamera()
+        );
         graphics.endRender();
     }
 }
