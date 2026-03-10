@@ -58,9 +58,8 @@ public class CameraEntity extends CollidableEntity {
     @Override
     public BoundingBox getBounds() {
         // TODO: make this actually collide
-        Vector3 size = transform.getScale(new Vector3());
-        Vector3 minCorner = size.cpy().scl(-0.5f).add(getPosition());
-        Vector3 maxCorner = size.scl(0.5f).add(getPosition());
+        Vector3 minCorner = size.cpy().scl(-0.5f).add(position);
+        Vector3 maxCorner = size.cpy().scl(0.5f).add(position);
         return new BoundingBox(minCorner, maxCorner);
     }
 

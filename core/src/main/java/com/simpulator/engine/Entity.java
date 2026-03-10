@@ -10,15 +10,14 @@ import com.badlogic.gdx.math.Vector3;
  */
 public abstract class Entity implements Movable, Renderable {
 
+    protected Vector3 position;
+    protected Vector3 size;
+    protected Quaternion rotation;
     /** Position, size and rotation encoded in a 4x4 matrix, in world units. */
-    protected Matrix4 transform;
+    private Matrix4 transform;
+    private boolean transformDirty = true;
     /** Controls how the entity is rendered. */
     protected EntityRenderer renderer;
-
-    protected Entity(Matrix4 transform, EntityRenderer renderer) {
-        this.transform = transform;
-        this.renderer = renderer;
-    }
 
     protected Entity(
         Vector3 position,
@@ -26,61 +25,58 @@ public abstract class Entity implements Movable, Renderable {
         Quaternion rotation,
         EntityRenderer renderer
     ) {
-        this.transform = new Matrix4(position, rotation.nor(), size);
+        this.position = position.cpy();
+        this.size = size.cpy();
+        this.rotation = rotation.cpy();
+        this.transform = new Matrix4();
         this.renderer = renderer;
     }
 
     /** Returns the center of the entity in world space. */
     public Vector3 getPosition() {
-        Vector3 position = new Vector3();
-        transform.getTranslation(position);
-        return position;
+        return position.cpy();
     }
 
     /** Sets the center of the entity in world space. */
     public void setPosition(Vector3 position) {
-        transform.setTranslation(position);
+        this.position.set(position);
+        transformDirty = true;
     }
 
     public Vector3 getSize() {
-        Vector3 scale = new Vector3();
-        return transform.getScale(scale);
+        return size.cpy();
     }
 
     public void setSize(Vector3 size) {
-        Vector3 position = new Vector3();
-        transform.getTranslation(position);
-        Quaternion rotation = new Quaternion();
-        transform.getRotation(rotation);
-        transform.set(position, rotation, size);
+        this.size.set(size);
+        transformDirty = true;
     }
 
     public Quaternion getRotation() {
-        Quaternion rotation = new Quaternion();
-        transform.getRotation(rotation);
-        return rotation;
+        return rotation.cpy();
     }
 
     public void setRotation(Quaternion rotation) {
-        Vector3 scale = new Vector3();
-        transform.getScale(scale);
-        Vector3 position = new Vector3();
-        transform.getTranslation(position);
-        transform.set(position, rotation.nor(), scale);
+        this.rotation.set(rotation);
+        transformDirty = true;
     }
 
     /** Sets the rotation of the entity in world space. */
     public void setRotation(Vector3 axis, float radians) {
-        Vector3 scale = new Vector3();
-        transform.getScale(scale);
-        Vector3 position = new Vector3();
-        transform.getTranslation(position);
-        Quaternion rotation = new Quaternion().setFromAxis(axis, radians);
-        transform.set(position, rotation.nor(), scale);
+        this.rotation.setFromAxisRad(axis, radians);
+        transformDirty = true;
     }
 
     /** Returns the entity's world space transform. */
     public Matrix4 getTransform() {
+        if (transformDirty) {
+            transform
+                .idt()
+                .translate(position)
+                .rotate(rotation)
+                .scale(size.x, size.y, size.z);
+            transformDirty = false;
+        }
         return transform.cpy();
     }
 
@@ -94,27 +90,24 @@ public abstract class Entity implements Movable, Renderable {
 
     @Override
     public void translate(Vector3 delta) {
-        transform.val[Matrix4.M03] += delta.x;
-        transform.val[Matrix4.M13] += delta.y;
-        transform.val[Matrix4.M23] += delta.z;
+        position.add(delta);
+        transformDirty = true;
     }
 
     public void scale(Vector3 scale) {
-        transform.scale(scale.x, scale.y, scale.z);
+        size.scl(scale);
+        transformDirty = true;
     }
 
     public void rotate(Quaternion delta) {
-        transform.rotate(delta);
+        rotation.mul(delta);
+        transformDirty = true;
     }
 
     @Override
     public void rotate(Vector3 axis, float radians) {
-        transform.rotateRad(axis, radians);
-    }
-
-    /** Applies the given matrix to the entity's world space transform. */
-    public void transform(Matrix4 transform) {
-        this.transform.mul(transform);
+        rotation.mul(new Quaternion().setFromAxisRad(axis, radians));
+        transformDirty = true;
     }
 
     @Override

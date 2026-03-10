@@ -97,18 +97,16 @@ public class TiledRenderer implements EntityRenderer {
             verts[i] = new Vector3();
         }
 
-        // TODO: tile it again
-        batch.draw(textureRegion, entity.getTransform());
         for (float x = -0.5f; x + xStep <= 0.5f; x += xStep) {
             for (float y = -0.5f; y + yStep <= 0.5f; y += yStep) {
-                // batch.draw(
-                //     textureRegion,
-                //     entity.getTransform(),
-                //     x,
-                //     y,
-                //     x + xStep,
-                //     y + yStep
-                // );
+                batch.draw(
+                    textureRegion,
+                    entity.getTransform(),
+                    x,
+                    y,
+                    x + xStep,
+                    y + yStep
+                );
             }
         }
     }

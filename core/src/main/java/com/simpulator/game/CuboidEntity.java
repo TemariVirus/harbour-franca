@@ -38,7 +38,7 @@ public class CuboidEntity extends CollidableEntity {
         Vector3 maxCorner = new Vector3(0.5f, 0.5f, 0.5f);
 
         BoundingBox box = new BoundingBox(minCorner, maxCorner);
-        return new OrientedBoundingBox(box, transform);
+        return new OrientedBoundingBox(box, getTransform());
     }
 
     @Override

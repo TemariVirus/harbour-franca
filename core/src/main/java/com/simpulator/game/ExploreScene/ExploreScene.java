@@ -20,7 +20,6 @@ import com.simpulator.game.ActionHelper;
 import com.simpulator.game.Clock;
 import com.simpulator.game.Config;
 import com.simpulator.game.CuboidEntity;
-import com.simpulator.game.MoveAction;
 import com.simpulator.game.Scenes;
 import com.simpulator.game.TiledRenderer;
 
@@ -51,20 +50,15 @@ public class ExploreScene extends Scene {
             new TextureRegion(textures.get(BRICK_IMG)),
             new Vector2(1, 1)
         );
-        CuboidEntity a = new CuboidEntity(
-            new Vector3(0, 0, WIDTH),
-            new Vector3(WIDTH * 2, HEIGHT, 1),
-            new Quaternion().setFromAxis(Vector3.Y, 0),
-            renderer,
-            false
+        entityManager.add(
+            new CuboidEntity(
+                new Vector3(0, 0, WIDTH),
+                new Vector3(WIDTH * 2, HEIGHT, 1),
+                new Quaternion().setFromAxis(Vector3.Y, 0),
+                renderer,
+                false
+            )
         );
-        entityManager.add(a);
-        keyboard.bind(
-            ButtonBindType.HOLD,
-            Keys.SPACE,
-            new MoveAction(a, new Vector3(0, 0, 0), new Vector3(0, 1, 0), 2)
-        );
-
         entityManager.add(
             new CuboidEntity(
                 new Vector3(0, 0, -WIDTH),
