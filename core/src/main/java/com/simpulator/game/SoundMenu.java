@@ -12,13 +12,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.simpulator.engine.Action;
-import com.simpulator.engine.ButtonManager.ButtonBindType;
-import com.simpulator.engine.GraphicsManager;
-import com.simpulator.engine.KeyboardManager;
-import com.simpulator.engine.MusicManager;
-import com.simpulator.engine.Scene;
-import com.simpulator.engine.SceneManager;
+import com.simpulator.engine.graphics.GraphicsManager;
+import com.simpulator.engine.input.Action;
+import com.simpulator.engine.input.ButtonManager.ButtonBindType;
+import com.simpulator.engine.input.KeyboardManager;
+import com.simpulator.engine.scene.MusicManager;
+import com.simpulator.engine.scene.Scene;
+import com.simpulator.engine.scene.SceneManager;
 
 public class SoundMenu extends Scene {
 

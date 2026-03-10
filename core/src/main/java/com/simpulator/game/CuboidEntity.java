@@ -5,9 +5,10 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.math.collision.OrientedBoundingBox;
 import com.simpulator.engine.CollidableEntity;
-import com.simpulator.engine.Cuboid;
-import com.simpulator.engine.EntityRenderer;
-import com.simpulator.engine.GJKShape;
+import com.simpulator.engine.collision.Cuboid;
+import com.simpulator.engine.collision.GJKShape;
+import com.simpulator.engine.graphics.EntityRenderer;
+
 import java.util.Arrays;
 
 public class CuboidEntity extends CollidableEntity {

@@ -9,8 +9,8 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.math.collision.OrientedBoundingBox;
 import com.simpulator.engine.Entity;
-import com.simpulator.engine.EntityRenderer;
-import com.simpulator.engine.TextureBatch;
+import com.simpulator.engine.graphics.EntityRenderer;
+import com.simpulator.engine.graphics.TextureBatch;
 
 public class TiledRenderer implements EntityRenderer {
 

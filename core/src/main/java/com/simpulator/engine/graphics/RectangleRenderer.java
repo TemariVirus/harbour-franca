@@ -1,4 +1,4 @@
-package com.simpulator.engine;
+package com.simpulator.engine.graphics;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.math.collision.OrientedBoundingBox;
+import com.simpulator.engine.Entity;
 
 /** A renderer for drawing flat rectangular entities. */
 public class RectangleRenderer implements EntityRenderer {

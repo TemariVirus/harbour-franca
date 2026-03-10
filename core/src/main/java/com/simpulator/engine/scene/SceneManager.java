@@ -1,6 +1,7 @@
-package com.simpulator.engine;
+package com.simpulator.engine.scene;
 
 import com.badlogic.gdx.utils.Disposable;
+import com.simpulator.engine.graphics.GraphicsManager;
 import java.util.HashMap;
 
 /** Manages loading and unloading of scenes. */

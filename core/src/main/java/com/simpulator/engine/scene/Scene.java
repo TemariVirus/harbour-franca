@@ -1,15 +1,17 @@
-package com.simpulator.engine;
+package com.simpulator.engine.scene;
+
+import com.simpulator.engine.graphics.GraphicsManager;
 
 /** A scene encapsulates the state and business logic of a section of the simulation. */
 public abstract class Scene {
 
     protected SoundManager sounds;
-    protected TextureManager textures;
+    protected TextureCache textures;
 
     /** Create an empty scene. */
     public Scene() {
         sounds = new SoundManager();
-        textures = new TextureManager();
+        textures = new TextureCache();
     }
 
     /** Load the scene's resources into memory and start the scene. */

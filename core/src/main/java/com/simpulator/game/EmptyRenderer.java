@@ -2,8 +2,8 @@ package com.simpulator.game;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.simpulator.engine.Entity;
-import com.simpulator.engine.EntityRenderer;
-import com.simpulator.engine.TextureBatch;
+import com.simpulator.engine.graphics.EntityRenderer;
+import com.simpulator.engine.graphics.TextureBatch;
 
 /** An EntityRenderer that does nothing. */
 public class EmptyRenderer implements EntityRenderer {

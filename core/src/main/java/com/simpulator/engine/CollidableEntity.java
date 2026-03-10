@@ -2,6 +2,8 @@ package com.simpulator.engine;
 
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
+import com.simpulator.engine.collision.ColliderMesh;
+import com.simpulator.engine.graphics.EntityRenderer;
 
 /** An entity that can collide with other entities. */
 public abstract class CollidableEntity extends Entity implements ColliderMesh {

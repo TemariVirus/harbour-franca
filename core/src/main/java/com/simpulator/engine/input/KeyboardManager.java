@@ -1,7 +1,7 @@
-package com.simpulator.engine;
+package com.simpulator.engine.input;
 
 import com.badlogic.gdx.InputAdapter;
-import com.simpulator.engine.ButtonManager.ButtonBindType;
+import com.simpulator.engine.input.ButtonManager.ButtonBindType;
 import java.util.Set;
 
 /** Invokes actions from keyboard inputs. */

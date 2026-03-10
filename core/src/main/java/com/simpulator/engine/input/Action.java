@@ -1,4 +1,4 @@
-package com.simpulator.engine;
+package com.simpulator.engine.input;
 
 /** Capable of performing an action. */
 public interface Action<T> {

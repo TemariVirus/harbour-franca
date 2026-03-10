@@ -2,8 +2,8 @@ package com.simpulator.game;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.simpulator.engine.Renderable;
-import com.simpulator.engine.TextureBatch;
+import com.simpulator.engine.graphics.Renderable;
+import com.simpulator.engine.graphics.TextureBatch;
 
 public class UIText implements Renderable {
 

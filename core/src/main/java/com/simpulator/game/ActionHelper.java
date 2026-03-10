@@ -1,7 +1,7 @@
 package com.simpulator.game;
 
-import com.simpulator.engine.Action;
-import com.simpulator.engine.SceneManager;
+import com.simpulator.engine.input.Action;
+import com.simpulator.engine.scene.SceneManager;
 
 public final class ActionHelper {
 

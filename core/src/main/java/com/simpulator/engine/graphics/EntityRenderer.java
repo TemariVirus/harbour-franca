@@ -1,6 +1,7 @@
-package com.simpulator.engine;
+package com.simpulator.engine.graphics;
 
 import com.badlogic.gdx.graphics.Camera;
+import com.simpulator.engine.Entity;
 
 /** Strategy based on Renderable for rendering entities */
 public interface EntityRenderer {

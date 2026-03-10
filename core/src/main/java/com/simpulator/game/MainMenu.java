@@ -5,11 +5,11 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.simpulator.engine.ButtonManager.ButtonBindType;
-import com.simpulator.engine.GraphicsManager;
-import com.simpulator.engine.KeyboardManager;
-import com.simpulator.engine.Scene;
-import com.simpulator.engine.SceneManager;
+import com.simpulator.engine.graphics.GraphicsManager;
+import com.simpulator.engine.input.ButtonManager.ButtonBindType;
+import com.simpulator.engine.input.KeyboardManager;
+import com.simpulator.engine.scene.Scene;
+import com.simpulator.engine.scene.SceneManager;
 
 public class MainMenu extends Scene {
 

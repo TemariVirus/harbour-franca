@@ -1,6 +1,6 @@
 package com.simpulator.game;
 
-import com.simpulator.engine.SoundManager;
+import com.simpulator.engine.scene.SoundManager;
 
 public class SoundPlayer {
 

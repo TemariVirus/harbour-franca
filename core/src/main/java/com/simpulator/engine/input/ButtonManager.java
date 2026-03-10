@@ -1,4 +1,4 @@
-package com.simpulator.engine;
+package com.simpulator.engine.input;
 
 import java.util.ArrayList;
 import java.util.HashMap;

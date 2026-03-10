@@ -16,7 +16,7 @@
  * limitations under the License.
  ******************************************************************************/
 
-package com.simpulator.engine;
+package com.simpulator.engine.graphics;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;

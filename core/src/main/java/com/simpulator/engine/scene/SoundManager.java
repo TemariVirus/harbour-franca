@@ -1,4 +1,4 @@
-package com.simpulator.engine;
+package com.simpulator.engine.scene;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;

@@ -4,6 +4,9 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
+import com.simpulator.engine.graphics.EntityRenderer;
+import com.simpulator.engine.graphics.Renderable;
+import com.simpulator.engine.graphics.TextureBatch;
 
 /**
  * An entity with 3D position, 2D size, and 3D rotation.

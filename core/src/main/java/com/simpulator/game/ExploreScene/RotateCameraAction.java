@@ -2,8 +2,8 @@ package com.simpulator.game.ExploreScene;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
-import com.simpulator.engine.Action;
-import com.simpulator.engine.MouseManager;
+import com.simpulator.engine.input.Action;
+import com.simpulator.engine.input.MouseManager;
 
 public class RotateCameraAction implements Action<MouseManager.MouseMoveEvent> {
 

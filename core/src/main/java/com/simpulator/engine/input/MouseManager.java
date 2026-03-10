@@ -1,8 +1,8 @@
-package com.simpulator.engine;
+package com.simpulator.engine.input;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
-import com.simpulator.engine.ButtonManager.ButtonBindType;
+import com.simpulator.engine.input.ButtonManager.ButtonBindType;
 import java.util.ArrayList;
 
 /** Invokes actions from mouse inputs. */

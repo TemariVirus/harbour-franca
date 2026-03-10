@@ -1,9 +1,9 @@
 package com.simpulator.game;
 
 import com.badlogic.gdx.math.Vector3;
-import com.simpulator.engine.Action;
-import com.simpulator.engine.KeyboardManager;
 import com.simpulator.engine.Movable;
+import com.simpulator.engine.input.Action;
+import com.simpulator.engine.input.KeyboardManager;
 
 public class MoveAction implements Action<KeyboardManager.KeyEvent> {
 
