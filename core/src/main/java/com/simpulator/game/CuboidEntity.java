@@ -49,7 +49,8 @@ public class CuboidEntity extends CollidableEntity {
 
     @Override
     public BoundingBox getBounds() {
-        return getOrientedBoundingBox().getBounds();
+        OrientedBoundingBox obb = getOrientedBoundingBox();
+        return new BoundingBox().set(obb.getVertices());
     }
 
     @Override

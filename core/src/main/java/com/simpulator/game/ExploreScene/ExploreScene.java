@@ -43,8 +43,9 @@ public class ExploreScene extends Scene {
     }
 
     private void createLevelLayout() {
-        final int WIDTH = 5;
-        final int HEIGHT = 3;
+        final float WIDTH = 5;
+        final float HEIGHT = 3;
+        final float WALL_THICKNESS = 0.2f;
 
         TiledRenderer renderer = new TiledRenderer(
             new TextureRegion(textures.get(BRICK_IMG)),
@@ -53,7 +54,7 @@ public class ExploreScene extends Scene {
         entityManager.add(
             new CuboidEntity(
                 new Vector3(0, 0, WIDTH),
-                new Vector3(WIDTH * 2, HEIGHT, 1),
+                new Vector3(WIDTH * 2, HEIGHT, WALL_THICKNESS),
                 new Quaternion().setFromAxis(Vector3.Y, 0),
                 renderer,
                 false
@@ -62,7 +63,7 @@ public class ExploreScene extends Scene {
         entityManager.add(
             new CuboidEntity(
                 new Vector3(0, 0, -WIDTH),
-                new Vector3(WIDTH * 2, HEIGHT, 1),
+                new Vector3(WIDTH * 2, HEIGHT, WALL_THICKNESS),
                 new Quaternion().setFromAxis(Vector3.Y, 0),
                 renderer,
                 false
@@ -71,7 +72,7 @@ public class ExploreScene extends Scene {
         entityManager.add(
             new CuboidEntity(
                 new Vector3(WIDTH, 0, 0),
-                new Vector3(WIDTH * 2, HEIGHT, 1),
+                new Vector3(WIDTH * 2, HEIGHT, WALL_THICKNESS),
                 new Quaternion().setFromAxis(Vector3.Y, 90),
                 renderer,
                 false
@@ -80,7 +81,7 @@ public class ExploreScene extends Scene {
         entityManager.add(
             new CuboidEntity(
                 new Vector3(-WIDTH, 0, 0),
-                new Vector3(WIDTH * 2, HEIGHT, 1),
+                new Vector3(WIDTH * 2, HEIGHT, WALL_THICKNESS),
                 new Quaternion().setFromAxis(Vector3.Y, 90),
                 renderer,
                 false
@@ -101,8 +102,8 @@ public class ExploreScene extends Scene {
         camera.far = 100f;
 
         playerCamera = new CameraEntity(
-            new Vector3(0, 1, 0),
-            new Vector3(1, 2, 1),
+            new Vector3(0, 0, 0),
+            new Vector3(1, 1, 1),
             new Quaternion().setFromAxis(Vector3.Y, 0),
             camera
         );
