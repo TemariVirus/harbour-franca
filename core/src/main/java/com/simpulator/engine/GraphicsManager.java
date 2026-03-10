@@ -1,7 +1,8 @@
 package com.simpulator.engine;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Disposable;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -9,8 +10,23 @@ import java.util.Comparator;
 /** Manages rendering of entities and text. */
 public class GraphicsManager implements Disposable {
 
-    protected SpriteBatch batch = new SpriteBatch();
+    protected TextureBatch batch = new TextureBatch();
     private boolean isRendering = false;
+
+    protected void setCamera(Camera camera) {
+        if (camera == null) {
+            batch.setProjectionMatrix(
+                new Matrix4().setToOrtho2D(
+                    0,
+                    0,
+                    Gdx.graphics.getWidth(),
+                    Gdx.graphics.getHeight()
+                )
+            );
+        } else {
+            batch.setProjectionMatrix(camera.combined);
+        }
+    }
 
     protected void beginRender() {
         if (isRendering) return;
@@ -22,8 +38,9 @@ public class GraphicsManager implements Disposable {
     /** Render a single object from the camera's perspective, on top of everything so far. */
     public void render(Renderable renderable, Camera camera) {
         if (renderable == null) return;
-
         beginRender();
+
+        setCamera(camera);
         if (renderable.isVisible(camera)) {
             renderable.render(batch, camera);
         }
@@ -32,6 +49,9 @@ public class GraphicsManager implements Disposable {
     /** Render multiple entities from the camera's perspective. The entities are rendered back to front. */
     public void render(Renderable[] renderables, Camera camera) {
         if (renderables == null) return;
+        beginRender();
+
+        setCamera(camera);
 
         Arrays.sort(
             renderables,
@@ -50,7 +70,6 @@ public class GraphicsManager implements Disposable {
             }
         );
 
-        beginRender();
         for (Renderable r : renderables) {
             if (r != null && r.isVisible(camera)) {
                 r.render(batch, camera);
@@ -63,6 +82,10 @@ public class GraphicsManager implements Disposable {
         if (!isRendering) return;
         batch.end();
         isRendering = false;
+    }
+
+    public boolean isRendering() {
+        return isRendering;
     }
 
     @Override

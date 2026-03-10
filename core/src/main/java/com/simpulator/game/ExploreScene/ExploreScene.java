@@ -20,6 +20,7 @@ import com.simpulator.game.ActionHelper;
 import com.simpulator.game.Clock;
 import com.simpulator.game.Config;
 import com.simpulator.game.CuboidEntity;
+import com.simpulator.game.MoveAction;
 import com.simpulator.game.Scenes;
 import com.simpulator.game.TiledRenderer;
 
@@ -50,15 +51,20 @@ public class ExploreScene extends Scene {
             new TextureRegion(textures.get(BRICK_IMG)),
             new Vector2(1, 1)
         );
-        entityManager.add(
-            new CuboidEntity(
-                new Vector3(0, 0, WIDTH),
-                new Vector3(WIDTH * 2, HEIGHT, 1),
-                new Quaternion().setFromAxis(Vector3.Y, 0),
-                renderer,
-                false
-            )
+        CuboidEntity a = new CuboidEntity(
+            new Vector3(0, 0, WIDTH),
+            new Vector3(WIDTH * 2, HEIGHT, 1),
+            new Quaternion().setFromAxis(Vector3.Y, 0),
+            renderer,
+            false
         );
+        entityManager.add(a);
+        keyboard.bind(
+            ButtonBindType.HOLD,
+            Keys.SPACE,
+            new MoveAction(a, new Vector3(0, 0, 0), new Vector3(0, 1, 0), 2)
+        );
+
         entityManager.add(
             new CuboidEntity(
                 new Vector3(0, 0, -WIDTH),
@@ -99,6 +105,7 @@ public class ExploreScene extends Scene {
         );
         camera.near = 0.05f;
         camera.far = 100f;
+
         playerCamera = new CameraEntity(
             new Vector3(0, 1, 0),
             new Vector3(1, 2, 1),
@@ -109,9 +116,8 @@ public class ExploreScene extends Scene {
 
         sounds.setVolume(Config.volume * 0.01f);
 
-        createLevelLayout();
-
         keyboard = new KeyboardManager();
+        createLevelLayout();
         // @formatter:off
         keyboard.bind(ButtonBindType.HOLD, Keys.W, new TranslateCameraAction(playerCamera, new Vector3(0, 0, -PLAYER_SPEED)));
         keyboard.bind(ButtonBindType.HOLD, Keys.A, new TranslateCameraAction(playerCamera, new Vector3(-PLAYER_SPEED, 0, 0)));

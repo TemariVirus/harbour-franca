@@ -1,9 +1,9 @@
 package com.simpulator.game;
 
 import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.simpulator.engine.Entity;
 import com.simpulator.engine.EntityRenderer;
+import com.simpulator.engine.TextureBatch;
 
 /** An EntityRenderer that does nothing. */
 public class EmptyRenderer implements EntityRenderer {
@@ -19,5 +19,5 @@ public class EmptyRenderer implements EntityRenderer {
     }
 
     @Override
-    public void render(SpriteBatch batch, Camera camera, Entity entity) {}
+    public void render(TextureBatch batch, Camera camera, Entity entity) {}
 }

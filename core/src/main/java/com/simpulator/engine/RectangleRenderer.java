@@ -2,7 +2,6 @@ package com.simpulator.engine;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
@@ -76,7 +75,7 @@ public class RectangleRenderer implements EntityRenderer {
     }
 
     @Override
-    public void render(SpriteBatch batch, Camera camera, Entity entity) {
+    public void render(TextureBatch batch, Camera camera, Entity entity) {
         float[] vertexData = new float[20];
         for (int i = 0; i < 4; i++) {
             boolean isLeft = i < 2;

@@ -1,7 +1,6 @@
 package com.simpulator.engine;
 
 import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
@@ -129,7 +128,7 @@ public abstract class Entity implements Movable, Renderable {
     }
 
     @Override
-    public void render(SpriteBatch batch, Camera camera) {
+    public void render(TextureBatch batch, Camera camera) {
         renderer.render(batch, camera, this);
     }
 

@@ -2,8 +2,8 @@ package com.simpulator.game;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.simpulator.engine.Renderable;
+import com.simpulator.engine.TextureBatch;
 
 public class UIText implements Renderable {
 
@@ -31,7 +31,7 @@ public class UIText implements Renderable {
     }
 
     @Override
-    public void render(SpriteBatch batch, Camera camera) {
+    public void render(TextureBatch batch, Camera camera) {
         font.draw(batch, text, x, y);
     }
 }

@@ -1,7 +1,6 @@
 package com.simpulator.engine;
 
 import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 /** Strategy based on Renderable for rendering entities */
 public interface EntityRenderer {
@@ -12,5 +11,5 @@ public interface EntityRenderer {
     public float getZOrder(Camera camera, Entity entity);
 
     /** Render the entity from the camera's perspective. */
-    public void render(SpriteBatch batch, Camera camera, Entity entity);
+    public void render(TextureBatch batch, Camera camera, Entity entity);
 }

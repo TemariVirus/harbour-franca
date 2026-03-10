@@ -2,7 +2,6 @@ package com.simpulator.game;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -10,6 +9,7 @@ import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.math.collision.OrientedBoundingBox;
 import com.simpulator.engine.Entity;
 import com.simpulator.engine.EntityRenderer;
+import com.simpulator.engine.TextureBatch;
 
 public class TiledRenderer implements EntityRenderer {
 
@@ -76,7 +76,7 @@ public class TiledRenderer implements EntityRenderer {
     }
 
     @Override
-    public void render(SpriteBatch batch, Camera camera, Entity entity) {
+    public void render(TextureBatch batch, Camera camera, Entity entity) {
         Vector3 size = entity.getSize();
         float xStep = tileSize.x / size.x;
         float yStep = tileSize.y / size.y;
@@ -97,33 +97,18 @@ public class TiledRenderer implements EntityRenderer {
             verts[i] = new Vector3();
         }
 
+        // TODO: tile it again
+        batch.draw(textureRegion, entity.getTransform());
         for (float x = -0.5f; x + xStep <= 0.5f; x += xStep) {
             for (float y = -0.5f; y + yStep <= 0.5f; y += yStep) {
-                // Local space
-                verts[0].set(x, y, 0);
-                verts[1].set(x, y + yStep, 0);
-                verts[2].set(x + xStep, y + yStep, 0);
-                verts[3].set(x + xStep, y, 0);
-                // World space
-                for (int i = 0; i < 4; i++) {
-                    verts[i].mul(entity.getTransform());
-                }
-                // Cull if not in view
-                if (
-                    !camera.frustum.boundsInFrustum(
-                        new BoundingBox(verts[0], verts[2])
-                    )
-                ) {
-                    continue;
-                }
-
-                // Screen space
-                for (int i = 0; i < 4; i++) {
-                    camera.project(verts[i]);
-                    vertexData[i * 5 + 0] = verts[i].x;
-                    vertexData[i * 5 + 1] = verts[i].y;
-                }
-                batch.draw(textureRegion.getTexture(), vertexData, 0, 20);
+                // batch.draw(
+                //     textureRegion,
+                //     entity.getTransform(),
+                //     x,
+                //     y,
+                //     x + xStep,
+                //     y + yStep
+                // );
             }
         }
     }

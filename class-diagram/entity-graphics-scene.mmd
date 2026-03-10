@@ -54,7 +54,7 @@ classDiagram
         + transform(transform: Matrix4) void
         + isVisible(camera: Camera) boolean
         + getZOrder(camera: Camera) float
-        + render(batch: SpriteBatch, camera: Camera) void
+        + render(batch: TextureBatch, camera: Camera) void
         + update(deltaTime: float) void
     }
 
@@ -83,7 +83,7 @@ classDiagram
 
         + isVisible(camera: Camera, entity: Entity) boolean
         + getZOrder(camera: Camera, entity: Entity) float
-        + render(batch: SpriteBatch, camera: Camera, entity: Entity) void
+        + render(batch: TextureBatch, camera: Camera, entity: Entity) void
     }
 
     class RectangleRenderer {
@@ -99,11 +99,11 @@ classDiagram
         - getVertex(index: int) Vector3
         + isVisible(camera: Camera, entity: Entity) boolean
         + getZOrder(camera: Camera, entity: Entity) float
-        + render(batch: SpriteBatch, camera: Camera, entity: Entity) void
+        + render(batch: TextureBatch, camera: Camera, entity: Entity) void
     }
 
     class GraphicsManager {
-        # batch: SpriteBatch
+        # batch: TextureBatch
         - isRendering: boolean
 
         + GraphicsManager()
@@ -126,7 +126,7 @@ classDiagram
 
         + isVisible(camera: Camera) boolean
         + getZOrder(camera: Camera) float
-        + render(batch: SpriteBatch, camera: Camera) void
+        + render(batch: TextureBatch, camera: Camera) void
     }
 
     class ResourceCache~K&comma; V: Disposable~ {
