@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.simpulator.engine.EntityManager;
 import com.simpulator.engine.graphics.GraphicsManager;
+import com.simpulator.engine.graphics.Skybox;
 import com.simpulator.engine.input.ButtonManager.ButtonBindType;
 import com.simpulator.engine.input.KeyboardManager;
 import com.simpulator.engine.input.MouseManager;
@@ -20,13 +21,14 @@ import com.simpulator.game.ActionHelper;
 import com.simpulator.game.Clock;
 import com.simpulator.game.Config;
 import com.simpulator.game.CuboidEntity;
+import com.simpulator.game.Level;
 import com.simpulator.game.Scenes;
 import com.simpulator.game.TiledRenderer;
 
 public class ExploreScene extends Scene {
 
-    private static final String BRICK_IMG = "brick.png";
-    private static final float PLAYER_SPEED = 3f;
+    private static final String BRICK_IMG = "Oran.jpeg";
+    private static final float PLAYER_SPEED = 4f;
 
     private final Clock clock = new Clock(0);
     private CameraEntity playerCamera;
@@ -37,8 +39,12 @@ public class ExploreScene extends Scene {
     private KeyboardManager keyboard;
     private MouseManager mouse;
 
-    public ExploreScene(SceneManager sceneManager) {
+    private Level currentLevel;
+    private Skybox skybox;
+
+    public ExploreScene(SceneManager sceneManager, Level level) {
         this.sceneManager = sceneManager;
+        this.currentLevel = level;
         this.entityManager = new EntityManager();
     }
 
@@ -102,17 +108,31 @@ public class ExploreScene extends Scene {
         camera.far = 100f;
 
         playerCamera = new CameraEntity(
-            new Vector3(0, 0, 0),
+            new Vector3(currentLevel.playerStartX, currentLevel.playerStartY, currentLevel.playerStartZ),
             new Vector3(1, 1, 1),
             new Quaternion().setFromAxis(Vector3.Y, 0),
             camera
         );
         entityManager.add(playerCamera);
 
+     // Load the Sky box
+        if (currentLevel.skyboxTexturePrefix != null) {
+            TextureRegion[] faces = new TextureRegion[6];
+            faces[0] = new TextureRegion(textures.get(currentLevel.skyboxTexturePrefix + "_ft.png"));
+            faces[1] = new TextureRegion(textures.get(currentLevel.skyboxTexturePrefix + "_bk.png"));
+            faces[2] = new TextureRegion(textures.get(currentLevel.skyboxTexturePrefix + "_lf.png"));
+            faces[3] = new TextureRegion(textures.get(currentLevel.skyboxTexturePrefix + "_rt.png"));
+            faces[4] = new TextureRegion(textures.get(currentLevel.skyboxTexturePrefix + "_up.png"));
+            faces[5] = new TextureRegion(textures.get(currentLevel.skyboxTexturePrefix + "_dn.png"));
+            
+            skybox = new Skybox(faces, camera.far);
+        }
+
         sounds.setVolume(Config.volume * 0.01f);
 
         keyboard = new KeyboardManager();
         createLevelLayout();
+        
         // @formatter:off
         keyboard.bind(ButtonBindType.HOLD, Keys.W, new TranslateCameraAction(playerCamera, new Vector3(0, 0, -PLAYER_SPEED)));
         keyboard.bind(ButtonBindType.HOLD, Keys.A, new TranslateCameraAction(playerCamera, new Vector3(-PLAYER_SPEED, 0, 0)));
@@ -152,6 +172,12 @@ public class ExploreScene extends Scene {
     public void render(GraphicsManager graphics) {
         ScreenUtils.clear(0f, 0f, 0f, 1f);
 
+        // Render Sky box first
+        if (skybox != null) {
+            graphics.render3D(skybox, playerCamera.getCamera());
+        }
+
+        // Render world entities
         graphics.render3D(
             entityManager.getEntities(),
             playerCamera.getCamera()

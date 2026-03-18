@@ -15,11 +15,12 @@ public class GameMaster extends ApplicationAdapter {
     public void create() {
         sceneManager = new SceneManager();
         musics = new MusicManager();
-
+        LevelManager levelManager = new LevelManager();
+        levelManager.setCurrentLevelId("level_01");
+        
         MainMenu mainMenu = new MainMenu(sceneManager);
         SoundMenu soundMenu = new SoundMenu(sceneManager, musics);
-        ExploreScene mainGame = new ExploreScene(sceneManager);
-
+        ExploreScene mainGame = new ExploreScene(sceneManager, levelManager.getCurrentLevel());
         sceneManager.addScene(Scenes.MainMenu, mainMenu);
         sceneManager.addScene(Scenes.SoundMenu, soundMenu);
         sceneManager.addScene(Scenes.Explore, mainGame);
