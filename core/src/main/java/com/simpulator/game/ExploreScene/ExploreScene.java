@@ -70,7 +70,7 @@ public class ExploreScene extends Scene {
             new CuboidEntity(
                 new Vector3(0, 0, -WIDTH),
                 new Vector3(WIDTH * 2, HEIGHT, WALL_THICKNESS),
-                new Quaternion().setFromAxis(Vector3.Y, 0),
+                new Quaternion().setFromAxis(Vector3.Y, 180),
                 renderer,
                 false
             )
@@ -88,7 +88,7 @@ public class ExploreScene extends Scene {
             new CuboidEntity(
                 new Vector3(-WIDTH, 0, 0),
                 new Vector3(WIDTH * 2, HEIGHT, WALL_THICKNESS),
-                new Quaternion().setFromAxis(Vector3.Y, 90),
+                new Quaternion().setFromAxis(Vector3.Y, -90),
                 renderer,
                 false
             )
@@ -175,6 +175,7 @@ public class ExploreScene extends Scene {
         // Render Sky box first
         if (skybox != null) {
             graphics.render3D(skybox, playerCamera.getCamera());
+            graphics.endRender();
         }
 
         // Render world entities

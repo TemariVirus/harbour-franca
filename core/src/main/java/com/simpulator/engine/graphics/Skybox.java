@@ -4,71 +4,69 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
+
 // Centers on cam
 public class Skybox implements Renderable {
-    private TextureRegion[] faces; //0=Front, 1=Back, 2=Left, 3=Right, 4=Top, 5=Bottom
-    private Matrix4 transform = new Matrix4();
-    
 
-    private float scale; 
+    private TextureRegion[] faces; // 0=Front, 1=Back, 2=Left, 3=Right, 4=Top, 5=Bottom
+    private Matrix4 tmpTransform = new Matrix4(); // Don't allocate a new matrix on every render call
+
+    private float scale;
 
     public Skybox(TextureRegion[] faces, float cameraFarDinstance) {
         if (faces.length != 6) {
-            throw new IllegalArgumentException("Skybox requires exactly 6 texture faces.");
+            throw new IllegalArgumentException(
+                "Skybox requires exactly 6 texture faces."
+            );
         }
+
         this.faces = faces;
-        // Scale the box
-        this.scale = cameraFarDinstance * 0.5f; 
+        this.scale = cameraFarDinstance;
     }
 
     @Override
     public void render(TextureBatch batch, Camera camera) {
         Vector3 camPos = camera.position;
+        float halfScale = this.scale * 0.5f;
 
-        // Front Face (Z - scale)
-        transform.setToTranslation(camPos.x, camPos.y, camPos.z - scale);
-        transform.scale(scale * 2, scale * 2, 1);
-        batch.draw3D(faces[0], transform);
+        // Front Face
+        tmpTransform.setToTranslation(camPos.x, camPos.y, camPos.z - halfScale);
+        tmpTransform.scale(scale, scale, 1);
+        batch.draw3D(faces[0], tmpTransform);
 
-        // Back Face (Z + scale)
-        transform.setToTranslation(camPos.x, camPos.y, camPos.z + scale);
-        transform.rotate(0, 1, 0, 180); // Face inward
-        transform.scale(scale * 2, scale * 2, 1);
-        batch.draw3D(faces[1], transform);
+        // Back Face
+        tmpTransform.setToTranslation(camPos.x, camPos.y, camPos.z + halfScale);
+        tmpTransform.rotate(Vector3.Y, 180);
+        tmpTransform.scale(scale, scale, 1);
+        batch.draw3D(faces[1], tmpTransform);
 
-        // Left Face (X - scale)
-        transform.setToTranslation(camPos.x - scale, camPos.y, camPos.z);
-        transform.rotate(0, 1, 0, -90);
-        transform.scale(scale * 2, scale * 2, 1);
-        batch.draw3D(faces[2], transform);
+        // Left Face
+        tmpTransform.setToTranslation(camPos.x - halfScale, camPos.y, camPos.z);
+        tmpTransform.rotate(Vector3.Y, -90);
+        tmpTransform.scale(scale, scale, 1);
+        batch.draw3D(faces[2], tmpTransform);
 
-        // Right Face (X + scale)
-        transform.setToTranslation(camPos.x + scale, camPos.y, camPos.z);
-        transform.rotate(0, 1, 0, 90);
-        transform.scale(scale * 2, scale * 2, 1);
-        batch.draw3D(faces[3], transform);
+        // Right Face
+        tmpTransform.setToTranslation(camPos.x + halfScale, camPos.y, camPos.z);
+        tmpTransform.rotate(Vector3.Y, 90);
+        tmpTransform.scale(scale, scale, 1);
+        batch.draw3D(faces[3], tmpTransform);
 
-        // Top Face (Y + scale)
-        transform.setToTranslation(camPos.x, camPos.y + scale, camPos.z);
-        transform.rotate(1, 0, 0, -90);
-        transform.scale(scale * 2, scale * 2, 1);
-        batch.draw3D(faces[4], transform);
+        // Top Face
+        tmpTransform.setToTranslation(camPos.x, camPos.y + halfScale, camPos.z);
+        tmpTransform.rotate(Vector3.X, -90);
+        tmpTransform.scale(scale, scale, 1);
+        batch.draw3D(faces[4], tmpTransform);
 
-        // Bottom Face (Y - scale)
-        transform.setToTranslation(camPos.x, camPos.y - scale, camPos.z);
-        transform.rotate(1, 0, 0, 90);
-        transform.scale(scale * 2, scale * 2, 1);
-        batch.draw3D(faces[5], transform);
+        // Bottom Face
+        tmpTransform.setToTranslation(camPos.x, camPos.y - halfScale, camPos.z);
+        tmpTransform.rotate(Vector3.X, 90);
+        tmpTransform.scale(scale, scale, 1);
+        batch.draw3D(faces[5], tmpTransform);
     }
 
     @Override
     public boolean isVisible(Camera camera) {
         return true; // Skybox is always visible
-    }
-
-    @Override
-    public float getZOrder(Camera camera) {
-        // make sure it renders behind everything
-        return Float.MAX_VALUE; 
     }
 }
