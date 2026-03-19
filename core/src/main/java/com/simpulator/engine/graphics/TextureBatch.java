@@ -260,22 +260,22 @@ public class TextureBatch implements Batch {
     }
 
     /**
-     * Draw a TextureRegion as a perspective-correct 3D quad using the given
+     * Draw a TextureRegion as a perspective-correct 3D rect using the given
      * 4x4 transform matrix (model matrix). The camera's combined matrix is
      * applied by the shader, so pass world-space vertices here.
      *
-     * The quad is a unit square [-0.5, 0.5] in local X/Y, Z=0.
+     * The rect is a unit square [-0.5, 0.5] in local X/Y, Z=0.
      */
     public void draw3D(TextureRegion region, Matrix4 transform) {
         draw3D(region, transform, -0.5f, -0.5f, 0.5f, 0.5f);
     }
 
     /**
-     * Draw a TextureRegion as a perspective-correct 3D quad using the given
+     * Draw a TextureRegion as a perspective-correct 3D rect using the given
      * 4x4 transform matrix (model matrix). The camera's combined matrix is
      * applied by the shader, so pass world-space vertices here.
      *
-     * The quad is defined by the given left, bottom, right, and top coordinates in local space, with Z=0.
+     * The rect is defined by the given left, bottom, right, and top coordinates in local space, with Z=0.
      */
     public void draw3D(
         TextureRegion region,
