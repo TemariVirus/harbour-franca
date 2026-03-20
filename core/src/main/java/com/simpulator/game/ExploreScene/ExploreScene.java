@@ -1,6 +1,7 @@
 package com.simpulator.game.ExploreScene;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
@@ -24,6 +25,20 @@ import com.simpulator.game.CuboidEntity;
 import com.simpulator.game.Level;
 import com.simpulator.game.Scenes;
 import com.simpulator.game.TiledRenderer;
+import java.util.ArrayList;
+import java.util.List;
+import com.simpulator.game.ExploreScene.NpcEntity;
+import com.simpulator.game.ExploreScene.GameHUD;
+import com.simpulator.game.ExploreScene.NpcTargetingSystem;
+import com.simpulator.game.SimpleSkin;
+import com.simpulator.engine.graphics.RectangleRenderer;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.simpulator.engine.input.Action;
+import com.simpulator.engine.input.KeyboardManager.KeyEvent;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.utils.Timer;
+import com.simpulator.game.TradingUI;
 
 public class ExploreScene extends Scene {
 
@@ -41,6 +56,11 @@ public class ExploreScene extends Scene {
 
     private Level currentLevel;
     private Skybox skybox;
+
+    private List<NpcEntity> npcs = new ArrayList<>();
+    private GameHUD hud;
+    private TradingUI tradingUI;
+    private NpcTargetingSystem npcTargetingSystem;
 
     public ExploreScene(SceneManager sceneManager, Level level) {
         this.sceneManager = sceneManager;
@@ -130,7 +150,110 @@ public class ExploreScene extends Scene {
 
         sounds.setVolume(Config.volume * 0.01f);
 
+        Skin hudSkin = SimpleSkin.getSkin();
+        
+        // GameHUD requires "default", "title", and "prompt" label styles.
+        Label.LabelStyle labelStyle = new Label.LabelStyle();
+        labelStyle.font = hudSkin.getFont("default");
+        labelStyle.fontColor = Color.WHITE;
+        hudSkin.add("default", labelStyle);
+        hudSkin.add("title", labelStyle);
+        
+        Label.LabelStyle promptStyle = new Label.LabelStyle();
+        promptStyle.font = hudSkin.getFont("default");
+        promptStyle.fontColor = Color.YELLOW;
+        hudSkin.add("prompt", promptStyle);
+
+        // --- Initialize Engine Input Managers first ---
         keyboard = new KeyboardManager();
+        mouse = new MouseManager();
+        mouse.bindMove(new RotateCameraAction(playerCamera, 0.15f));
+        
+        inputMux = new InputMultiplexer();
+        inputMux.addProcessor(keyboard);
+        inputMux.addProcessor(mouse);
+
+        hud = new GameHUD(hudSkin, sceneManager.getGraphics().getBatch());
+        hud.setInventory(new String[]{"Sword", "Shield", "Potion"});
+        
+        tradingUI = new TradingUI(hudSkin);
+        tradingUI.setListener(new TradingUI.TradingUIListener() {
+            @Override
+            public void onDialogueSelected(int optionIndex) {
+                 if (optionIndex == 0) tradingUI.setInnerThoughts("No way he's trading that!");
+                 else if (optionIndex == 1) tradingUI.setInnerThoughts("Hopefully his not making this trade.");
+                 else if (optionIndex == 2) tradingUI.setInnerThoughts("Seems fair.");
+                 else tradingUI.setInnerThoughts("Hmm...");
+            }
+            @Override
+            public void onTradeConfirmed(int itemIndex) {
+                 tradingUI.showTradeResult("Traded successfully!");
+                 String[] currentInv = new String[]{"Sword", "Shield", "Potion"};
+                 if (itemIndex >= 0 && itemIndex < currentInv.length) {
+                     currentInv[itemIndex] = "Traded " + currentInv[itemIndex];
+                 }
+                 hud.setInventory(currentInv);
+                 
+                 // Restore control
+                 Gdx.input.setInputProcessor(inputMux);
+                 mouse.ignoreNextDelta();
+                 Gdx.input.setCursorCatched(true);
+                 
+                 Timer.schedule(new Timer.Task() {
+                     @Override
+                     public void run() {
+                         tradingUI.hide();
+                     }
+                 }, 2f);
+            }
+            @Override
+            public void onTradeCancelled() {
+                 tradingUI.hide();
+                 // Restore control
+                 Gdx.input.setInputProcessor(inputMux);
+                 mouse.ignoreNextDelta();
+                 Gdx.input.setCursorCatched(true);
+            }
+            @Override
+            public void onTimeUp() {
+                 tradingUI.showTradeResult("Too slow!");
+                 
+                 // Restore control
+                 Gdx.input.setInputProcessor(inputMux);
+                 mouse.ignoreNextDelta();
+                 Gdx.input.setCursorCatched(true);
+                 
+                 Timer.schedule(new Timer.Task() {
+                     @Override
+                     public void run() {
+                         tradingUI.hide();
+                     }
+                 }, 2f);
+            }
+        });
+
+        TextureRegion brickRegion = new TextureRegion(textures.get(BRICK_IMG));
+        NpcEntity npc1 = new NpcEntity(
+            new Vector3(2, 0, 2), new Vector3(1, 2, 1), new RectangleRenderer(brickRegion, Color.RED),
+            "Chinese Merchant", "Chinese", new String[]{"更值錢", "公平", "不值錢"}, new String[]{"Yes", "Hmm", "No"}
+        );
+        NpcEntity npc2 = new NpcEntity(
+            new Vector3(-2, 0, 2), new Vector3(1, 2, 1), new RectangleRenderer(brickRegion, Color.GREEN),
+            "Vietnamese Merchant", "Vietnamese", new String[]{"Giá trị hơn", "Công bằng", "Giá trị thấp hơn"}, new String[]{"Yes", "Hmm", "No"}
+        );
+        NpcEntity npc3 = new NpcEntity(
+            new Vector3(0, 0, -2), new Vector3(1, 2, 1), new RectangleRenderer(brickRegion, Color.BLUE),
+            "Japanese Merchant", "Japanese", new String[]{"もっと価値がある", "妥当な", "価値が低い"}, new String[]{"Yes", "Hmm", "No"}
+        );
+        npcs.add(npc1);
+        npcs.add(npc2);
+        npcs.add(npc3);
+        entityManager.add(npc1);
+        entityManager.add(npc2);
+        entityManager.add(npc3);
+
+        npcTargetingSystem = new NpcTargetingSystem(playerCamera, npcs);
+
         createLevelLayout();
         
         // @formatter:off
@@ -140,14 +263,32 @@ public class ExploreScene extends Scene {
         keyboard.bind(ButtonBindType.HOLD, Keys.D, new TranslateCameraAction(playerCamera, new Vector3(PLAYER_SPEED, 0, 0)));
 
         keyboard.bind(ButtonBindType.DOWN, Keys.ESCAPE, ActionHelper.switchSceneAction(sceneManager, Scenes.MainMenu));
+        
+        keyboard.bind(ButtonBindType.DOWN, Keys.E, new Action<KeyEvent>() {
+            @Override
+            public void act(KeyEvent event) {
+                NpcEntity target = npcTargetingSystem.getTargetedNpc();
+                if (target != null && !tradingUI.isVisible()) {
+                    tradingUI.show(target.getName(), target.getDialogueOptions(), new String[]{"Sword", "Shield", "Potion"}, new String[]{"Common", "Rare", "Epic"});
+                    Gdx.input.setInputProcessor(tradingUI.getInputProcessor());
+                    Gdx.input.setCursorCatched(false);
+                }
+            }
+        });
+        
+        mouse.bindButton(ButtonBindType.DOWN, Input.Buttons.RIGHT, new Action<MouseManager.MouseButtonEvent>() {
+            @Override
+            public void act(MouseManager.MouseButtonEvent event) {
+                NpcEntity target = npcTargetingSystem.getTargetedNpc();
+                if (target != null && !tradingUI.isVisible()) {
+                    tradingUI.show(target.getName(), target.getDialogueOptions(), new String[]{"Sword", "Shield", "Potion"}, new String[]{"Common", "Rare", "Epic"});
+                    Gdx.input.setInputProcessor(tradingUI.getInputProcessor());
+                    Gdx.input.setCursorCatched(false);
+                }
+            }
+        });
         // @formatter:on
 
-        mouse = new MouseManager();
-        mouse.bindMove(new RotateCameraAction(playerCamera, 0.15f));
-
-        inputMux = new InputMultiplexer();
-        inputMux.addProcessor(keyboard);
-        inputMux.addProcessor(mouse);
         Gdx.input.setInputProcessor(inputMux);
     }
 
@@ -162,27 +303,42 @@ public class ExploreScene extends Scene {
     @Override
     public void update(float deltaTime) {
         clock.forward(deltaTime);
-        keyboard.update(deltaTime, clock.getSeconds());
-        mouse.update(deltaTime, clock.getSeconds());
+        if (!tradingUI.isVisible()) {
+            keyboard.update(deltaTime, clock.getSeconds());
+            mouse.update(deltaTime, clock.getSeconds());
+            
+            npcTargetingSystem.update();
+            NpcEntity targeted = npcTargetingSystem.getTargetedNpc();
+            if (targeted != null) {
+                hud.showInteractionPrompt(targeted.getName());
+            } else {
+                hud.hideInteractionPrompt();
+            }
+        } else {
+            hud.hideInteractionPrompt();
+        }
+        
         entityManager.updateCollisions();
         entityManager.update(deltaTime);
     }
 
     @Override
     public void render(GraphicsManager graphics) {
-        ScreenUtils.clear(0f, 0f, 0f, 1f);
+        ScreenUtils.clear(0.2f, 0.2f, 0.2f, 1f);
 
+        // Render world objects
+        graphics.render3D(skybox, playerCamera.getCamera());
+        graphics.render3D(entityManager.getEntities(), playerCamera.getCamera());
+
+        // Render UI on top
+        graphics.render(hud, null);
+        graphics.render(tradingUI, null);
         // Render Sky box first
         if (skybox != null) {
             graphics.render3D(skybox, playerCamera.getCamera());
             graphics.endRender();
         }
 
-        // Render world entities
-        graphics.render3D(
-            entityManager.getEntities(),
-            playerCamera.getCamera()
-        );
         graphics.endRender();
     }
 }

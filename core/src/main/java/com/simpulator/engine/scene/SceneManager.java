@@ -60,6 +60,10 @@ public class SceneManager implements Disposable {
         }
     }
 
+    public GraphicsManager getGraphics() {
+        return graphics;
+    }
+
     @Override
     public void dispose() {
         if (currentScene != null) {

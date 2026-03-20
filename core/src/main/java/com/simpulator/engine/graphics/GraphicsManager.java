@@ -116,6 +116,10 @@ public class GraphicsManager implements Disposable {
         isRendering = false;
     }
 
+    public TextureBatch getBatch() {
+        return batch;
+    }
+
     public boolean isRendering() {
         return isRendering;
     }
