@@ -1,7 +1,6 @@
 package com.simpulator.engine.graphics;
 
 import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import java.util.Arrays;
@@ -127,10 +126,6 @@ public class GraphicsManager implements Disposable {
 
         batch.end();
         viewport = null;
-    }
-
-    public TextureBatch getBatch() {
-        return batch;
     }
 
     public boolean isRendering() {

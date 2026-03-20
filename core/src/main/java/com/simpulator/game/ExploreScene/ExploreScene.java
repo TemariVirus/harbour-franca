@@ -4,18 +4,25 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.simpulator.engine.EntityManager;
 import com.simpulator.engine.graphics.GraphicsManager;
+import com.simpulator.engine.graphics.RectangleRenderer;
 import com.simpulator.engine.graphics.Skybox;
+import com.simpulator.engine.input.Action;
 import com.simpulator.engine.input.ButtonManager.ButtonBindType;
 import com.simpulator.engine.input.KeyboardManager;
+import com.simpulator.engine.input.KeyboardManager.KeyEvent;
 import com.simpulator.engine.input.MouseManager;
 import com.simpulator.engine.scene.Scene;
 import com.simpulator.engine.scene.SceneManager;
@@ -25,21 +32,11 @@ import com.simpulator.game.Config;
 import com.simpulator.game.CuboidEntity;
 import com.simpulator.game.Level;
 import com.simpulator.game.Scenes;
+import com.simpulator.game.SimpleSkin;
 import com.simpulator.game.TiledRenderer;
+import com.simpulator.game.TradingUI;
 import java.util.ArrayList;
 import java.util.List;
-import com.simpulator.game.ExploreScene.NpcEntity;
-import com.simpulator.game.ExploreScene.GameHUD;
-import com.simpulator.game.ExploreScene.NpcTargetingSystem;
-import com.simpulator.game.SimpleSkin;
-import com.simpulator.engine.graphics.RectangleRenderer;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.simpulator.engine.input.Action;
-import com.simpulator.engine.input.KeyboardManager.KeyEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.utils.Timer;
-import com.simpulator.game.TradingUI;
 
 public class ExploreScene extends Scene {
 
@@ -156,14 +153,14 @@ public class ExploreScene extends Scene {
         sounds.setVolume(Config.volume * 0.01f);
 
         Skin hudSkin = SimpleSkin.getSkin();
-        
+
         // GameHUD requires "default", "title", and "prompt" label styles.
         Label.LabelStyle labelStyle = new Label.LabelStyle();
         labelStyle.font = hudSkin.getFont("default");
         labelStyle.fontColor = Color.WHITE;
         hudSkin.add("default", labelStyle);
         hudSkin.add("title", labelStyle);
-        
+
         Label.LabelStyle promptStyle = new Label.LabelStyle();
         promptStyle.font = hudSkin.getFont("default");
         promptStyle.fontColor = Color.YELLOW;
@@ -173,14 +170,14 @@ public class ExploreScene extends Scene {
         keyboard = new KeyboardManager();
         mouse = new MouseManager();
         mouse.bindMove(new RotateCameraAction(playerCamera, 0.15f));
-        
+
         inputMux = new InputMultiplexer();
         inputMux.addProcessor(keyboard);
         inputMux.addProcessor(mouse);
 
-        hud = new GameHUD(hudSkin, sceneManager.getGraphics().getBatch());
+        hud = new GameHUD(hudSkin);
         hud.setInventory(new String[]{"Sword", "Shield", "Potion"});
-        
+
         tradingUI = new TradingUI(hudSkin);
         tradingUI.setListener(new TradingUI.TradingUIListener() {
             @Override
@@ -198,12 +195,12 @@ public class ExploreScene extends Scene {
                      currentInv[itemIndex] = "Traded " + currentInv[itemIndex];
                  }
                  hud.setInventory(currentInv);
-                 
+
                  // Restore control
                  Gdx.input.setInputProcessor(inputMux);
                  mouse.ignoreNextDelta();
                  Gdx.input.setCursorCatched(true);
-                 
+
                  Timer.schedule(new Timer.Task() {
                      @Override
                      public void run() {
@@ -222,12 +219,12 @@ public class ExploreScene extends Scene {
             @Override
             public void onTimeUp() {
                  tradingUI.showTradeResult("Too slow!");
-                 
+
                  // Restore control
                  Gdx.input.setInputProcessor(inputMux);
                  mouse.ignoreNextDelta();
                  Gdx.input.setCursorCatched(true);
-                 
+
                  Timer.schedule(new Timer.Task() {
                      @Override
                      public void run() {
@@ -267,7 +264,7 @@ public class ExploreScene extends Scene {
         keyboard.bind(ButtonBindType.HOLD, Keys.D, new TranslateCameraAction(playerCamera, new Vector3(PLAYER_SPEED, 0, 0)));
 
         keyboard.bind(ButtonBindType.DOWN, Keys.ESCAPE, ActionHelper.switchSceneAction(sceneManager, Scenes.MainMenu));
-        
+
         keyboard.bind(ButtonBindType.DOWN, Keys.E, new Action<KeyEvent>() {
             @Override
             public void act(KeyEvent event) {
@@ -279,7 +276,7 @@ public class ExploreScene extends Scene {
                 }
             }
         });
-        
+
         mouse.bindButton(ButtonBindType.DOWN, Input.Buttons.RIGHT, new Action<MouseManager.MouseButtonEvent>() {
             @Override
             public void act(MouseManager.MouseButtonEvent event) {
@@ -310,7 +307,7 @@ public class ExploreScene extends Scene {
         if (!tradingUI.isVisible()) {
             keyboard.update(deltaTime, clock.getSeconds());
             mouse.update(deltaTime, clock.getSeconds());
-            
+
             npcTargetingSystem.update();
             NpcEntity targeted = npcTargetingSystem.getTargetedNpc();
             if (targeted != null) {
@@ -321,7 +318,7 @@ public class ExploreScene extends Scene {
         } else {
             hud.hideInteractionPrompt();
         }
-        
+
         entityManager.updateCollisions();
         entityManager.update(deltaTime);
     }
@@ -336,7 +333,7 @@ public class ExploreScene extends Scene {
             graphics.render3D(skybox, playerCamera.getCamera());
             graphics.endRender();
         }
-        
+
         // Render world entities
         graphics.beginRender(viewport);
         graphics.render3D(

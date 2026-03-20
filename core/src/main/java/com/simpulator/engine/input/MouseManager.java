@@ -104,6 +104,7 @@ public class MouseManager extends InputAdapter {
     private float scrolledX, scrolledY;
     private boolean ignoreNextDelta = false;
 
+    // TODO: remove this and fix the mouse jumping bug externally
     public void ignoreNextDelta() {
         this.ignoreNextDelta = true;
     }

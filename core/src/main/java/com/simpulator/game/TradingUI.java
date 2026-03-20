@@ -307,6 +307,8 @@ public class TradingUI implements InputProcessor, Renderable {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        // TODO: check for left click
+        // TODO: use MouseManager instead of rolling our own input
         if (state == State.HIDDEN || state == State.TRADE_RESULT) return false;
 
         // Use the viewport to correctly unproject real screen touches to virtual coordinates

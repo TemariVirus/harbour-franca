@@ -2,11 +2,11 @@ package com.simpulator.game.ExploreScene;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.simpulator.engine.graphics.Renderable;
 import com.simpulator.engine.graphics.TextureBatch;
@@ -15,7 +15,7 @@ import com.simpulator.engine.graphics.TextureBatch;
  * In-game HUD overlay showing mission objective, player inventory,
  * interaction prompts, and a crosshair.
  */
-public class GameHUD implements Renderable {
+public class GameHUD implements Renderable, Disposable {
 
     private final Stage stage;
     private final Skin skin;
@@ -26,9 +26,9 @@ public class GameHUD implements Renderable {
     private Label interactionPrompt;
     private Label crosshair;
 
-    public GameHUD(Skin skin, Batch batch) {
+    public GameHUD(Skin skin) {
         this.skin = skin;
-        this.stage = new Stage(new ScreenViewport(), batch);
+        this.stage = new Stage(new ScreenViewport());
         buildHUD();
     }
 
@@ -69,8 +69,12 @@ public class GameHUD implements Renderable {
         for (int i = 0; i < 3; i++) {
             inventorySlots[i] = new Label("[Empty]", skin);
             Table slotBox = new Table();
-            slotBox.setBackground(skin.newDrawable("white",
-                new com.badlogic.gdx.graphics.Color(0.2f, 0.2f, 0.2f, 0.7f)));
+            slotBox.setBackground(
+                skin.newDrawable(
+                    "white",
+                    new com.badlogic.gdx.graphics.Color(0.2f, 0.2f, 0.2f, 0.7f)
+                )
+            );
             slotBox.add(inventorySlots[i]).pad(8);
             bottomRow.add(slotBox).width(110).height(35).padRight(5);
         }
@@ -117,24 +121,25 @@ public class GameHUD implements Renderable {
         interactionPrompt.setVisible(false);
     }
 
-    public Stage getStage() {
-        return stage;
-    }
-
     /**
      * Render the HUD. Call after the main scene render.
      */
     @Override
     public void render(TextureBatch batch, Camera camera) {
-        stage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
+        stage
+            .getViewport()
+            // TODO: inject from viewport instead of using global value
+            .update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
+        // TODO: inject from update instead of using global value
         stage.act(Gdx.graphics.getDeltaTime());
-        
-        // Use manual draw to avoid Stage's internal begin/end cycle, 
+
+        // Use manual draw to avoid Stage's internal begin/end cycle,
         // since the batch is already started by GraphicsManager.
         batch.setProjectionMatrix(stage.getViewport().getCamera().combined);
         stage.getRoot().draw(batch, 1.0f);
     }
 
+    @Override
     public void dispose() {
         stage.dispose();
     }
