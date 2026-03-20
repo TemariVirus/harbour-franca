@@ -61,8 +61,8 @@ public class TradingUI implements InputProcessor, Renderable {
 
     public TradingUI(Skin skin) {
         this.state = State.HIDDEN;
-        this.font = new BitmapFont();
-        this.font.getData().setScale(1.5f); // Solid scale perfectly balanced for virtual viewport
+        this.font = new BitmapFont(Gdx.files.internal("fonts/jp.fnt")); // TODO: cache fonts
+        this.font.getData().setScale(0.67f); // Solid scale perfectly balanced for virtual viewport
         this.layout = new GlyphLayout();
         this.white = new TextureRegion(skin.get("white", Texture.class));
         
