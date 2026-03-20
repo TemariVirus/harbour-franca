@@ -10,17 +10,25 @@ public class GameMaster extends ApplicationAdapter {
 
     private SceneManager sceneManager;
     private MusicManager musics;
+    private int windowWidth;
+    private int windowHeight;
 
     @Override
     public void create() {
         sceneManager = new SceneManager();
         musics = new MusicManager();
+        windowWidth = Gdx.graphics.getWidth();
+        windowHeight = Gdx.graphics.getHeight();
+
         LevelManager levelManager = new LevelManager();
         levelManager.setCurrentLevelId("level_01");
-        
+
         MainMenu mainMenu = new MainMenu(sceneManager);
         SoundMenu soundMenu = new SoundMenu(sceneManager, musics);
-        ExploreScene mainGame = new ExploreScene(sceneManager, levelManager.getCurrentLevel());
+        ExploreScene mainGame = new ExploreScene(
+            sceneManager,
+            levelManager.getCurrentLevel()
+        );
         sceneManager.addScene(Scenes.MainMenu, mainMenu);
         sceneManager.addScene(Scenes.SoundMenu, soundMenu);
         sceneManager.addScene(Scenes.Explore, mainGame);
@@ -33,7 +41,13 @@ public class GameMaster extends ApplicationAdapter {
     public void render() {
         float deltaTime = Gdx.graphics.getDeltaTime();
         sceneManager.update(deltaTime);
-        sceneManager.render();
+        sceneManager.render(windowWidth, windowHeight);
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        this.windowWidth = width;
+        this.windowHeight = height;
     }
 
     @Override

@@ -9,7 +9,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import com.simpulator.engine.EntityManager;
 import com.simpulator.engine.graphics.GraphicsManager;
 import com.simpulator.engine.graphics.Skybox;
@@ -48,6 +49,7 @@ public class ExploreScene extends Scene {
     private final Clock clock = new Clock(0);
     private CameraEntity playerCamera;
 
+    private Viewport viewport;
     private SceneManager sceneManager;
     private EntityManager entityManager;
     private InputMultiplexer inputMux;
@@ -63,6 +65,7 @@ public class ExploreScene extends Scene {
     private NpcTargetingSystem npcTargetingSystem;
 
     public ExploreScene(SceneManager sceneManager, Level level) {
+        this.viewport = new ExtendViewport(640, 480);
         this.sceneManager = sceneManager;
         this.currentLevel = level;
         this.entityManager = new EntityManager();
@@ -126,7 +129,9 @@ public class ExploreScene extends Scene {
         );
         camera.near = 0.05f;
         camera.far = 100f;
+        viewport.setCamera(camera);
 
+        // @formatter:off
         playerCamera = new CameraEntity(
             new Vector3(currentLevel.playerStartX, currentLevel.playerStartY, currentLevel.playerStartZ),
             new Vector3(1, 1, 1),
@@ -135,7 +140,7 @@ public class ExploreScene extends Scene {
         );
         entityManager.add(playerCamera);
 
-     // Load the Sky box
+        // Load the Sky box
         if (currentLevel.skyboxTexturePrefix != null) {
             TextureRegion[] faces = new TextureRegion[6];
             faces[0] = new TextureRegion(textures.get(currentLevel.skyboxTexturePrefix + "_ft.png"));
@@ -144,7 +149,7 @@ public class ExploreScene extends Scene {
             faces[3] = new TextureRegion(textures.get(currentLevel.skyboxTexturePrefix + "_rt.png"));
             faces[4] = new TextureRegion(textures.get(currentLevel.skyboxTexturePrefix + "_up.png"));
             faces[5] = new TextureRegion(textures.get(currentLevel.skyboxTexturePrefix + "_dn.png"));
-            
+
             skybox = new Skybox(faces, camera.far);
         }
 
@@ -255,8 +260,7 @@ public class ExploreScene extends Scene {
         npcTargetingSystem = new NpcTargetingSystem(playerCamera, npcs);
 
         createLevelLayout();
-        
-        // @formatter:off
+
         keyboard.bind(ButtonBindType.HOLD, Keys.W, new TranslateCameraAction(playerCamera, new Vector3(0, 0, -PLAYER_SPEED)));
         keyboard.bind(ButtonBindType.HOLD, Keys.A, new TranslateCameraAction(playerCamera, new Vector3(-PLAYER_SPEED, 0, 0)));
         keyboard.bind(ButtonBindType.HOLD, Keys.S, new TranslateCameraAction(playerCamera, new Vector3(0, 0, PLAYER_SPEED)));
@@ -323,22 +327,28 @@ public class ExploreScene extends Scene {
     }
 
     @Override
-    public void render(GraphicsManager graphics) {
-        ScreenUtils.clear(0.2f, 0.2f, 0.2f, 1f);
+    public void render(GraphicsManager graphics, int width, int height) {
+        viewport.update(width, height);
 
-        // Render world objects
-        graphics.render3D(skybox, playerCamera.getCamera());
-        graphics.render3D(entityManager.getEntities(), playerCamera.getCamera());
-
-        // Render UI on top
-        graphics.render(hud, null);
-        graphics.render(tradingUI, null);
         // Render Sky box first
         if (skybox != null) {
+            graphics.beginRender(viewport);
             graphics.render3D(skybox, playerCamera.getCamera());
             graphics.endRender();
         }
+        
+        // Render world entities
+        graphics.beginRender(viewport);
+        graphics.render3D(
+            entityManager.getEntities(),
+            playerCamera.getCamera()
+        );
+        graphics.endRender();
 
+        // Render UI on top
+        graphics.beginRender(viewport);
+        graphics.render(hud, null);
+        graphics.render(tradingUI, null);
         graphics.endRender();
     }
 }

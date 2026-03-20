@@ -1,9 +1,9 @@
 package com.simpulator.engine.graphics;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import java.util.Arrays;
 import java.util.Comparator;
 
@@ -11,34 +11,34 @@ import java.util.Comparator;
 public class GraphicsManager implements Disposable {
 
     protected TextureBatch batch = new TextureBatch();
-    private boolean isRendering = false;
+    private Viewport viewport = null;
 
-    protected void setCamera(Camera camera) {
+    private void setCamera(Camera camera) {
         if (camera == null) {
-            batch.setProjectionMatrix(
-                new Matrix4().setToOrtho2D(
-                    0,
-                    0,
-                    Gdx.graphics.getWidth(),
-                    Gdx.graphics.getHeight()
-                )
-            );
+            batch.setProjectionMatrix(this.viewport.getCamera().combined);
         } else {
             batch.setProjectionMatrix(camera.combined);
         }
     }
 
-    protected void beginRender() {
-        if (isRendering) return;
+    public void beginRender(Viewport viewport) {
+        if (isRendering()) {
+            endRender();
+        }
 
         batch.begin();
-        isRendering = true;
+        this.viewport = viewport;
+        this.viewport.apply();
     }
 
     /** Render a single object from the camera's perspective, on top of everything so far. */
     public void render(Renderable renderable, Camera camera) {
+        if (!isRendering()) {
+            throw new IllegalStateException(
+                "Cannot call render() while not rendering. Call beginRender() first."
+            );
+        }
         if (renderable == null) return;
-        beginRender();
 
         setCamera(camera);
         if (renderable.isVisible(camera)) {
@@ -48,8 +48,12 @@ public class GraphicsManager implements Disposable {
 
     /** Render multiple entities from the camera's perspective. The entities are rendered back to front. */
     public void render(Renderable[] renderables, Camera camera) {
+        if (!isRendering()) {
+            throw new IllegalStateException(
+                "Cannot call render() while not rendering. Call beginRender() first."
+            );
+        }
         if (renderables == null) return;
-        beginRender();
 
         setCamera(camera);
 
@@ -83,8 +87,12 @@ public class GraphicsManager implements Disposable {
      * It should use the TextureBatch.draw3D methods to render itself.
      */
     public void render3D(Renderable renderable, Camera camera) {
+        if (!isRendering()) {
+            throw new IllegalStateException(
+                "Cannot call render3D() while not rendering. Call beginRender() first."
+            );
+        }
         if (renderable == null) return;
-        beginRender();
 
         setCamera(camera);
         if (renderable.isVisible(camera)) {
@@ -98,8 +106,12 @@ public class GraphicsManager implements Disposable {
      * They should use the TextureBatch.draw3D methods to render themselves.
      */
     public void render3D(Renderable[] renderables, Camera camera) {
+        if (!isRendering()) {
+            throw new IllegalStateException(
+                "Cannot call render3D() while not rendering. Call beginRender() first."
+            );
+        }
         if (renderables == null) return;
-        beginRender();
 
         setCamera(camera);
         for (Renderable r : renderables) {
@@ -111,9 +123,10 @@ public class GraphicsManager implements Disposable {
 
     /** Finish rendering and draw the result to the screen. */
     public void endRender() {
-        if (!isRendering) return;
+        if (!isRendering()) return;
+
         batch.end();
-        isRendering = false;
+        viewport = null;
     }
 
     public TextureBatch getBatch() {
@@ -121,7 +134,7 @@ public class GraphicsManager implements Disposable {
     }
 
     public boolean isRendering() {
-        return isRendering;
+        return this.viewport != null;
     }
 
     @Override

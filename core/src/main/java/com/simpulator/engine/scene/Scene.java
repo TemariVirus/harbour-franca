@@ -28,5 +28,9 @@ public abstract class Scene {
     public abstract void update(float deltaTime);
 
     /** Draw the scene to the screen. */
-    public abstract void render(GraphicsManager graphics);
+    public abstract void render(
+        GraphicsManager graphics,
+        int width,
+        int height
+    );
 }
