@@ -23,20 +23,14 @@ public class MainMenu extends Scene {
         sounds.setVolume(Config.volume * 0.01f);
 
         this.km = new KeyboardManager();
-        km.bind(
-            ButtonBindType.DOWN,
-            Keys.ENTER,
-            ActionHelper.switchSceneAction(sceneManager, Scenes.Explore)
+        km.bind(ButtonBindType.DOWN, Keys.ENTER, e ->
+            sceneManager.setScene(Scenes.Explore)
         );
-        km.bind(
-            ButtonBindType.DOWN,
-            Keys.G,
-            ActionHelper.switchSceneAction(sceneManager, Scenes.Explore)
+        km.bind(ButtonBindType.DOWN, Keys.G, e ->
+            sceneManager.setScene(Scenes.Explore)
         );
-        km.bind(
-            ButtonBindType.DOWN,
-            Keys.S,
-            ActionHelper.switchSceneAction(sceneManager, Scenes.SoundMenu)
+        km.bind(ButtonBindType.DOWN, Keys.S, e ->
+            sceneManager.setScene(Scenes.SoundMenu)
         );
 
         this.font = new BitmapFont();

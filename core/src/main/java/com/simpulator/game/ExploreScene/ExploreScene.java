@@ -24,7 +24,6 @@ import com.simpulator.engine.input.KeyboardManager;
 import com.simpulator.engine.input.MouseManager;
 import com.simpulator.engine.scene.Scene;
 import com.simpulator.engine.scene.SceneManager;
-import com.simpulator.game.ActionHelper;
 import com.simpulator.game.Clock;
 import com.simpulator.game.Config;
 import com.simpulator.game.CuboidEntity;
@@ -268,10 +267,8 @@ public class ExploreScene extends Scene {
             )
         );
 
-        keyboard.bind(
-            ButtonBindType.DOWN,
-            Keys.ESCAPE,
-            ActionHelper.switchSceneAction(sceneManager, Scenes.MainMenu)
+        keyboard.bind(ButtonBindType.DOWN, Keys.ESCAPE, e ->
+            sceneManager.setScene(Scenes.MainMenu)
         );
 
         keyboard.bind(ButtonBindType.DOWN, Keys.E, event -> {

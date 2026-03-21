@@ -59,15 +59,11 @@ public class SoundMenu extends Scene {
         table.add(volumeSlider).width(300).height(50).padTop(5);
 
         this.km = new KeyboardManager();
-        km.bind(
-            ButtonBindType.DOWN,
-            Keys.ESCAPE,
-            ActionHelper.switchSceneAction(sceneManager, Scenes.MainMenu)
+        km.bind(ButtonBindType.DOWN, Keys.ESCAPE, e ->
+            sceneManager.setScene(Scenes.MainMenu)
         );
-        km.bind(
-            ButtonBindType.DOWN,
-            Keys.BACKSPACE,
-            ActionHelper.switchSceneAction(sceneManager, Scenes.MainMenu)
+        km.bind(ButtonBindType.DOWN, Keys.BACKSPACE, e ->
+            sceneManager.setScene(Scenes.MainMenu)
         );
         km.bind(ButtonBindType.DOWN, Keys.LEFT, changeVolumeAction(-10));
         km.bind(ButtonBindType.DOWN, Keys.RIGHT, changeVolumeAction(10));
