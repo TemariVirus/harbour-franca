@@ -51,9 +51,10 @@ public class TradingUI
 
     private String npcName = "";
     private String[] dialogueOptions = new String[3];
-    private String[] offeredItemNames = new String[3];
-    private String[] offeredItemRarities = new String[3];
+    private String[] offeredItemNames = new String[0];
+    private String[] offeredItemRarities = new String[0];
     private int currentItemIndex = 0;
+    private int carouselSize = 0;
     private String innerThought = "";
     private String resultText = "";
     private int selectedDialogueIndex = -1;
@@ -95,10 +96,9 @@ public class TradingUI
         this.timeLeft = 90f; // 1 min 30 sec
         this.timerActive = true;
         this.npcName = npcName;
-        for(int i=0; i<3; i++) {
-            this.offeredItemNames[i] = (itemNames != null && i < itemNames.length) ? itemNames[i] : "";
-            this.offeredItemRarities[i] = (itemRarities != null && i < itemRarities.length) ? itemRarities[i] : "";
-        }
+        this.carouselSize = (itemNames != null) ? itemNames.length : 0;
+        this.offeredItemNames = (itemNames != null) ? itemNames.clone() : new String[0];
+        this.offeredItemRarities = (itemRarities != null) ? itemRarities.clone() : new String[0];
         this.currentItemIndex = 0;
         this.innerThought = "";
         this.selectedDialogueIndex = -1;
@@ -340,13 +340,13 @@ public class TradingUI
         if (state == State.CHOOSING_DIALOGUE || state == State.TRADE_READY) {
             if (prevBtnRect.contains(x, y)) {
                 currentItemIndex--;
-                if (currentItemIndex < 0) currentItemIndex = 2;
+                if (currentItemIndex < 0) currentItemIndex = carouselSize - 1;
                 if (listener != null) listener.onNpcItemChanged(currentItemIndex);
                 return true;
             }
             if (nextBtnRect.contains(x, y)) {
                 currentItemIndex++;
-                if (currentItemIndex > 2) currentItemIndex = 0;
+                if (currentItemIndex >= carouselSize) currentItemIndex = 0;
                 if (listener != null) listener.onNpcItemChanged(currentItemIndex); 
                 return true;
             }

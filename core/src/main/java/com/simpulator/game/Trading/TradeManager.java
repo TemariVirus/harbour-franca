@@ -12,13 +12,10 @@ public class TradeManager {
     }
 
     /**
-     * @param npcChoiceIndex    which NPC item the player selected 
-     * @param playerChoiceIndex which player item to give away 
+     * @param npcChoiceIndex    which NPC item the player selected
+     * @param playerChoiceIndex which player item to give away
      */
-    public TradeResult attemptTrade(TradeOffer offer, int npcChoiceIndex, int playerChoiceIndex) {
-        Item npcItem = offer.getNpcChoices().get(npcChoiceIndex);
-        Item playerItem = offer.getPlayerChoices().get(playerChoiceIndex);
-
+    public TradeResult attemptTrade(Item playerItem, Item npcItem) {
         int diff = playerItem.getValue() - npcItem.getValue();
 
         if (diff < -acceptanceThreshold) {
@@ -27,8 +24,7 @@ public class TradeManager {
 
         inventory.removeItem(playerItem);
         inventory.addItem(npcItem);
-        inventory.subtractTradeValue(playerItem.getValue());
-        inventory.addTradeValue(npcItem.getValue());
+        inventory.recalculateTotalValue();
 
         return (diff > acceptanceThreshold) ? TradeResult.NPC_HAPPY : TradeResult.SUCCESS;
     }

@@ -175,11 +175,9 @@ public class ExploreScene extends Scene {
                         if (currentOffer == null || selectedDialogueIndex < 0)
                             return;
 
-                        TradeResult result = tradeManager.attemptTrade(
-                                currentOffer,
-                                selectedDialogueIndex, // NPC item player receives
-                                playerItemIndex // player item given away (carousel)
-                        );
+                        Item playerItem = playerInventory.getItems().get(playerItemIndex);
+                        Item npcItem = currentOffer.getNpcChoices().get(selectedDialogueIndex);
+                        TradeResult result = tradeManager.attemptTrade(playerItem, npcItem);
 
                         NpcEntity target = npcTargetingSystem.getTargetedNpc();
                         if (target != null) {
@@ -423,10 +421,9 @@ public class ExploreScene extends Scene {
         selectedDialogueIndex = -1;
         selectedPlayerItemIndex = 0;
 
-        // Left carousel = player's items (what they give away)
-        List<Item> playerChoices = currentOffer.getPlayerChoices();
-        String[] playerNames = playerChoices.stream().map(Item::getName).toArray(String[]::new);
-        String[] playerRarities = playerChoices.stream().map(i -> i.getRarity().name()).toArray(String[]::new);
+        List<Item> allItems = playerInventory.getItems();
+        String[] playerNames = allItems.stream().map(Item::getName).toArray(String[]::new);
+        String[] playerRarities = allItems.stream().map(i -> i.getRarity().name()).toArray(String[]::new);
 
         // Right dialogue buttons = NPC's language strings aligned to npcChoices
         String[] npcDialogue = currentOffer.getNpcDialogueLabels().toArray(new String[0]);
@@ -451,7 +448,7 @@ public class ExploreScene extends Scene {
         if (currentOffer == null || selectedDialogueIndex < 0)
             return;
 
-        Item playerItem = currentOffer.getPlayerChoices().get(selectedPlayerItemIndex);
+        Item playerItem = playerInventory.getItems().get(selectedPlayerItemIndex);
         Item npcItem = currentOffer.getNpcChoices().get(selectedDialogueIndex);
         int diff = playerItem.getValue() - npcItem.getValue();
 
