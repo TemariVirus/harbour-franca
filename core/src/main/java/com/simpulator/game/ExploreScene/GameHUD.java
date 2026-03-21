@@ -1,21 +1,21 @@
 package com.simpulator.game.ExploreScene;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.simpulator.engine.graphics.Renderable;
-import com.simpulator.engine.graphics.TextureBatch;
+import com.simpulator.engine.Widget;
+import com.simpulator.engine.graphics.GraphicsManager;
 
 /**
  * In-game HUD overlay showing mission objective, player inventory,
  * interaction prompts, and a crosshair.
  */
-public class GameHUD implements Renderable, Disposable {
+public class GameHUD implements Widget, Disposable {
 
     private final Stage stage;
     private final Skin skin;
@@ -30,16 +30,6 @@ public class GameHUD implements Renderable, Disposable {
         this.skin = skin;
         this.stage = new Stage(new ScreenViewport());
         buildHUD();
-    }
-
-    @Override
-    public boolean isVisible(Camera camera) {
-        return true;
-    }
-
-    @Override
-    public float getZOrder(Camera camera) {
-        return -1;
     }
 
     private void buildHUD() {
@@ -79,6 +69,11 @@ public class GameHUD implements Renderable, Disposable {
             bottomRow.add(slotBox).width(110).height(35).padRight(5);
         }
         root.add(bottomRow).expand().bottom().left().padBottom(15).padLeft(20);
+    }
+
+    @Override
+    public InputProcessor getInputProcessor() {
+        return stage;
     }
 
     /**
@@ -125,18 +120,20 @@ public class GameHUD implements Renderable, Disposable {
      * Render the HUD. Call after the main scene render.
      */
     @Override
-    public void render(TextureBatch batch, Camera camera) {
-        stage
-            .getViewport()
-            // TODO: inject from viewport instead of using global value
-            .update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
+    public void render(
+        GraphicsManager graphics,
+        int x,
+        int y,
+        int width,
+        int height
+    ) {
+        stage.getViewport().update(width, height, true);
+        stage.getViewport().setScreenPosition(x, y);
         // TODO: inject from update instead of using global value
         stage.act(Gdx.graphics.getDeltaTime());
 
-        // Use manual draw to avoid Stage's internal begin/end cycle,
-        // since the batch is already started by GraphicsManager.
-        batch.setProjectionMatrix(stage.getViewport().getCamera().combined);
-        stage.getRoot().draw(batch, 1.0f);
+        // stage.getViewport().apply();
+        stage.draw();
     }
 
     @Override

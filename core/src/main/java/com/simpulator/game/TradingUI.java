@@ -2,20 +2,25 @@ package com.simpulator.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.simpulator.engine.Widget;
+import com.simpulator.engine.graphics.GraphicsManager;
 import com.simpulator.engine.graphics.Renderable;
 import com.simpulator.engine.graphics.TextureBatch;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
-public class TradingUI implements InputProcessor, Renderable {
+public class TradingUI
+    implements InputProcessor, Widget, Renderable, Disposable
+{
 
     public enum State {
         HIDDEN,
@@ -75,6 +80,11 @@ public class TradingUI implements InputProcessor, Renderable {
         }
     }
 
+    @Override
+    public InputProcessor getInputProcessor() {
+        return this;
+    }
+
     public void setListener(TradingUIListener listener) {
         this.listener = listener;
     }
@@ -117,38 +127,48 @@ public class TradingUI implements InputProcessor, Renderable {
     }
 
     @Override
-    public boolean isVisible(Camera camera) {
-        return state != State.HIDDEN;
-    }
-
-    @Override
-    public float getZOrder(Camera camera) {
-        return -1;
-    }
-
-    public InputProcessor getInputProcessor() {
-        return this;
-    }
-
-    @Override
-    public void render(TextureBatch batch, Camera camera) {
+    public void update(float deltaTime) {
         if (state == State.HIDDEN) return;
 
         if (timerActive) {
-            timeLeft -= Gdx.graphics.getDeltaTime();
+            timeLeft -= deltaTime;
             if (timeLeft <= 0) {
                 timeLeft = 0;
                 timerActive = false;
                 if (listener != null) listener.onTimeUp();
             }
         }
+    }
+
+    @Override
+    public void render(
+        GraphicsManager graphics,
+        int x,
+        int y,
+        int width,
+        int height
+    ) {
+        if (!isVisible()) return;
 
         // Apply dynamic projection to prevent maximizing distortion
-        viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
+        viewport.update(width, height, true);
+        viewport.setScreenPosition(x, y);
+
+        graphics.beginRender(viewport);
+        graphics.render(this, null);
+        graphics.endRender();
+    }
+
+    @Override
+    public boolean isVisible(Camera camera) {
+        return this.isVisible();
+    }
+
+    @Override
+    public void render(TextureBatch batch, Camera camera) {
+        // TODO: split this into a Renderable for each box/text
         float w = viewport.getWorldWidth();
         float h = viewport.getWorldHeight();
-
-        batch.setProjectionMatrix(viewport.getCamera().combined);
 
         // --- Colors for Ancient France Maritime Vibe ---
         Color goldTrim = new Color(0.83f, 0.68f, 0.21f, 1f);

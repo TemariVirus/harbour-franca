@@ -408,6 +408,8 @@ public class ExploreScene extends Scene {
 
         entityManager.updateCollisions();
         entityManager.update(deltaTime);
+        hud.update(deltaTime);
+        tradingUI.update(deltaTime);
     }
 
     @Override
@@ -430,9 +432,19 @@ public class ExploreScene extends Scene {
         graphics.endRender();
 
         // Render UI on top
-        graphics.beginRender(viewport);
-        graphics.render(hud, null);
-        graphics.render(tradingUI, null);
-        graphics.endRender();
+        hud.render(
+            graphics,
+            viewport.getScreenX(),
+            viewport.getScreenY(),
+            viewport.getScreenWidth(),
+            viewport.getScreenHeight()
+        );
+        tradingUI.render(
+            graphics,
+            viewport.getScreenX(),
+            viewport.getScreenY(),
+            viewport.getScreenWidth(),
+            viewport.getScreenHeight()
+        );
     }
 }
