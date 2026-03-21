@@ -44,6 +44,7 @@ public class SceneManager implements Disposable {
             currentScene.dispose();
         }
         currentScene = scenes.get(name).create();
+        currentScene.onLoad();
         Gdx.input.setInputProcessor(currentScene.getInputProcessor());
     }
 

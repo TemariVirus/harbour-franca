@@ -19,10 +19,8 @@ import com.simpulator.engine.EntityManager;
 import com.simpulator.engine.graphics.GraphicsManager;
 import com.simpulator.engine.graphics.RectangleRenderer;
 import com.simpulator.engine.graphics.Skybox;
-import com.simpulator.engine.input.Action;
 import com.simpulator.engine.input.ButtonManager.ButtonBindType;
 import com.simpulator.engine.input.KeyboardManager;
-import com.simpulator.engine.input.KeyboardManager.KeyEvent;
 import com.simpulator.engine.input.MouseManager;
 import com.simpulator.engine.scene.Scene;
 import com.simpulator.engine.scene.SceneManager;
@@ -65,8 +63,8 @@ public class ExploreScene extends Scene {
 
         PerspectiveCamera camera = new PerspectiveCamera(
             70,
-            Gdx.graphics.getWidth(),
-            Gdx.graphics.getHeight()
+            viewport.getWorldWidth(),
+            viewport.getWorldHeight()
         );
         camera.near = 0.05f;
         camera.far = 100f;
@@ -276,40 +274,17 @@ public class ExploreScene extends Scene {
             ActionHelper.switchSceneAction(sceneManager, Scenes.MainMenu)
         );
 
-        keyboard.bind(
-            ButtonBindType.DOWN,
-            Keys.E,
-            new Action<KeyEvent>() {
-                @Override
-                public void act(KeyEvent event) {
-                    NpcEntity target = npcTargetingSystem.getTargetedNpc();
-                    if (target != null && !tradingUI.isVisible()) {
-                        tradingUI.show(
-                            target.getName(),
-                            target.getDialogueOptions(),
-                            new String[] { "Sword", "Shield", "Potion" },
-                            new String[] { "Common", "Rare", "Epic" }
-                        );
-                        Gdx.input.setInputProcessor(
-                            tradingUI.getInputProcessor()
-                        );
-                        Gdx.input.setCursorCatched(false);
-                    }
-                }
+        keyboard.bind(ButtonBindType.DOWN, Keys.E, event -> {
+            NpcEntity target = npcTargetingSystem.getTargetedNpc();
+            if (target != null && !tradingUI.isVisible()) {
+                openTradingUI(target);
             }
-        );
+        });
 
         mouse.bindButton(ButtonBindType.DOWN, Input.Buttons.RIGHT, event -> {
             NpcEntity target = npcTargetingSystem.getTargetedNpc();
             if (target != null) {
-                tradingUI.show(
-                    target.getName(),
-                    target.getDialogueOptions(),
-                    new String[] { "Sword", "Shield", "Potion" },
-                    new String[] { "Common", "Rare", "Epic" }
-                );
-                Gdx.input.setInputProcessor(tradingUI.getInputProcessor());
-                Gdx.input.setCursorCatched(false);
+                openTradingUI(target);
             }
         });
     }
@@ -363,12 +338,15 @@ public class ExploreScene extends Scene {
 
     @Override
     public InputProcessor getInputProcessor() {
-        Gdx.input.setCursorCatched(true);
-        mouse.resetMousePosition();
         InputMultiplexer inputMux = new InputMultiplexer();
         inputMux.addProcessor(keyboard);
         inputMux.addProcessor(mouse);
         return inputMux;
+    }
+
+    @Override
+    public void onLoad() {
+        Gdx.input.setCursorCatched(true);
     }
 
     @Override
@@ -378,14 +356,26 @@ public class ExploreScene extends Scene {
         tradingUI.dispose();
     }
 
-    private void openTradingUI() {
-        // TODO
+    private void openTradingUI(NpcEntity target) {
+        tradingUI.show(
+            target.getName(),
+            target.getDialogueOptions(),
+            new String[] { "Sword", "Shield", "Potion" },
+            new String[] { "Common", "Rare", "Epic" }
+        );
+        InputMultiplexer inputMux = new InputMultiplexer();
+        inputMux.addProcessor(tradingUI.getInputProcessor());
+        inputMux.addProcessor(keyboard);
+        inputMux.addProcessor(mouse);
         Gdx.input.setCursorCatched(false);
+        Gdx.input.setInputProcessor(inputMux);
     }
 
     private void closeTradingUI() {
         tradingUI.hide();
+        Gdx.input.setCursorCatched(true);
         Gdx.input.setInputProcessor(getInputProcessor());
+        mouse.resetMousePosition();
     }
 
     @Override

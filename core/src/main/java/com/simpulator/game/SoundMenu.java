@@ -88,11 +88,15 @@ public class SoundMenu extends Scene {
 
     @Override
     public InputProcessor getInputProcessor() {
-        Gdx.input.setCursorCatched(false);
         InputMultiplexer multiplexer = new InputMultiplexer();
         multiplexer.addProcessor(stage);
         multiplexer.addProcessor(km);
         return multiplexer;
+    }
+
+    @Override
+    public void onLoad() {
+        Gdx.input.setCursorCatched(false);
     }
 
     @Override

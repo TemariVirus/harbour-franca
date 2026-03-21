@@ -22,7 +22,10 @@ public abstract class Scene implements Disposable {
     /** Return the input processor for this scene, or null. */
     public abstract InputProcessor getInputProcessor();
 
-    /** Free all resources. */
+    /** Called when the scene is loaded. */
+    public void onLoad() {}
+
+    /** Free all resources. Called when the scene is unloaded. */
     @Override
     public void dispose() {
         sounds.dispose();

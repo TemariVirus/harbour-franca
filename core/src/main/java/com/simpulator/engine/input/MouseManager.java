@@ -113,6 +113,17 @@ public class MouseManager extends InputAdapter {
 
     public MouseManager() {
         resetMousePosition();
+        resetMouseScroll();
+    }
+
+    public void resetMousePosition() {
+        this.lastFrameX = Gdx.input.getX();
+        this.lastFrameY = Gdx.input.getY();
+        this.thisFrameX = this.lastFrameX;
+        this.thisFrameY = this.lastFrameY;
+    }
+
+    public void resetMouseScroll() {
         this.scrolledX = 0;
         this.scrolledY = 0;
     }
@@ -146,13 +157,6 @@ public class MouseManager extends InputAdapter {
         this.scrolledX += amountX;
         this.scrolledY += amountY;
         return true;
-    }
-
-    public void resetMousePosition() {
-        this.lastFrameX = Gdx.input.getX();
-        this.lastFrameY = Gdx.input.getY();
-        this.thisFrameX = this.lastFrameX;
-        this.thisFrameY = this.lastFrameY;
     }
 
     /** Bind the given action to a button and event type. */

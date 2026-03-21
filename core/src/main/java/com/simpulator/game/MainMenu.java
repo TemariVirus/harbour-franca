@@ -46,8 +46,12 @@ public class MainMenu extends Scene {
 
     @Override
     public InputProcessor getInputProcessor() {
-        Gdx.input.setCursorCatched(false);
         return km;
+    }
+
+    @Override
+    public void onLoad() {
+        Gdx.input.setCursorCatched(false);
     }
 
     @Override
