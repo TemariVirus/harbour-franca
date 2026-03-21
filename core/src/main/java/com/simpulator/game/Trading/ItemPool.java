@@ -1,6 +1,7 @@
 package com.simpulator.game.Trading;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
@@ -58,4 +59,22 @@ public class ItemPool {
         return chosen;
     }
 
+    public static Item drawClosest(ItemRarity rarity, int targetValue, List<String> usedIds) {
+        List<Item> pool = new ArrayList<>(getPool(rarity));
+        pool.removeIf(item -> usedIds.contains(item.getId()));
+        if (pool.isEmpty())
+            pool = new ArrayList<>(getPool(rarity));
+
+        return pool.stream()
+                .min(Comparator.comparingInt(i -> Math.abs(i.getValue() - targetValue)))
+                .get();
+    }
+
+    public static ItemRarity getRarityForValue(int value) {
+        if (value >= 50)
+            return ItemRarity.EPIC;
+        if (value >= 25)
+            return ItemRarity.RARE;
+        return ItemRarity.COMMON;
+    }
 }

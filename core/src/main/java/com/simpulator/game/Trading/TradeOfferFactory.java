@@ -29,9 +29,9 @@ public class TradeOfferFactory {
 
         List<String> usedIds = new ArrayList<>();
         List<Item> npcItems = new ArrayList<>();
-        npcItems.add(drawClosest(getRarityForValue(badDealValue), badDealValue, usedIds));
-        npcItems.add(drawClosest(getRarityForValue(fairValue), fairValue, usedIds));
-        npcItems.add(drawClosest(getRarityForValue(greatValue), greatValue, usedIds));
+        npcItems.add(ItemPool.drawClosest(ItemPool.getRarityForValue(badDealValue), badDealValue, usedIds));
+        npcItems.add(ItemPool.drawClosest(ItemPool.getRarityForValue(fairValue), fairValue, usedIds));
+        npcItems.add(ItemPool.drawClosest(ItemPool.getRarityForValue(greatValue), greatValue, usedIds));
 
         List<String> npcDialogue = new ArrayList<>();
         npcDialogue.add(npcDialogueOptions[0]);
@@ -49,27 +49,5 @@ public class TradeOfferFactory {
         }
 
         return new TradeOffer(shuffledNpcItems, shuffledNpcDialogue);
-    }
-
-    private Item drawClosest(ItemRarity rarity, int targetValue, List<String> usedIds) {
-        List<Item> pool = new ArrayList<>(ItemPool.getPool(rarity));
-        pool.removeIf(item -> usedIds.contains(item.getId()));
-        if (pool.isEmpty())
-            pool = new ArrayList<>(ItemPool.getPool(rarity));
-
-        Item closest = pool.stream()
-                .min(Comparator.comparingInt(i -> Math.abs(i.getValue() - targetValue)))
-                .get();
-
-        usedIds.add(closest.getId());
-        return closest; // real pool item with real pool value
-    }
-
-    private ItemRarity getRarityForValue(int value) {
-        if (value >= 50)
-            return ItemRarity.EPIC;
-        if (value >= 25)
-            return ItemRarity.RARE;
-        return ItemRarity.COMMON;
     }
 }

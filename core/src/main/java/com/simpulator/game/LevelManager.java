@@ -25,6 +25,7 @@ public class LevelManager {
         level1.playerStartX = 0f;
         level1.playerStartY = 1f;
         level1.playerStartZ = 0f;
+        level1.startInventoryValue = 60;
 
         level1.entitiesToSpawn.add(new Level.EntityConfig("Tree", 5f, 0f, 5f));
 

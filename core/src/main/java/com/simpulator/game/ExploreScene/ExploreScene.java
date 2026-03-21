@@ -144,7 +144,7 @@ public class ExploreScene extends Scene {
         mouse = new MouseManager();
         mouse.bindMove(new RotateCameraAction(playerCamera, 0.15f));
         playerInventory = new PlayerInventory();
-        currentLevel.generateStarterInventory(playerInventory, new Random()); 
+        currentLevel.generateStarterInventory(playerInventory); 
         tradeManager = new TradeManager(playerInventory, 50, ACCEPTANCE_THRESHOLD);
 
         tradeOfferFactory = new TradeOfferFactory(new Random(), ACCEPTANCE_THRESHOLD);

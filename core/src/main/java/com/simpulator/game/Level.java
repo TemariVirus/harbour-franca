@@ -1,7 +1,7 @@
 package com.simpulator.game;
 
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -35,44 +35,23 @@ public class Level {
         }
     }
 
-    public void generateStarterInventory(PlayerInventory inventory, Random rng) {
+    public void generateStarterInventory(PlayerInventory inventory) {
         inventory.clear();
         List<String> usedIds = new ArrayList<>();
 
-        int perItem = startInventoryValue / 3;
-        int remainder = startInventoryValue % 3;
+        ItemRarity rarity = ItemPool.getRarityForValue(startInventoryValue / 3);
+        List<Item> pool = new ArrayList<>(ItemPool.getPool(rarity));
 
-        for (int i = 0; i < 3; i++) {
-            int targetValue = (i == 2) ? perItem + remainder : perItem;
-            ItemRarity rarity = getRarityForValue(targetValue);
-            Item item = drawClosest(rarity, targetValue, rng, usedIds); // real pool item
-
-            inventory.addItem(item);
+        // Shuffle and pick first 3 unique items
+        Collections.shuffle(pool, new Random());
+        for (int i = 0; i < Math.min(3, pool.size()); i++) {
+            Item item = pool.get(i);
+            if (!usedIds.contains(item.getId())) {
+                inventory.addItem(item);
+                usedIds.add(item.getId());
+            }
         }
 
         inventory.recalculateTotalValue();
     }
-
-    private Item drawClosest(ItemRarity rarity, int targetValue, Random rng, List<String> usedIds) {
-        List<Item> pool = new ArrayList<>(ItemPool.getPool(rarity));
-        pool.removeIf(item -> usedIds.contains(item.getId()));
-        if (pool.isEmpty())
-            pool = new ArrayList<>(ItemPool.getPool(rarity));
-
-        Item closest = pool.stream()
-                .min(Comparator.comparingInt(i -> Math.abs(i.getValue() - targetValue)))
-                .get();
-
-        usedIds.add(closest.getId());
-        return closest;
-    }
-
-    private ItemRarity getRarityForValue(int value) {
-        if (value >= 50)
-            return ItemRarity.EPIC;
-        if (value >= 25)
-            return ItemRarity.RARE;
-        return ItemRarity.COMMON;
-    }
-
 }
