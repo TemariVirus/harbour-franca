@@ -154,8 +154,8 @@ public class ExploreScene extends Scene {
 
         tradingUI = new TradingUI(hudSkin);
         tradingUI.setListener(
-            new TradingUI.TradingUIListener() {
-                @Override
+                new TradingUI.TradingUIListener() {
+                    @Override
                 public void onDialogueSelected(int optionIndex) {
                     selectedDialogueIndex = optionIndex;
                     updateInnerThought();
@@ -175,6 +175,12 @@ public class ExploreScene extends Scene {
                         Item playerItem = playerInventory.getItems().get(playerItemIndex);
                         Item npcItem = currentOffer.getNpcChoices().get(selectedDialogueIndex);
                         TradeResult result = tradeManager.attemptTrade(playerItem, npcItem);
+
+                        if (result == TradeResult.SUCCESS || result == TradeResult.NPC_HAPPY) {
+                            for (NpcEntity npc : npcs) {
+                                npc.clearCachedOffer();
+                            }
+                        }
 
                         NpcEntity target = npcTargetingSystem.getTargetedNpc();
                         if (target != null) {
@@ -408,12 +414,15 @@ public class ExploreScene extends Scene {
         if (!target.canTrade() || tradingUI.isVisible())
             return;
 
-        try {
-            currentOffer = tradeOfferFactory.createOffer(playerInventory, target.getDialogueOptions());
-        } catch (IllegalStateException e) {
-            Gdx.app.log("Trade", "createOffer failed: " + e.getMessage());
-            return;
+        if (target.getCachedOffer() == null) {
+            try {
+                target.setCachedOffer(tradeOfferFactory.createOffer(playerInventory, target.getDialogueOptions()));
+            } catch (IllegalStateException e) {
+                Gdx.app.log("Trade", "createOffer failed: " + e.getMessage());
+                return;
+            }
         }
+        currentOffer = target.getCachedOffer();
 
         selectedDialogueIndex = -1;
         selectedPlayerItemIndex = 0;

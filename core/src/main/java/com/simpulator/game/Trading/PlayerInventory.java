@@ -35,4 +35,9 @@ public class PlayerInventory {
     public void recalculateTotalValue() {
         totalTradeValue = items.stream().mapToInt(Item::getValue).sum();
     }
+
+    public void clear() {
+        items.clear();
+        totalTradeValue = 0;
+    }
 }

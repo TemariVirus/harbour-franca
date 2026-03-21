@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.simpulator.engine.graphics.EntityRenderer;
 import com.simpulator.engine.graphics.RectangleRenderer;
 import com.simpulator.game.CuboidEntity;
+import com.simpulator.game.Trading.TradeOffer;
 
 /**
  * A static NPC entity that the player can interact with to trade.
@@ -26,6 +27,7 @@ public class NpcEntity extends CuboidEntity {
     private final String name;
     private final String language;
     private TradeState tradeState;
+    private TradeOffer cachedOffer = null;
 
     // Dialogue options in the NPC's language.
     // Index 0 = "worth more", 1 = "worth same", 2 = "worth less"
@@ -47,14 +49,13 @@ public class NpcEntity extends CuboidEntity {
      * @param innerThoughts   3 inner thought strings (English reactions).
      */
     public NpcEntity(
-        Vector3 position,
-        Vector3 size,
-        EntityRenderer renderer,
-        String name,
-        String language,
-        String[] dialogueOptions,
-        String[] innerThoughts
-    ) {
+            Vector3 position,
+            Vector3 size,
+            EntityRenderer renderer,
+            String name,
+            String language,
+            String[] dialogueOptions,
+            String[] innerThoughts) {
         super(position, size, new Quaternion().setFromAxis(Vector3.Y, 0), renderer, false);
         this.name = name;
         this.language = language;
@@ -98,5 +99,17 @@ public class NpcEntity extends CuboidEntity {
      */
     public String[] getInnerThoughts() {
         return innerThoughts;
+    }
+
+    public TradeOffer getCachedOffer() {
+        return cachedOffer;
+    }
+
+    public void setCachedOffer(TradeOffer offer) {
+        cachedOffer = offer;
+    }
+
+    public void clearCachedOffer() {
+        cachedOffer = null;
     }
 }
