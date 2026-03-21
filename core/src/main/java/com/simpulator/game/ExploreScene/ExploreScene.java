@@ -433,15 +433,6 @@ public class ExploreScene extends Scene {
 
         String[] npcDialogue = currentOffer.getNpcDialogueLabels().toArray(new String[0]);
 
-        List<Item> npcChoices = currentOffer.getNpcChoices();
-        for (int i = 0; i < npcChoices.size(); i++) {
-            Item item = npcChoices.get(i);
-            Gdx.app.log("Trade", "NPC option " + i + ": " + item.getName() 
-                + " | value=" + item.getValue() 
-                + " | rarity=" + item.getRarity()
-                + " | label=" + currentOffer.getNpcDialogueLabels().get(i));
-        }
-
         tradingUI.show(target.getName(), npcDialogue, playerNames, playerRarities);
         InputMultiplexer inputMux = new InputMultiplexer();
         inputMux.addProcessor(tradingUI.getInputProcessor());
