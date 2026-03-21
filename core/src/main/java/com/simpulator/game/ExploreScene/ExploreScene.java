@@ -364,7 +364,7 @@ public class ExploreScene extends Scene {
     @Override
     public InputProcessor getInputProcessor() {
         Gdx.input.setCursorCatched(true);
-        mouse.ignoreNextDelta();
+        mouse.resetMousePosition();
         InputMultiplexer inputMux = new InputMultiplexer();
         inputMux.addProcessor(keyboard);
         inputMux.addProcessor(mouse);

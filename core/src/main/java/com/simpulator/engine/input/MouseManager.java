@@ -102,12 +102,6 @@ public class MouseManager extends InputAdapter {
     private int lastFrameX, lastFrameY;
     private int thisFrameX, thisFrameY;
     private float scrolledX, scrolledY;
-    private boolean ignoreNextDelta = false;
-
-    // TODO: remove this and fix the mouse jumping bug externally
-    public void ignoreNextDelta() {
-        this.ignoreNextDelta = true;
-    }
 
     private final ButtonManager<MouseButtonEvent> buttonManager =
         new ButtonManager<>();
@@ -118,10 +112,7 @@ public class MouseManager extends InputAdapter {
         new ArrayList<>();
 
     public MouseManager() {
-        this.lastFrameX = Gdx.input.getX();
-        this.lastFrameY = Gdx.input.getY();
-        this.thisFrameX = this.lastFrameX;
-        this.thisFrameY = this.lastFrameY;
+        resetMousePosition();
         this.scrolledX = 0;
         this.scrolledY = 0;
     }
@@ -155,6 +146,13 @@ public class MouseManager extends InputAdapter {
         this.scrolledX += amountX;
         this.scrolledY += amountY;
         return true;
+    }
+
+    public void resetMousePosition() {
+        this.lastFrameX = Gdx.input.getX();
+        this.lastFrameY = Gdx.input.getY();
+        this.thisFrameX = this.lastFrameX;
+        this.thisFrameY = this.lastFrameY;
     }
 
     /** Bind the given action to a button and event type. */
@@ -222,12 +220,6 @@ public class MouseManager extends InputAdapter {
      * @param timestamp The time since some epoch, in seconds.
      */
     public void update(float deltaTime, float timestamp) {
-        if (ignoreNextDelta) {
-            lastFrameX = thisFrameX;
-            lastFrameY = thisFrameY;
-            ignoreNextDelta = false;
-        }
-
         buttonManager.update((button, type, thisFrameButtons) ->
             new MouseButtonEvent(
                 thisFrameX,
