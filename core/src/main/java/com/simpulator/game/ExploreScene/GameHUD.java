@@ -1,6 +1,5 @@
 package com.simpulator.game.ExploreScene;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -116,6 +115,11 @@ public class GameHUD implements Widget, Disposable {
         interactionPrompt.setVisible(false);
     }
 
+    @Override
+    public void update(float deltaTime) {
+        stage.act(deltaTime);
+    }
+
     /**
      * Render the HUD. Call after the main scene render.
      */
@@ -129,8 +133,6 @@ public class GameHUD implements Widget, Disposable {
     ) {
         stage.getViewport().update(width, height, true);
         stage.getViewport().setScreenPosition(x, y);
-        // TODO: inject from update instead of using global value
-        stage.act(Gdx.graphics.getDeltaTime());
 
         // stage.getViewport().apply();
         stage.draw();

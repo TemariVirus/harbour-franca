@@ -420,6 +420,7 @@ public class ExploreScene extends Scene {
         if (skybox != null) {
             graphics.beginRender(viewport);
             graphics.render3D(skybox, playerCamera.getCamera());
+            // End render so that everything else is rendered on top of the skybox
             graphics.endRender();
         }
 
