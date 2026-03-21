@@ -425,8 +425,16 @@ public class ExploreScene extends Scene {
         String[] playerNames = allItems.stream().map(Item::getName).toArray(String[]::new);
         String[] playerRarities = allItems.stream().map(i -> i.getRarity().name()).toArray(String[]::new);
 
-        // Right dialogue buttons = NPC's language strings aligned to npcChoices
         String[] npcDialogue = currentOffer.getNpcDialogueLabels().toArray(new String[0]);
+
+        List<Item> npcChoices = currentOffer.getNpcChoices();
+        for (int i = 0; i < npcChoices.size(); i++) {
+            Item item = npcChoices.get(i);
+            Gdx.app.log("Trade", "NPC option " + i + ": " + item.getName() 
+                + " | value=" + item.getValue() 
+                + " | rarity=" + item.getRarity()
+                + " | label=" + currentOffer.getNpcDialogueLabels().get(i));
+        }
 
         tradingUI.show(target.getName(), npcDialogue, playerNames, playerRarities);
         InputMultiplexer inputMux = new InputMultiplexer();
@@ -453,10 +461,12 @@ public class ExploreScene extends Scene {
         int diff = playerItem.getValue() - npcItem.getValue();
 
         String thought;
-        if (diff > ACCEPTANCE_THRESHOLD)
+        if (diff > 0)
             thought = "He's offering more than it's worth!";
-        else if (diff >= -ACCEPTANCE_THRESHOLD)
+        else if (diff == 0) {
             thought = "Seems like a fair deal...";
+        } else if (diff >= -ACCEPTANCE_THRESHOLD)
+            thought = "Hmm, not quite equal but I'll take it...";
         else
             thought = "No way he's trading that!";
 
