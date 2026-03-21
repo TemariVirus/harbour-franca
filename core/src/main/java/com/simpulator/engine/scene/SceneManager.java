@@ -1,5 +1,6 @@
 package com.simpulator.engine.scene;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Disposable;
 import com.simpulator.engine.graphics.GraphicsManager;
 import java.util.HashMap;
@@ -8,7 +9,7 @@ import java.util.HashMap;
 public class SceneManager implements Disposable {
 
     private Scene currentScene;
-    private HashMap<String, Scene> scenes;
+    private HashMap<String, SceneFactory> scenes;
     private GraphicsManager graphics;
 
     /** Create an empty SceneManager. */
@@ -18,21 +19,21 @@ public class SceneManager implements Disposable {
     }
 
     /** Add a new scene that can be reference by its name. */
-    public void addScene(String name, Scene scene)
+    public void addScene(String name, SceneFactory factory)
         throws IllegalArgumentException {
         if (scenes.containsKey(name)) {
             throw new IllegalArgumentException(
-                "Scene with name " + name + " already exists."
+                "Factory with name " + name + " already exists."
             );
         }
-        if (scene == null) {
-            throw new IllegalArgumentException("Scene cannot be null.");
+        if (factory == null) {
+            throw new IllegalArgumentException("Factory cannot be null.");
         }
-        scenes.put(name, scene);
+        scenes.put(name, factory);
     }
 
-    /** Unload the current scene, if any, and load and return the given scene. */
-    public void switchScene(String name) {
+    /** Unload the current scene, if any, and load the given scene. */
+    public void setScene(String name) {
         if (!scenes.containsKey(name)) {
             throw new IllegalArgumentException(
                 "Scene with name " + name + " does not exist."
@@ -40,10 +41,10 @@ public class SceneManager implements Disposable {
         }
 
         if (currentScene != null) {
-            currentScene.unload();
+            currentScene.dispose();
         }
-        currentScene = scenes.get(name);
-        currentScene.load();
+        currentScene = scenes.get(name).create();
+        Gdx.input.setInputProcessor(currentScene.getInputProcessor());
     }
 
     /** Update the current scene by the given delta time in seconds. */
@@ -60,14 +61,10 @@ public class SceneManager implements Disposable {
         }
     }
 
-    public GraphicsManager getGraphics() {
-        return graphics;
-    }
-
     @Override
     public void dispose() {
         if (currentScene != null) {
-            currentScene.unload();
+            currentScene.dispose();
         }
         graphics.dispose();
     }

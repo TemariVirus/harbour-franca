@@ -23,17 +23,17 @@ public class GameMaster extends ApplicationAdapter {
         LevelManager levelManager = new LevelManager();
         levelManager.setCurrentLevelId("level_01");
 
-        MainMenu mainMenu = new MainMenu(sceneManager);
-        SoundMenu soundMenu = new SoundMenu(sceneManager, musics);
-        ExploreScene mainGame = new ExploreScene(
-            sceneManager,
-            levelManager.getCurrentLevel()
+        sceneManager.addScene(Scenes.MainMenu, () ->
+            new MainMenu(sceneManager)
         );
-        sceneManager.addScene(Scenes.MainMenu, mainMenu);
-        sceneManager.addScene(Scenes.SoundMenu, soundMenu);
-        sceneManager.addScene(Scenes.Explore, mainGame);
+        sceneManager.addScene(Scenes.SoundMenu, () ->
+            new SoundMenu(sceneManager, musics)
+        );
+        sceneManager.addScene(Scenes.Explore, () ->
+            new ExploreScene(sceneManager, levelManager.getCurrentLevel())
+        );
 
-        sceneManager.switchScene(Scenes.MainMenu);
+        sceneManager.setScene(Scenes.MainMenu);
         musics.startMusic("GameAudio.mp3");
     }
 

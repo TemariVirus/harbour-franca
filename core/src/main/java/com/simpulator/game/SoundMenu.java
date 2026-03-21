@@ -3,6 +3,7 @@ package com.simpulator.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.MathUtils;
@@ -13,7 +14,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
 import com.simpulator.engine.graphics.GraphicsManager;
 import com.simpulator.engine.input.Action;
 import com.simpulator.engine.input.ButtonManager.ButtonBindType;
@@ -24,8 +24,6 @@ import com.simpulator.engine.scene.SceneManager;
 
 public class SoundMenu extends Scene {
 
-    private Viewport viewport;
-    private SceneManager sceneManager;
     private MusicManager musics;
     private KeyboardManager km;
     private BitmapFont font;
@@ -34,33 +32,33 @@ public class SoundMenu extends Scene {
     private float renderDeltaTime = 0;
 
     public SoundMenu(SceneManager sceneManager, MusicManager musicManager) {
-        this.viewport = new FitViewport(640, 480);
-        this.sceneManager = sceneManager;
+        super(new FitViewport(640, 480));
         this.musics = musicManager;
-    }
 
-    private <T> Action<T> changeVolumeAction(int amount) {
-        return new Action<T>() {
-            public void act(T data) {
-                Config.volume = MathUtils.clamp(Config.volume + amount, 0, 100);
-
-                float volume = Config.volume * 0.01f;
-                sounds.setVolume(volume);
-                musics.setVolume(volume);
-                if (volumeSlider != null) {
-                    volumeSlider.setValue(Config.volume);
-                }
-            }
-        };
-    }
-
-    @Override
-    public void load() {
         font = new BitmapFont();
         font.setColor(Color.YELLOW);
         font.getData().setScale(2);
 
-        km = new KeyboardManager();
+        stage = new Stage(viewport);
+        Table table = new Table();
+        table.setFillParent(true);
+        stage.addActor(table);
+
+        this.volumeSlider = new Slider(0, 100, 10, false, SimpleSkin.getSkin());
+        volumeSlider.setValue(Config.volume);
+        volumeSlider.addListener(
+            new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    Config.volume = Math.round(volumeSlider.getValue());
+                    sounds.setVolume(Config.volume * 0.01f);
+                    musics.setVolume(Config.volume * 0.01f);
+                }
+            }
+        );
+        table.add(volumeSlider).width(300).height(50).padTop(5);
+
+        this.km = new KeyboardManager();
         km.bind(
             ButtonBindType.DOWN,
             Keys.ESCAPE,
@@ -73,41 +71,35 @@ public class SoundMenu extends Scene {
         );
         km.bind(ButtonBindType.DOWN, Keys.LEFT, changeVolumeAction(-10));
         km.bind(ButtonBindType.DOWN, Keys.RIGHT, changeVolumeAction(10));
+    }
 
-        stage = new Stage(viewport);
-        Table table = new Table();
-        table.setFillParent(true);
-        stage.addActor(table);
+    private <T> Action<T> changeVolumeAction(int amount) {
+        return (T data) -> {
+            Config.volume = MathUtils.clamp(Config.volume + amount, 0, 100);
 
-        volumeSlider = new Slider(0, 100, 10, false, SimpleSkin.getSkin());
-        volumeSlider.setValue(Config.volume);
-
-        volumeSlider.addListener(
-            new ChangeListener() {
-                @Override
-                public void changed(ChangeEvent event, Actor actor) {
-                    Config.volume = Math.round(volumeSlider.getValue());
-                    sounds.setVolume(Config.volume * 0.01f);
-                    musics.setVolume(Config.volume * 0.01f);
-                }
+            float volume = Config.volume * 0.01f;
+            sounds.setVolume(volume);
+            musics.setVolume(volume);
+            if (volumeSlider != null) {
+                volumeSlider.setValue(Config.volume);
             }
-        );
-
-        table.add(volumeSlider).width(300).height(50).padTop(5);
-
-        InputMultiplexer multiplexer = new InputMultiplexer();
-        multiplexer.addProcessor(stage);
-        multiplexer.addProcessor(km);
-
-        Gdx.input.setInputProcessor(multiplexer);
+        };
     }
 
     @Override
-    public void unload() {
-        super.unload();
+    public InputProcessor getInputProcessor() {
+        Gdx.input.setCursorCatched(false);
+        InputMultiplexer multiplexer = new InputMultiplexer();
+        multiplexer.addProcessor(stage);
+        multiplexer.addProcessor(km);
+        return multiplexer;
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
         font.dispose();
         stage.dispose();
-        Gdx.input.setInputProcessor(null);
     }
 
     @Override

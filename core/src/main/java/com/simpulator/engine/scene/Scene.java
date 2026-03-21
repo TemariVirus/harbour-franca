@@ -1,25 +1,30 @@
 package com.simpulator.engine.scene;
 
+import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import com.simpulator.engine.graphics.GraphicsManager;
 
 /** A scene encapsulates the state and business logic of a section of the simulation. */
-public abstract class Scene {
+public abstract class Scene implements Disposable {
 
     protected SoundManager sounds;
     protected TextureCache textures;
+    protected Viewport viewport;
 
     /** Create an empty scene. */
-    public Scene() {
+    public Scene(Viewport viewport) {
         sounds = new SoundManager();
         textures = new TextureCache();
+        this.viewport = viewport;
     }
 
-    /** Load the scene's resources into memory and start the scene. */
-    public abstract void load();
+    /** Return the input processor for this scene, or null. */
+    public abstract InputProcessor getInputProcessor();
 
-    /** Stop the scene and free all resources. */
-    public void unload() {
-        // These fields can be safely reused in the next load()
+    /** Free all resources. */
+    @Override
+    public void dispose() {
         sounds.dispose();
         textures.dispose();
     }

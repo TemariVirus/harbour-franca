@@ -11,7 +11,7 @@ public final class ActionHelper {
     ) {
         return new Action<T>() {
             public void act(T data) {
-                sceneManager.switchScene(sceneName);
+                sceneManager.setScene(sceneName);
             }
         };
     }
