@@ -31,6 +31,7 @@ public class TradingUI
 
     public interface TradingUIListener {
         void onDialogueSelected(int optionIndex);
+        void onNpcItemChanged(int newIndex);
         void onTradeConfirmed(int itemIndex);
         void onTradeCancelled();
         void onTimeUp();
@@ -340,11 +341,13 @@ public class TradingUI
             if (prevBtnRect.contains(x, y)) {
                 currentItemIndex--;
                 if (currentItemIndex < 0) currentItemIndex = 2;
+                if (listener != null) listener.onNpcItemChanged(currentItemIndex);
                 return true;
             }
             if (nextBtnRect.contains(x, y)) {
                 currentItemIndex++;
                 if (currentItemIndex > 2) currentItemIndex = 0;
+                if (listener != null) listener.onNpcItemChanged(currentItemIndex); 
                 return true;
             }
         }

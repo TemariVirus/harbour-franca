@@ -32,6 +32,14 @@ import com.simpulator.game.Scenes;
 import com.simpulator.game.SimpleSkin;
 import com.simpulator.game.TiledRenderer;
 import com.simpulator.game.TradingUI;
+import com.simpulator.game.Trading.Item;
+import com.simpulator.game.Trading.ItemRarity;
+import com.simpulator.game.Trading.PlayerInventory;
+import com.simpulator.game.Trading.TradeManager;
+import com.simpulator.game.Trading.TradeOffer;
+import com.simpulator.game.Trading.TradeOfferFactory;
+import com.simpulator.game.Trading.TradeResult;
+import java.util.Random;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,6 +47,9 @@ public class ExploreScene extends Scene {
 
     private static final String BRICK_IMG = "Oran.jpeg";
     private static final float PLAYER_SPEED = 4f;
+    private static final int ACCEPTANCE_THRESHOLD = 10;
+    private int selectedDialogueIndex   = -1;
+    private int selectedPlayerItemIndex = 0;
 
     private final Clock clock = new Clock(0);
     private CameraEntity playerCamera;
@@ -54,6 +65,11 @@ public class ExploreScene extends Scene {
     private GameHUD hud;
     private TradingUI tradingUI;
     private NpcTargetingSystem npcTargetingSystem;
+
+    private PlayerInventory playerInventory;
+    private TradeManager tradeManager;
+    private TradeOfferFactory tradeOfferFactory;
+    private TradeOffer currentOffer;
 
     public ExploreScene(SceneManager sceneManager, Level level) {
         super(new ExtendViewport(640, 480));
@@ -127,59 +143,99 @@ public class ExploreScene extends Scene {
         keyboard = new KeyboardManager();
         mouse = new MouseManager();
         mouse.bindMove(new RotateCameraAction(playerCamera, 0.15f));
+        playerInventory = new PlayerInventory();
+        playerInventory.addItem(new Item("common_coin", "Coin",  ItemRarity.COMMON,  10));
+        playerInventory.addItem(new Item("rare_bow",    "Bow",   ItemRarity.RARE,   20));
+        playerInventory.addItem(new Item("common_wooden_sword",  "Wooden Sword", ItemRarity.COMMON,   7));
+        playerInventory.recalculateTotalValue();
+
+        tradeManager      = new TradeManager(playerInventory, 50, ACCEPTANCE_THRESHOLD);
+        tradeOfferFactory = new TradeOfferFactory(new Random(), ACCEPTANCE_THRESHOLD);
 
         hud = new GameHUD(hudSkin);
-        hud.setInventory(new String[] { "Sword", "Shield", "Potion" });
+        syncHUD();
 
         tradingUI = new TradingUI(hudSkin);
         tradingUI.setListener(
             new TradingUI.TradingUIListener() {
                 @Override
                 public void onDialogueSelected(int optionIndex) {
-                    if (optionIndex == 0) tradingUI.setInnerThoughts(
-                        "No way he's trading that!"
-                    );
-                    else if (optionIndex == 1) tradingUI.setInnerThoughts(
-                        "Hopefully his not making this trade."
-                    );
-                    else if (optionIndex == 2) tradingUI.setInnerThoughts(
-                        "Seems fair."
-                    );
-                    else tradingUI.setInnerThoughts("Hmm...");
+                    selectedDialogueIndex = optionIndex;
+                    updateInnerThought();
                 }
 
                 @Override
-                public void onTradeConfirmed(int itemIndex) {
-                    tradingUI.showTradeResult("Traded successfully!");
-                    String[] currentInv = new String[] {
-                        "Sword",
-                        "Shield",
-                        "Potion",
-                    };
-                    if (itemIndex >= 0 && itemIndex < currentInv.length) {
-                        currentInv[itemIndex] =
-                            "Traded " + currentInv[itemIndex];
-                    }
-                    hud.setInventory(currentInv);
-
-                    Timer.schedule(
-                        new Timer.Task() {
-                            @Override
-                            public void run() {
-                                closeTradingUI();
-                            }
-                        },
-                        2f
-                    );
+                public void onNpcItemChanged(int newIndex) {
+                    selectedPlayerItemIndex = newIndex;
+                    updateInnerThought();
                 }
+
+                @Override
+                public void onTradeConfirmed(int playerItemIndex) {
+                        if (currentOffer == null || selectedDialogueIndex < 0)
+                            return;
+
+                        TradeResult result = tradeManager.attemptTrade(
+                                currentOffer,
+                                selectedDialogueIndex, // NPC item player receives
+                                playerItemIndex // player item given away (carousel)
+                        );
+
+                        NpcEntity target = npcTargetingSystem.getTargetedNpc();
+                        if (target != null) {
+                            switch (result) {
+                                case SUCCESS:
+                                case NPC_HAPPY:
+                                    target.setTradeState(NpcEntity.TradeState.TRADED);
+                                    break;
+                                case FAILED:
+                                    target.setTradeState(NpcEntity.TradeState.ANGRY);
+                                    break;
+                            }
+                        }
+
+                        String resultText;
+                        if (result == TradeResult.NPC_HAPPY)
+                            resultText = "NPC is happy with the deal!";
+                        else if (result == TradeResult.SUCCESS)
+                            resultText = "Trade successful!";
+                        else
+                            resultText = "NPC rejected the trade!";
+                        tradingUI.showTradeResult(resultText);
+
+                        syncHUD();
+                        currentOffer = null;
+                        selectedDialogueIndex = -1;
+                        selectedPlayerItemIndex = 0;
+
+                        if (tradeManager.isLevelComplete()) {
+                            tradingUI.showTradeResult("Level Complete! Goal reached!");
+                            // TODO: switch to win scene
+                        }
+
+                        Timer.schedule(
+                                new Timer.Task() {
+                                    @Override
+                                    public void run() {
+                                        closeTradingUI();
+                                    }
+                                },
+                                2f);
+                    }
 
                 @Override
                 public void onTradeCancelled() {
+                    currentOffer = null;
+                    selectedDialogueIndex   = -1;
+                    selectedPlayerItemIndex = 0;
                     closeTradingUI();
                 }
 
                 @Override
                 public void onTimeUp() {
+                    currentOffer = null;
+                    selectedDialogueIndex   = -1;
+                    selectedPlayerItemIndex = 0;
                     tradingUI.showTradeResult("Too slow!");
                     Timer.schedule(
                         new Timer.Task() {
@@ -354,12 +410,28 @@ public class ExploreScene extends Scene {
     }
 
     private void openTradingUI(NpcEntity target) {
-        tradingUI.show(
-            target.getName(),
-            target.getDialogueOptions(),
-            new String[] { "Sword", "Shield", "Potion" },
-            new String[] { "Common", "Rare", "Epic" }
-        );
+        if (!target.canTrade() || tradingUI.isVisible())
+            return;
+
+        try {
+            currentOffer = tradeOfferFactory.createOffer(playerInventory, target.getDialogueOptions());
+        } catch (IllegalStateException e) {
+            Gdx.app.log("Trade", "createOffer failed: " + e.getMessage());
+            return;
+        }
+
+        selectedDialogueIndex = -1;
+        selectedPlayerItemIndex = 0;
+
+        // Left carousel = player's items (what they give away)
+        List<Item> playerChoices = currentOffer.getPlayerChoices();
+        String[] playerNames = playerChoices.stream().map(Item::getName).toArray(String[]::new);
+        String[] playerRarities = playerChoices.stream().map(i -> i.getRarity().name()).toArray(String[]::new);
+
+        // Right dialogue buttons = NPC's language strings aligned to npcChoices
+        String[] npcDialogue = currentOffer.getNpcDialogueLabels().toArray(new String[0]);
+
+        tradingUI.show(target.getName(), npcDialogue, playerNames, playerRarities);
         InputMultiplexer inputMux = new InputMultiplexer();
         inputMux.addProcessor(tradingUI.getInputProcessor());
         inputMux.addProcessor(keyboard);
@@ -373,6 +445,33 @@ public class ExploreScene extends Scene {
         Gdx.input.setCursorCatched(true);
         Gdx.input.setInputProcessor(getInputProcessor());
         mouse.resetMousePosition();
+    }
+
+    private void updateInnerThought() {
+        if (currentOffer == null || selectedDialogueIndex < 0)
+            return;
+
+        Item playerItem = currentOffer.getPlayerChoices().get(selectedPlayerItemIndex);
+        Item npcItem = currentOffer.getNpcChoices().get(selectedDialogueIndex);
+        int diff = playerItem.getValue() - npcItem.getValue();
+
+        String thought;
+        if (diff > ACCEPTANCE_THRESHOLD)
+            thought = "He's offering more than it's worth!";
+        else if (diff >= -ACCEPTANCE_THRESHOLD)
+            thought = "Seems like a fair deal...";
+        else
+            thought = "No way he's trading that!";
+
+        tradingUI.setInnerThoughts(thought);
+    }
+
+    private void syncHUD() {
+        String[] names = playerInventory.getItems().stream()
+                .map(Item::getName)
+                .toArray(String[]::new);
+        hud.setInventory(names);
+        hud.setObjective(tradeManager.getProgressValue(), tradeManager.getLevelGoalValue());
     }
 
     @Override
