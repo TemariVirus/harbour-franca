@@ -9,7 +9,7 @@ import java.util.ArrayList;
 public class MouseManager extends InputAdapter {
 
     /** Represents a mouse movement event. */
-    public class MouseMoveEvent {
+    public final class MouseMoveEvent {
 
         /** The x position of the mouse, in pixels */
         public final int x;
@@ -42,7 +42,7 @@ public class MouseManager extends InputAdapter {
     }
 
     /** Represents a mouse button event. */
-    public class MouseButtonEvent {
+    public final class MouseButtonEvent {
 
         /** The x position of the mouse, in pixels */
         public final int x;
@@ -75,7 +75,7 @@ public class MouseManager extends InputAdapter {
     }
 
     /** Represents a mouse scroll event. */
-    public class MouseScrollEvent {
+    public final class MouseScrollEvent {
 
         /** The amount scrolled in the x direction. */
         public final float scrollX;

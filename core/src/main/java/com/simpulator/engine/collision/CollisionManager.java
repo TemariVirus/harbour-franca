@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** Collision detection and resolution. */
-public class CollisionManager {
+public final class CollisionManager {
 
     /**
      * Returns whether 2 convex shapes are intersecting using the GJK algorithm.
@@ -261,13 +261,13 @@ final class GJK {
 }
 
 /** 3D Polytope used in the Expanding Polytope Algorithm. */
-class Polytope {
+final class Polytope {
 
     private ArrayList<Vector3> vertices;
     private ArrayList<PolytopeFace> faces;
 
     /** An edge of the polytope, refering the vertices by index. */
-    private class PolytopeEdge {
+    private final class PolytopeEdge {
 
         public int p1Index;
         public int p2Index;
@@ -287,7 +287,7 @@ class Polytope {
     }
 
     /** A face of the polytope, refering the vertices by index. */
-    private class PolytopeFace {
+    private final class PolytopeFace {
 
         public int p1Index;
         public int p2Index;
