@@ -144,12 +144,9 @@ public class ExploreScene extends Scene {
         mouse = new MouseManager();
         mouse.bindMove(new RotateCameraAction(playerCamera, 0.15f));
         playerInventory = new PlayerInventory();
-        playerInventory.addItem(new Item("common_coin", "Coin",  ItemRarity.COMMON,  10));
-        playerInventory.addItem(new Item("rare_bow",    "Bow",   ItemRarity.RARE,   20));
-        playerInventory.addItem(new Item("common_wooden_sword",  "Wooden Sword", ItemRarity.COMMON,   7));
-        playerInventory.recalculateTotalValue();
+        currentLevel.generateStarterInventory(playerInventory, new Random()); 
+        tradeManager = new TradeManager(playerInventory, 50, ACCEPTANCE_THRESHOLD);
 
-        tradeManager      = new TradeManager(playerInventory, 50, ACCEPTANCE_THRESHOLD);
         tradeOfferFactory = new TradeOfferFactory(new Random(), ACCEPTANCE_THRESHOLD);
 
         hud = new GameHUD(hudSkin);
