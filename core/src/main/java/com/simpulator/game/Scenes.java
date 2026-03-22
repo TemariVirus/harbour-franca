@@ -5,4 +5,5 @@ public class Scenes {
     public static final String MainMenu = "MainMenu";
     public static final String SoundMenu = "SoundMenu";
     public static final String Explore = "Explore";
+    public static final String Victory = "Victory";
 }

@@ -32,6 +32,9 @@ public class GameMaster extends ApplicationAdapter {
         sceneManager.addScene(Scenes.Explore, () ->
             new ExploreScene(sceneManager, levelManager.getCurrentLevel())
         );
+        sceneManager.addScene(Scenes.Victory, () ->
+            new VictoryScene(sceneManager)
+        );
 
         sceneManager.setScene(Scenes.MainMenu);
         musics.startMusic("GameAudio.mp3");

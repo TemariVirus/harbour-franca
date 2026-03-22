@@ -1,5 +1,9 @@
 package com.simpulator.game.ExploreScene;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
@@ -31,17 +35,13 @@ import com.simpulator.game.Level;
 import com.simpulator.game.Scenes;
 import com.simpulator.game.SimpleSkin;
 import com.simpulator.game.TiledRenderer;
-import com.simpulator.game.TradingUI;
 import com.simpulator.game.Trading.Item;
-import com.simpulator.game.Trading.ItemRarity;
 import com.simpulator.game.Trading.PlayerInventory;
 import com.simpulator.game.Trading.TradeManager;
 import com.simpulator.game.Trading.TradeOffer;
 import com.simpulator.game.Trading.TradeOfferFactory;
 import com.simpulator.game.Trading.TradeResult;
-import java.util.Random;
-import java.util.ArrayList;
-import java.util.List;
+import com.simpulator.game.TradingUI;
 
 public class ExploreScene extends Scene {
 
@@ -70,6 +70,8 @@ public class ExploreScene extends Scene {
     private TradeManager tradeManager;
     private TradeOfferFactory tradeOfferFactory;
     private TradeOffer currentOffer;
+
+    private boolean victoryQueued = false;
 
     public ExploreScene(SceneManager sceneManager, Level level) {
         super(new ExtendViewport(640, 480));
@@ -209,19 +211,26 @@ public class ExploreScene extends Scene {
                         selectedDialogueIndex = -1;
                         selectedPlayerItemIndex = 0;
 
-                        if (tradeManager.isLevelComplete()) {
-                            tradingUI.showTradeResult("Level Complete! Goal reached!");
-                            // TODO: switch to win scene
-                        }
+                        if (tradeManager.isLevelComplete() && !victoryQueued) {
+                                    victoryQueued = true;
+                                    tradingUI.showTradeResult("Level Complete! Goal reached!");
 
-                        Timer.schedule(
-                                new Timer.Task() {
-                                    @Override
-                                    public void run() {
-                                        closeTradingUI();
-                                    }
-                                },
-                                2f);
+                                    Gdx.input.setCursorCatched(false);
+
+                                    Timer.schedule(new Timer.Task() {
+                                        @Override
+                                        public void run() {
+                                            sceneManager.setScene(Scenes.Victory);
+                                        }
+                                    }, 2f);
+                                } else {
+                                    Timer.schedule(new Timer.Task() {
+                                        @Override
+                                        public void run() {
+                                            closeTradingUI();
+                                        }
+                                    }, 2f);
+                                }
                     }
 
                 @Override
@@ -444,9 +453,12 @@ public class ExploreScene extends Scene {
 
     private void closeTradingUI() {
         tradingUI.hide();
-        Gdx.input.setCursorCatched(true);
-        Gdx.input.setInputProcessor(getInputProcessor());
-        mouse.resetMousePosition();
+        if(!victoryQueued){
+            Gdx.input.setCursorCatched(true);
+            Gdx.input.setInputProcessor(getInputProcessor());
+            mouse.resetMousePosition();
+        }
+
     }
 
     private void updateInnerThought() {
