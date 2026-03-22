@@ -103,6 +103,19 @@ public class UIRelativeLayout implements UILayout {
         }
     }
 
+    private static Alignment alignmentOpposite(Alignment align) {
+        switch (align) {
+            case START:
+                return Alignment.END;
+            case CENTER:
+                return Alignment.CENTER;
+            case END:
+                return Alignment.START;
+            default:
+                throw new IllegalStateException("Invalid alignment: " + align);
+        }
+    }
+
     @Override
     public Rect computeBounds(Rect bounds) {
         float w = getSize(width, bounds.left, bounds.right, padLeft, padRight);
@@ -116,11 +129,12 @@ public class UIRelativeLayout implements UILayout {
             w
         );
         float y = getOffset(
-            yAlignment,
+            // Y=0 is the bottom of the screen, so we need to flip the alignment
+            alignmentOpposite(yAlignment),
             bounds.top,
             bounds.bottom,
-            padTop,
             padBottom,
+            padTop,
             h
         );
         return new Rect(

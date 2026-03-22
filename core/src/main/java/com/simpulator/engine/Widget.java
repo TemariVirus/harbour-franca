@@ -3,6 +3,7 @@ package com.simpulator.engine;
 import com.badlogic.gdx.InputProcessor;
 import com.simpulator.engine.graphics.GraphicsManager;
 
+// TODO: combine with Scene
 public interface Widget {
     /** Returns the input processor for this widget, or null. */
     public InputProcessor getInputProcessor();
