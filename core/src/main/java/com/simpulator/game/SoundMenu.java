@@ -12,7 +12,6 @@ import com.simpulator.engine.graphics.GraphicsManager;
 import com.simpulator.engine.input.ButtonManager.ButtonBindType;
 import com.simpulator.engine.input.KeyboardManager;
 import com.simpulator.engine.input.MouseManager;
-import com.simpulator.engine.input.MouseManager.MouseButton;
 import com.simpulator.engine.scene.MusicManager;
 import com.simpulator.engine.scene.Scene;
 import com.simpulator.engine.scene.SceneManager;
@@ -71,17 +70,7 @@ public class SoundMenu extends Scene {
 
         font = new BitmapFont();
         uiRoot = new UIRoot();
-        mm.bindMove(UiHelper.uiMouseMoveHandler(viewport, uiRoot));
-        mm.bindButton(
-            ButtonBindType.DOWN,
-            MouseButton.LEFT,
-            UiHelper.uiMouseButtonHandler(viewport, uiRoot)
-        );
-        mm.bindButton(
-            ButtonBindType.UP,
-            MouseButton.LEFT,
-            UiHelper.uiMouseButtonHandler(viewport, uiRoot)
-        );
+        UiHelper.setupUiMouseHandlers(mm, viewport, uiRoot);
 
         uiRoot.addChild(
             new Text(

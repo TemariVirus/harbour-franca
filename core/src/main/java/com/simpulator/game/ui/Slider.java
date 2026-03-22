@@ -47,7 +47,7 @@ public class Slider extends UIElement {
         this.knobSize = knobSize;
 
         addListener(MouseButtonEvent.class, e -> {
-            if (e.button != MouseButton.LEFT) {
+            if (e.button != MouseButton.LEFT.getCode()) {
                 return false;
             }
             switch (e.type) {

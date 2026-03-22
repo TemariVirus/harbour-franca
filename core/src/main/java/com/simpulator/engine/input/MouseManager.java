@@ -107,11 +107,20 @@ public class MouseManager extends InputAdapter {
         }
     }
 
-    public static final class MouseButton {
+    public static enum MouseButton {
+        LEFT(0),
+        RIGHT(1),
+        MIDDLE(2);
 
-        public static final int LEFT = 0;
-        public static final int RIGHT = 1;
-        public static final int MIDDLE = 2;
+        private final int code;
+
+        MouseButton(int code) {
+            this.code = code;
+        }
+
+        public int getCode() {
+            return code;
+        }
     }
 
     private int lastFrameX, lastFrameY;

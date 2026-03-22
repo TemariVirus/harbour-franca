@@ -76,12 +76,7 @@ public class MainMenu extends Scene {
     private void buildUI(SceneManager sceneManager) {
         uiRoot = new UIRoot();
         font = new BitmapFont();
-        mm.bindMove(UiHelper.uiMouseMoveHandler(viewport, uiRoot));
-        mm.bindButton(
-            ButtonBindType.DOWN,
-            MouseButton.LEFT,
-            UiHelper.uiMouseButtonHandler(viewport, uiRoot)
-        );
+        UiHelper.setupUiMouseHandlers(mm, viewport, uiRoot);
 
         uiRoot.addChild(
             new Text(
@@ -158,7 +153,7 @@ public class MainMenu extends Scene {
         button.addHoverColor(BUTTON_COLOR, BUTTON_HOVER_COLOR);
         button.addListener(MouseManager.MouseButtonEvent.class, e -> {
             if (
-                e.button == MouseButton.LEFT &&
+                e.button == MouseButton.LEFT.getCode() &&
                 e.type == ButtonBindType.DOWN &&
                 button.getBounds().contains(e.x, e.y)
             ) {

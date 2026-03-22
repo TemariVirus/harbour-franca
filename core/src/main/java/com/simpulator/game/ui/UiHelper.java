@@ -6,6 +6,9 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.simpulator.engine.input.Action;
+import com.simpulator.engine.input.ButtonManager.ButtonBindType;
+import com.simpulator.engine.input.MouseManager;
+import com.simpulator.engine.input.MouseManager.MouseButton;
 import com.simpulator.engine.input.MouseManager.MouseButtonEvent;
 import com.simpulator.engine.input.MouseManager.MouseMoveEvent;
 import com.simpulator.engine.input.MouseManager.MouseScrollEvent;
@@ -24,6 +27,24 @@ public final class UiHelper {
             pixmap.dispose();
         }
         return whiteTexture;
+    }
+
+    public static void setupUiMouseHandlers(
+        MouseManager mm,
+        Viewport viewport,
+        UIRoot root
+    ) {
+        mm.bindMove(uiMouseMoveHandler(viewport, root));
+        for (ButtonBindType type : ButtonBindType.values()) {
+            for (MouseButton button : MouseButton.values()) {
+                mm.bindButton(
+                    type,
+                    button.getCode(),
+                    uiMouseButtonHandler(viewport, root)
+                );
+            }
+        }
+        mm.bindScroll(uiMouseScrollHandler(viewport, root));
     }
 
     public static Action<MouseMoveEvent> uiMouseMoveHandler(
