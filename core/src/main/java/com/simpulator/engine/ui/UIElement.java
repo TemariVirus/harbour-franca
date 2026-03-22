@@ -25,8 +25,8 @@ public abstract class UIElement {
         updateBounds(bounds);
     }
 
-    protected Rect getBounds() {
-        return bounds;
+    public Rect getBounds() {
+        return new Rect(bounds.left, bounds.top, bounds.right, bounds.bottom);
     }
 
     /** Call when the parent's bounds have changed to update the bounds of this element and its children. */

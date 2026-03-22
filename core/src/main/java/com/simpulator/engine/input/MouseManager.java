@@ -9,8 +9,12 @@ import java.util.ArrayList;
 public class MouseManager extends InputAdapter {
 
     /** Represents a mouse movement event. */
-    public final class MouseMoveEvent extends PointerEvent {
+    public static final class MouseMoveEvent {
 
+        /** The x position of the pointer, in pixels */
+        public final int x;
+        /** The y position of the pointer, in pixels */
+        public final int y;
         /** The change in x position since last update, in pixels */
         public final int deltaX;
         /** The change in y position since last update, in pixels */
@@ -28,7 +32,8 @@ public class MouseManager extends InputAdapter {
             float deltaTime,
             float timestamp
         ) {
-            super(x, y);
+            this.x = x;
+            this.y = y;
             this.deltaX = deltaX;
             this.deltaY = deltaY;
             this.deltaTime = deltaTime;
@@ -37,7 +42,7 @@ public class MouseManager extends InputAdapter {
     }
 
     /** Represents a mouse button event. */
-    public final class MouseButtonEvent extends PointerEvent {
+    public static final class MouseButtonEvent extends PointerEvent {
 
         /** The relevant button. */
         public final int button;
@@ -65,7 +70,7 @@ public class MouseManager extends InputAdapter {
     }
 
     /** Represents a mouse scroll event. */
-    public final class MouseScrollEvent extends PointerEvent {
+    public static final class MouseScrollEvent extends PointerEvent {
 
         /** The amount scrolled in the x direction. */
         public final float scrollX;
@@ -90,6 +95,13 @@ public class MouseManager extends InputAdapter {
             this.deltaTime = deltaTime;
             this.timestamp = timestamp;
         }
+    }
+
+    public static final class MouseButton {
+
+        public static final int LEFT = 0;
+        public static final int RIGHT = 1;
+        public static final int MIDDLE = 2;
     }
 
     private int lastFrameX, lastFrameY;

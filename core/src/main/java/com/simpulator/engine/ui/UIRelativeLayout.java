@@ -3,6 +3,60 @@ package com.simpulator.engine.ui;
 /** A layout that calculates bounds relative to its parent. */
 public class UIRelativeLayout implements UILayout {
 
+    public static class Builder {
+
+        private UIRelativeLayout layout = new UIRelativeLayout();
+
+        public Builder xAlignment(Alignment align) {
+            layout.setXAlignment(align);
+            return this;
+        }
+
+        public Builder yAlignment(Alignment align) {
+            layout.setYAlignment(align);
+            return this;
+        }
+
+        public Builder padLeft(float pad) {
+            layout.setPadLeft(pad);
+            return this;
+        }
+
+        public Builder padRight(float pad) {
+            layout.setPadRight(pad);
+            return this;
+        }
+
+        public Builder padTop(float pad) {
+            layout.setPadTop(pad);
+            return this;
+        }
+
+        public Builder padBottom(float pad) {
+            layout.setPadBottom(pad);
+            return this;
+        }
+
+        public Builder padAll(float pad) {
+            layout.setPadAll(pad);
+            return this;
+        }
+
+        public Builder width(float width) {
+            layout.setWidth(width);
+            return this;
+        }
+
+        public Builder height(float height) {
+            layout.setHeight(height);
+            return this;
+        }
+
+        public UIRelativeLayout getLayout() {
+            return layout;
+        }
+    }
+
     public enum Alignment {
         START,
         CENTER,
@@ -22,51 +76,43 @@ public class UIRelativeLayout implements UILayout {
 
     public UIRelativeLayout() {}
 
-    public UIRelativeLayout setXAlignment(Alignment align) {
+    public void setXAlignment(Alignment align) {
         this.xAlignment = align;
-        return this;
     }
 
-    public UIRelativeLayout setYAlignment(Alignment align) {
+    public void setYAlignment(Alignment align) {
         this.yAlignment = align;
-        return this;
     }
 
-    public UIRelativeLayout setPadLeft(float pad) {
+    public void setPadLeft(float pad) {
         this.padLeft = pad;
-        return this;
     }
 
-    public UIRelativeLayout setPadRight(float pad) {
+    public void setPadRight(float pad) {
         this.padRight = pad;
-        return this;
     }
 
-    public UIRelativeLayout setPadTop(float pad) {
+    public void setPadTop(float pad) {
         this.padTop = pad;
-        return this;
     }
 
-    public UIRelativeLayout setPadBottom(float pad) {
+    public void setPadBottom(float pad) {
         this.padBottom = pad;
-        return this;
     }
 
-    public UIRelativeLayout setPadAll(float pad) {
-        return setPadLeft(pad)
-            .setPadRight(pad)
-            .setPadTop(pad)
-            .setPadBottom(pad);
+    public void setPadAll(float pad) {
+        setPadLeft(pad);
+        setPadRight(pad);
+        setPadTop(pad);
+        setPadBottom(pad);
     }
 
-    public UIRelativeLayout setWidth(float width) {
+    public void setWidth(float width) {
         this.width = width;
-        return this;
     }
 
-    public UIRelativeLayout setHeight(float height) {
+    public void setHeight(float height) {
         this.height = height;
-        return this;
     }
 
     private static float getSize(

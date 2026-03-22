@@ -17,6 +17,7 @@ public class SimpleSkin {
         pixmap.fill();
         skin.add("white", new Texture(pixmap));
         skin.add("default", new BitmapFont());
+        pixmap.dispose();
 
         Slider.SliderStyle sliderStyle = new Slider.SliderStyle();
         sliderStyle.background = skin.newDrawable("white", Color.DARK_GRAY);
