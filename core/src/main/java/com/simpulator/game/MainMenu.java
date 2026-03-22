@@ -6,7 +6,6 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.simpulator.engine.graphics.GraphicsManager;
@@ -22,6 +21,7 @@ import com.simpulator.engine.ui.UIRelativeLayout.Alignment;
 import com.simpulator.engine.ui.UIRoot;
 import com.simpulator.game.ui.Box;
 import com.simpulator.game.ui.Text;
+import com.simpulator.game.ui.UiHelper;
 
 public class MainMenu extends Scene {
 
@@ -76,32 +76,12 @@ public class MainMenu extends Scene {
     private void buildUI(SceneManager sceneManager) {
         uiRoot = new UIRoot();
         font = new BitmapFont();
-        mm.bindMove(e -> {
-            Vector2 world = viewport.unproject(new Vector2(e.x, e.y));
-            uiRoot.handleEvent(
-                new MouseManager.MouseMoveEvent(
-                    (int) world.x,
-                    (int) world.y,
-                    e.deltaX,
-                    e.deltaY,
-                    e.deltaTime,
-                    e.timestamp
-                )
-            );
-        });
-        mm.bindButton(ButtonBindType.DOWN, MouseButton.LEFT, e -> {
-            Vector2 world = viewport.unproject(new Vector2(e.x, e.y));
-            uiRoot.handleEvent(
-                new MouseManager.MouseButtonEvent(
-                    (int) world.x,
-                    (int) world.y,
-                    e.button,
-                    e.type,
-                    e.deltaTime,
-                    e.timestamp
-                )
-            );
-        });
+        mm.bindMove(UiHelper.uiMouseMoveHandler(viewport, uiRoot));
+        mm.bindButton(
+            ButtonBindType.DOWN,
+            MouseButton.LEFT,
+            UiHelper.uiMouseButtonHandler(viewport, uiRoot)
+        );
 
         uiRoot.addChild(
             new Text.Builder(
@@ -180,10 +160,15 @@ public class MainMenu extends Scene {
         );
         button.addHoverColor(BUTTON_COLOR, BUTTON_HOVER_COLOR);
         button.addListener(MouseManager.MouseButtonEvent.class, e -> {
-            if (e.button == MouseButton.LEFT && e.type == ButtonBindType.DOWN) {
+            if (
+                e.button == MouseButton.LEFT &&
+                e.type == ButtonBindType.DOWN &&
+                button.getBounds().contains(e.x, e.y)
+            ) {
                 onClick.act(e);
+                return true;
             }
-            return true;
+            return false;
         });
         button.addChild(
             new Text.Builder(
@@ -224,6 +209,7 @@ public class MainMenu extends Scene {
     public void update(float deltaTime) {
         km.update(deltaTime, Float.NaN);
         mm.update(deltaTime, Float.NaN);
+        uiRoot.update(deltaTime);
     }
 
     @Override

@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.simpulator.engine.graphics.Renderable;
 import com.simpulator.engine.graphics.TextureBatch;
-import com.simpulator.engine.input.PointerEvent;
 import java.util.ArrayList;
 
 /** The root of the UI tree. */
@@ -55,13 +54,6 @@ public class UIRoot extends UIElement implements Renderable {
         walker.push(this);
         while (!walker.isEmpty()) {
             UIElement element = walker.pop();
-            if (event instanceof PointerEvent) {
-                PointerEvent e = (PointerEvent) event;
-                if (!element.getBounds().contains(e.x, e.y)) {
-                    walker.push(element); // Children may be outside of parent bounds
-                    continue;
-                }
-            }
             if (!element.handleEvent(event)) {
                 // Parent did not handle event, pass it to children
                 walker.push(element);

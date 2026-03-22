@@ -11,9 +11,9 @@ public class MouseManager extends InputAdapter {
     /** Represents a mouse movement event. */
     public static final class MouseMoveEvent {
 
-        /** The x position of the pointer, in pixels */
+        /** The x position of the mouse, in pixels */
         public final int x;
-        /** The y position of the pointer, in pixels */
+        /** The y position of the mouse, in pixels */
         public final int y;
         /** The change in x position since last update, in pixels */
         public final int deltaX;
@@ -42,8 +42,12 @@ public class MouseManager extends InputAdapter {
     }
 
     /** Represents a mouse button event. */
-    public static final class MouseButtonEvent extends PointerEvent {
+    public static final class MouseButtonEvent {
 
+        /** The x position of the mouse, in pixels */
+        public final int x;
+        /** The y position of the mouse, in pixels */
+        public final int y;
         /** The relevant button. */
         public final int button;
         /** Whether the button was pressed, held, or released. */
@@ -61,7 +65,8 @@ public class MouseManager extends InputAdapter {
             float deltaTime,
             float timestamp
         ) {
-            super(x, y);
+            this.x = x;
+            this.y = y;
             this.button = button;
             this.type = type;
             this.deltaTime = deltaTime;
@@ -70,8 +75,12 @@ public class MouseManager extends InputAdapter {
     }
 
     /** Represents a mouse scroll event. */
-    public static final class MouseScrollEvent extends PointerEvent {
+    public static final class MouseScrollEvent {
 
+        /** The x position of the mouse, in pixels */
+        public final int x;
+        /** The y position of the mouse, in pixels */
+        public final int y;
         /** The amount scrolled in the x direction. */
         public final float scrollX;
         /** The amount scrolled in the y direction. */
@@ -89,7 +98,8 @@ public class MouseManager extends InputAdapter {
             float deltaTime,
             float timestamp
         ) {
-            super(x, y);
+            this.x = x;
+            this.y = y;
             this.scrollX = scrollX;
             this.scrollY = scrollY;
             this.deltaTime = deltaTime;
@@ -154,6 +164,13 @@ public class MouseManager extends InputAdapter {
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
         buttonManager.setButton(button, false);
+        return true;
+    }
+
+    @Override
+    public boolean touchDragged(int screenX, int screenY, int pointer) {
+        thisFrameX = screenX;
+        thisFrameY = screenY;
         return true;
     }
 
