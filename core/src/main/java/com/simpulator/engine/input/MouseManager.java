@@ -77,6 +77,10 @@ public class MouseManager extends InputAdapter {
     /** Represents a mouse scroll event. */
     public final class MouseScrollEvent {
 
+        /** The x position of the mouse, in pixels */
+        public final int x;
+        /** The y position of the mouse, in pixels */
+        public final int y;
         /** The amount scrolled in the x direction. */
         public final float scrollX;
         /** The amount scrolled in the y direction. */
@@ -87,11 +91,15 @@ public class MouseManager extends InputAdapter {
         public final float timestamp;
 
         public MouseScrollEvent(
+            int x,
+            int y,
             float scrollX,
             float scrollY,
             float deltaTime,
             float timestamp
         ) {
+            this.x = x;
+            this.y = y;
             this.scrollX = scrollX;
             this.scrollY = scrollY;
             this.deltaTime = deltaTime;
@@ -250,7 +258,14 @@ public class MouseManager extends InputAdapter {
 
         for (Action<MouseScrollEvent> action : scrollBindings) {
             action.act(
-                new MouseScrollEvent(scrolledX, scrolledY, deltaTime, timestamp)
+                new MouseScrollEvent(
+                    thisFrameX,
+                    thisFrameY,
+                    scrolledX,
+                    scrolledY,
+                    deltaTime,
+                    timestamp
+                )
             );
         }
 
