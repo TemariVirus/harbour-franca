@@ -84,32 +84,30 @@ public class MainMenu extends Scene {
         );
 
         uiRoot.addChild(
-            new Text.Builder(
+            new Text(
                 "HARBOUR FRANCA",
                 font,
+                Text.Alignment.CENTER,
+                TITLE_COLOR,
                 new UIRelativeLayout.Builder()
                     .yAlignment(Alignment.START)
                     .padTop(90)
                     .height(21)
                     .getLayout()
             )
-                .xAnchor(Text.Alignment.CENTER)
-                .color(TITLE_COLOR)
-                .getText()
         );
         uiRoot.addChild(
-            new Text.Builder(
+            new Text(
                 "Learn languages through smart trading",
                 font,
+                Text.Alignment.CENTER,
+                TEXT_COLOR,
                 new UIRelativeLayout.Builder()
                     .yAlignment(Alignment.START)
                     .padTop(118)
                     .height(10.5f)
                     .getLayout()
             )
-                .xAnchor(Text.Alignment.CENTER)
-                .color(TEXT_COLOR)
-                .getText()
         );
 
         addMenuButton("Start Game", 225, e ->
@@ -121,18 +119,17 @@ public class MainMenu extends Scene {
         addMenuButton("Exit", 75, e -> Gdx.app.exit());
 
         uiRoot.addChild(
-            new Text.Builder(
+            new Text(
                 "ENTER = Start   |   S = Sound   |   ESC = Exit",
                 font,
+                Text.Alignment.CENTER,
+                HINT_COLOR,
                 new UIRelativeLayout.Builder()
                     .yAlignment(Alignment.END)
                     .padBottom(24)
                     .height(10.5f)
                     .getLayout()
             )
-                .xAnchor(Text.Alignment.CENTER)
-                .color(HINT_COLOR)
-                .getText()
         );
     }
 
@@ -171,17 +168,16 @@ public class MainMenu extends Scene {
             return false;
         });
         button.addChild(
-            new Text.Builder(
+            new Text(
                 text,
                 font,
+                Text.Alignment.CENTER,
+                TEXT_COLOR,
                 new UIRelativeLayout.Builder()
                     .yAlignment(Alignment.CENTER)
                     .height(FONT_SIZE)
                     .getLayout()
             )
-                .xAnchor(Text.Alignment.CENTER)
-                .color(TEXT_COLOR)
-                .getText()
         );
         uiRoot.addChild(button);
     }

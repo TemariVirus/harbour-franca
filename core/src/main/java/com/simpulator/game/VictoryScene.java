@@ -6,7 +6,6 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.simpulator.engine.graphics.GraphicsManager;
@@ -22,6 +21,7 @@ import com.simpulator.engine.ui.UIRelativeLayout.Alignment;
 import com.simpulator.engine.ui.UIRoot;
 import com.simpulator.game.ui.Box;
 import com.simpulator.game.ui.Text;
+import com.simpulator.game.ui.UiHelper;
 
 public class VictoryScene extends Scene {
 
@@ -76,62 +76,34 @@ public class VictoryScene extends Scene {
         uiRoot = new UIRoot();
         font = new BitmapFont();
 
-        mm.bindMove(e -> {
-            Vector2 world = viewport.unproject(new Vector2(e.x, e.y));
-            uiRoot.handleEvent(
-                new MouseManager.MouseMoveEvent(
-                    (int) world.x,
-                    (int) world.y,
-                    e.deltaX,
-                    e.deltaY,
-                    e.deltaTime,
-                    e.timestamp
-                )
-            );
-        });
-
-        mm.bindButton(ButtonBindType.DOWN, MouseButton.LEFT, e -> {
-            Vector2 world = viewport.unproject(new Vector2(e.x, e.y));
-            uiRoot.handleEvent(
-                new MouseManager.MouseButtonEvent(
-                    (int) world.x,
-                    (int) world.y,
-                    e.button,
-                    e.type,
-                    e.deltaTime,
-                    e.timestamp
-                )
-            );
-        });
+        UiHelper.setupUiMouseHandlers(mm, viewport, uiRoot);
 
         uiRoot.addChild(
-            new Text.Builder(
+            new Text(
                 "YOU WIN!",
                 font,
+                Text.Alignment.CENTER,
+                TITLE_COLOR,
                 new UIRelativeLayout.Builder()
                     .yAlignment(Alignment.START)
                     .padTop(90)
                     .height(24)
                     .getLayout()
             )
-                .xAnchor(Text.Alignment.CENTER)
-                .color(TITLE_COLOR)
-                .getText()
         );
 
         uiRoot.addChild(
-            new Text.Builder(
+            new Text(
                 "Great job completing the level",
                 font,
+                Text.Alignment.CENTER,
+                TEXT_COLOR,
                 new UIRelativeLayout.Builder()
                     .yAlignment(Alignment.START)
                     .padTop(122)
                     .height(11)
                     .getLayout()
             )
-                .xAnchor(Text.Alignment.CENTER)
-                .color(TEXT_COLOR)
-                .getText()
         );
 
         addMenuButton("Play Again", 225, e ->
@@ -143,18 +115,17 @@ public class VictoryScene extends Scene {
         addMenuButton("Quit", 75, e -> Gdx.app.exit());
 
         uiRoot.addChild(
-            new Text.Builder(
+            new Text(
                 "ENTER = Replay   |   M = Main Menu   |   ESC = QUIT ",
                 font,
+                Text.Alignment.CENTER,
+                HINT_COLOR,
                 new UIRelativeLayout.Builder()
                     .yAlignment(Alignment.END)
                     .padBottom(24)
                     .height(10.5f)
                     .getLayout()
             )
-                .xAnchor(Text.Alignment.CENTER)
-                .color(HINT_COLOR)
-                .getText()
         );
     }
 
@@ -180,28 +151,29 @@ public class VictoryScene extends Scene {
                 .height(HEIGHT)
                 .getLayout()
         );
-
         button.addHoverColor(BUTTON_COLOR, BUTTON_HOVER_COLOR);
-
         button.addListener(MouseManager.MouseButtonEvent.class, e -> {
-            if (e.button == MouseButton.LEFT && e.type == ButtonBindType.DOWN) {
+            if (
+                e.button == MouseButton.LEFT.getCode() &&
+                e.type == ButtonBindType.DOWN &&
+                button.getBounds().contains(e.x, e.y)
+            ) {
                 onClick.act(e);
             }
             return true;
         });
 
         button.addChild(
-            new Text.Builder(
+            new Text(
                 text,
                 font,
+                Text.Alignment.CENTER,
+                TEXT_COLOR,
                 new UIRelativeLayout.Builder()
                     .yAlignment(Alignment.CENTER)
                     .height(FONT_SIZE)
                     .getLayout()
             )
-                .xAnchor(Text.Alignment.CENTER)
-                .color(TEXT_COLOR)
-                .getText()
         );
 
         uiRoot.addChild(button);

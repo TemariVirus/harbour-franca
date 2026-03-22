@@ -16,35 +16,6 @@ public class Text extends UIElement {
         END,
     }
 
-    public static class Builder {
-
-        private Text text;
-
-        public Builder(CharSequence text, BitmapFont font, UILayout layout) {
-            this.text = new Text(
-                text,
-                font,
-                Alignment.START,
-                Color.WHITE,
-                layout
-            );
-        }
-
-        public Builder xAnchor(Alignment xAnchor) {
-            text.setXAnchor(xAnchor);
-            return this;
-        }
-
-        public Builder color(Color color) {
-            text.setColor(color);
-            return this;
-        }
-
-        public Text getText() {
-            return text;
-        }
-    }
-
     private CharSequence text;
     private BitmapFont font;
     private Alignment xAnchor;

@@ -78,7 +78,7 @@ public class Slider extends UIElement {
             if (step > 0) {
                 newValue = Math.round(newValue / step) * step;
             }
-            setValue(newValue);
+            setValue(newValue, true);
             return false;
         });
     }
@@ -87,10 +87,12 @@ public class Slider extends UIElement {
         return value;
     }
 
-    public void setValue(float value) {
+    public void setValue(float value, boolean notifyListeners) {
         this.value = Math.clamp(value, min, max);
-        for (Action<Float> action : valueListeners) {
-            action.act(this.value);
+        if (notifyListeners) {
+            for (Action<Float> action : valueListeners) {
+                action.act(this.value);
+            }
         }
     }
 
@@ -100,7 +102,7 @@ public class Slider extends UIElement {
 
     public void setMin(float min) {
         this.min = min;
-        setValue(value);
+        setValue(value, true);
     }
 
     public float getMax() {
@@ -109,7 +111,7 @@ public class Slider extends UIElement {
 
     public void setMax(float max) {
         this.max = max;
-        setValue(value);
+        setValue(value, true);
     }
 
     public float getStep() {
