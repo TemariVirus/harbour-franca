@@ -1,6 +1,7 @@
 package com.simpulator.engine.ui;
 
-public class UIFlowLayout implements UILayout {
+/** A layout that calculates bounds relative to its parent. */
+public class UIRelativeLayout implements UILayout {
 
     public enum Alignment {
         START,
@@ -19,51 +20,51 @@ public class UIFlowLayout implements UILayout {
     private float width = EXPAND;
     private float height = EXPAND;
 
-    public UIFlowLayout() {}
+    public UIRelativeLayout() {}
 
-    public UIFlowLayout setXAlignment(Alignment align) {
+    public UIRelativeLayout setXAlignment(Alignment align) {
         this.xAlignment = align;
         return this;
     }
 
-    public UIFlowLayout setYAlignment(Alignment align) {
+    public UIRelativeLayout setYAlignment(Alignment align) {
         this.yAlignment = align;
         return this;
     }
 
-    public UIFlowLayout setPadLeft(float pad) {
+    public UIRelativeLayout setPadLeft(float pad) {
         this.padLeft = pad;
         return this;
     }
 
-    public UIFlowLayout setPadRight(float pad) {
+    public UIRelativeLayout setPadRight(float pad) {
         this.padRight = pad;
         return this;
     }
 
-    public UIFlowLayout setPadTop(float pad) {
+    public UIRelativeLayout setPadTop(float pad) {
         this.padTop = pad;
         return this;
     }
 
-    public UIFlowLayout setPadBottom(float pad) {
+    public UIRelativeLayout setPadBottom(float pad) {
         this.padBottom = pad;
         return this;
     }
 
-    public UIFlowLayout setPadAll(float pad) {
+    public UIRelativeLayout setPadAll(float pad) {
         return setPadLeft(pad)
             .setPadRight(pad)
             .setPadTop(pad)
             .setPadBottom(pad);
     }
 
-    public UIFlowLayout setWidth(float width) {
+    public UIRelativeLayout setWidth(float width) {
         this.width = width;
         return this;
     }
 
-    public UIFlowLayout setHeight(float height) {
+    public UIRelativeLayout setHeight(float height) {
         this.height = height;
         return this;
     }

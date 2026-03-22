@@ -9,12 +9,8 @@ import java.util.ArrayList;
 public class MouseManager extends InputAdapter {
 
     /** Represents a mouse movement event. */
-    public final class MouseMoveEvent {
+    public final class MouseMoveEvent extends PointerEvent {
 
-        /** The x position of the mouse, in pixels */
-        public final int x;
-        /** The y position of the mouse, in pixels */
-        public final int y;
         /** The change in x position since last update, in pixels */
         public final int deltaX;
         /** The change in y position since last update, in pixels */
@@ -32,8 +28,7 @@ public class MouseManager extends InputAdapter {
             float deltaTime,
             float timestamp
         ) {
-            this.x = x;
-            this.y = y;
+            super(x, y);
             this.deltaX = deltaX;
             this.deltaY = deltaY;
             this.deltaTime = deltaTime;
@@ -42,12 +37,8 @@ public class MouseManager extends InputAdapter {
     }
 
     /** Represents a mouse button event. */
-    public final class MouseButtonEvent {
+    public final class MouseButtonEvent extends PointerEvent {
 
-        /** The x position of the mouse, in pixels */
-        public final int x;
-        /** The y position of the mouse, in pixels */
-        public final int y;
         /** The relevant button. */
         public final int button;
         /** Whether the button was pressed, held, or released. */
@@ -65,8 +56,7 @@ public class MouseManager extends InputAdapter {
             float deltaTime,
             float timestamp
         ) {
-            this.x = x;
-            this.y = y;
+            super(x, y);
             this.button = button;
             this.type = type;
             this.deltaTime = deltaTime;
@@ -75,12 +65,8 @@ public class MouseManager extends InputAdapter {
     }
 
     /** Represents a mouse scroll event. */
-    public final class MouseScrollEvent {
+    public final class MouseScrollEvent extends PointerEvent {
 
-        /** The x position of the mouse, in pixels */
-        public final int x;
-        /** The y position of the mouse, in pixels */
-        public final int y;
         /** The amount scrolled in the x direction. */
         public final float scrollX;
         /** The amount scrolled in the y direction. */
@@ -98,8 +84,7 @@ public class MouseManager extends InputAdapter {
             float deltaTime,
             float timestamp
         ) {
-            this.x = x;
-            this.y = y;
+            super(x, y);
             this.scrollX = scrollX;
             this.scrollY = scrollY;
             this.deltaTime = deltaTime;

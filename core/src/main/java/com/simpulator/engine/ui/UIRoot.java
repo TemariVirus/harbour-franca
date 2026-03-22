@@ -1,10 +1,14 @@
 package com.simpulator.engine.ui;
 
+import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.utils.viewport.Viewport;
+import com.simpulator.engine.graphics.Renderable;
 import com.simpulator.engine.graphics.TextureBatch;
-import com.simpulator.engine.input.MouseManager.MouseButtonEvent;
+import com.simpulator.engine.input.PointerEvent;
 import java.util.ArrayList;
 
-public class UIRoot extends UIElement {
+/** The root of the UI tree. */
+public class UIRoot extends UIElement implements Renderable {
 
     public UIRoot() {
         super(
@@ -14,6 +18,18 @@ public class UIRoot extends UIElement {
                     return parentBounds;
                 }
             }
+        );
+    }
+
+    /** Resizes the root to fill the viewport. */
+    public void updateBounds(Viewport viewport) {
+        updateBounds(
+            new Rect(
+                0,
+                0,
+                (int) viewport.getWorldWidth(),
+                (int) viewport.getWorldHeight()
+            )
         );
     }
 
@@ -30,23 +46,44 @@ public class UIRoot extends UIElement {
     }
 
     @Override
-    public boolean handleMouseButtonEvent(MouseButtonEvent event) {
+    public <T> boolean handleEvent(T event) {
+        if (super.handleEvent(event)) {
+            return true;
+        }
+
         UIWalker walker = new UIWalker();
         walker.push(this);
-
         while (!walker.isEmpty()) {
             UIElement element = walker.pop();
-            if (!element.getBounds().contains(event.x, event.y)) {
-                // Assume that children are fully contained within their parent
-                continue;
+            if (event instanceof PointerEvent) {
+                PointerEvent e = (PointerEvent) event;
+                if (!element.getBounds().contains(e.x, e.y)) {
+                    walker.push(element); // Children may be outside of parent bounds
+                    continue;
+                }
             }
-            if (!element.handleMouseButtonEvent(event)) {
+            if (!element.handleEvent(event)) {
                 // Parent did not handle event, pass it to children
                 walker.push(element);
             }
         }
 
         return true;
+    }
+
+    @Override
+    public boolean isVisible(Camera camera) {
+        return true;
+    }
+
+    @Override
+    public float getZOrder(Camera camera) {
+        return -1;
+    }
+
+    @Override
+    public void render(TextureBatch batch, Camera camera) {
+        render(batch);
     }
 }
 
