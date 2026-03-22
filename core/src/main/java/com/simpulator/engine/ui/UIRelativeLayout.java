@@ -126,8 +126,8 @@ public class UIRelativeLayout implements UILayout {
         return new Rect(
             (int) x,
             (int) y,
-            Math.min((int) (x + w), bounds.right),
-            Math.min((int) (y + h), bounds.bottom)
+            Math.min((int) Math.ceil(x + w), bounds.right),
+            Math.min((int) Math.ceil(y + h), bounds.bottom)
         );
     }
 }

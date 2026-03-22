@@ -27,8 +27,8 @@ public class UIRoot extends UIElement implements Renderable {
             new Rect(
                 0,
                 0,
-                (int) viewport.getWorldWidth(),
-                (int) viewport.getWorldHeight()
+                (int) Math.ceil(viewport.getWorldWidth()),
+                (int) Math.ceil(viewport.getWorldHeight())
             )
         );
     }
