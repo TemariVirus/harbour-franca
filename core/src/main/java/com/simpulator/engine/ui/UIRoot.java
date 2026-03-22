@@ -8,68 +8,63 @@ public class UIRoot extends UIElement {
 
     public UIRoot() {
         super(
-            new UIFlowLayout()
-                .setPadAll(0)
-                .setWidth(UIFlowLayout.EXPAND)
-                .setHeight(UIFlowLayout.EXPAND)
+            new UILayout() {
+                @Override
+                public Rect computeBounds(Rect parentBounds) {
+                    return parentBounds;
+                }
+            }
         );
     }
 
     @Override
-    public void render(TextureBatch batch, Rect bounds) {
+    public void render(TextureBatch batch) {
         UIWalker walker = new UIWalker();
-        walker.push(this, bounds);
+        walker.push(this);
 
         while (!walker.isEmpty()) {
-            UIWalker.Entry entry = walker.pop();
-            entry.element.render(batch, entry.bounds);
-            walker.push(entry.element, entry.bounds);
+            UIElement element = walker.pop();
+            element.render(batch);
+            walker.push(element);
         }
     }
 
-    public void handleMouseButtonEvent(MouseButtonEvent event, Rect bounds) {
+    @Override
+    public boolean handleMouseButtonEvent(MouseButtonEvent event) {
         UIWalker walker = new UIWalker();
-        walker.push(this, bounds);
+        walker.push(this);
 
         while (!walker.isEmpty()) {
-            UIWalker.Entry entry = walker.pop();
-            if (!entry.bounds.contains(event.x, event.y)) {
+            UIElement element = walker.pop();
+            if (!element.getBounds().contains(event.x, event.y)) {
+                // Assume that children are fully contained within their parent
                 continue;
             }
-            if (entry.element.handleMouseButtonEvent(event)) {
-                continue;
+            if (!element.handleMouseButtonEvent(event)) {
+                // Parent did not handle event, pass it to children
+                walker.push(element);
             }
-            walker.push(entry.element, entry.bounds);
         }
+
+        return true;
     }
 }
 
 final class UIWalker {
 
-    public final class Entry {
-
-        public final UIElement element;
-        public final Rect bounds;
-
-        public Entry(UIElement element, Rect bounds) {
-            this.element = element;
-            this.bounds = bounds;
-        }
-    }
-
-    ArrayList<Entry> stack = new ArrayList<>();
+    ArrayList<UIElement> stack = new ArrayList<>();
 
     public boolean isEmpty() {
         return stack.size() == 0;
     }
 
-    public void push(UIElement element, Rect bounds) {
+    public void push(UIElement element) {
         for (UIElement child : element.getChildrenReversed()) {
-            stack.add(new Entry(child, child.getBounds(bounds)));
+            stack.add(child);
         }
     }
 
-    public Entry pop() {
+    public UIElement pop() {
         return stack.removeLast();
     }
 }

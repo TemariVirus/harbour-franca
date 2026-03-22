@@ -17,4 +17,21 @@ public final class Rect {
     public boolean contains(int x, int y) {
         return left <= x && x <= right && top <= y && y <= bottom;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        Rect other = (Rect) obj;
+        return (
+            left == other.left &&
+            top == other.top &&
+            right == other.right &&
+            bottom == other.bottom
+        );
+    }
 }

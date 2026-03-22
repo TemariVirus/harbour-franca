@@ -7,10 +7,16 @@ import java.util.ArrayList;
 public abstract class UIElement {
 
     private UILayout layout;
+    private Rect bounds;
     private ArrayList<UIElement> children = new ArrayList<>();
 
     protected UIElement(UILayout layout) {
         this.layout = layout;
+        this.bounds = new Rect(0, 0, 0, 0);
+    }
+
+    protected Rect getBounds() {
+        return bounds;
     }
 
     public UIElement addChild(UIElement child) {
@@ -26,15 +32,22 @@ public abstract class UIElement {
         children.add(index, child);
     }
 
-    public Rect getBounds(Rect parentBounds) {
-        return layout.computeBounds(parentBounds);
+    public void resize(Rect parentBounds) {
+        Rect oldBounds = bounds;
+        bounds = layout.computeBounds(parentBounds);
+        if (bounds.equals(oldBounds)) {
+            return;
+        }
+        for (UIElement child : children) {
+            child.resize(bounds);
+        }
     }
 
-    public Iterable<UIElement> getChildrenReversed() {
+    protected Iterable<UIElement> getChildrenReversed() {
         return children.reversed();
     }
 
-    public abstract void render(TextureBatch batch, Rect bounds);
+    public abstract void render(TextureBatch batch);
 
     public boolean handleMouseButtonEvent(MouseButtonEvent event) {
         return false;
