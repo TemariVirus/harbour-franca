@@ -408,7 +408,7 @@ public class ExploreScene extends Scene {
     }
 
     @Override
-    public void onLoad() {
+    public void onFocus() {
         Gdx.input.setCursorCatched(true);
     }
 

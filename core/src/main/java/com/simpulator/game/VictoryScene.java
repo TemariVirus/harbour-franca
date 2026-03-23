@@ -188,7 +188,7 @@ public class VictoryScene extends Scene {
     }
 
     @Override
-    public void onLoad() {
+    public void onFocus() {
         Gdx.input.setCursorCatched(false);
     }
 

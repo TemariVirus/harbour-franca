@@ -22,8 +22,8 @@ public abstract class Scene implements Disposable {
     /** Return the input processor for this scene, or null. */
     public abstract InputProcessor getInputProcessor();
 
-    /** Called when the scene is loaded. */
-    public void onLoad() {}
+    /** Called when the scene becomes the top scene. */
+    public void onFocus() {}
 
     /** Free all resources. Called when the scene is unloaded. */
     @Override
