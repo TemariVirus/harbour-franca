@@ -11,6 +11,8 @@ public abstract class UIElement {
 
     private UILayout layout;
     private Rect bounds;
+    private boolean visible = true;
+
     private final List<UIElement> children = new ArrayList<>();
     private final Map<Class<?>, List<UIListener<?>>> eventHandlers =
         new HashMap<>();
@@ -39,6 +41,14 @@ public abstract class UIElement {
         for (UIElement child : children) {
             child.updateBounds(bounds);
         }
+    }
+
+    public boolean isVisible() {
+        return visible;
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
     }
 
     public UIElement addChild(UIElement child) {

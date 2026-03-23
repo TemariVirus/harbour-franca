@@ -151,7 +151,7 @@ public class ExploreScene extends Scene {
 
         tradeOfferFactory = new TradeOfferFactory(new Random(), ACCEPTANCE_THRESHOLD);
 
-        hud = new GameHUD(hudSkin);
+        hud = new GameHUD();
         syncHUD();
 
         tradingUI = new TradingUI(hudSkin);
@@ -499,10 +499,16 @@ public class ExploreScene extends Scene {
 
             npcTargetingSystem.update();
             NpcEntity targeted = npcTargetingSystem.getTargetedNpc();
-            if (targeted != null) {
-                hud.showInteractionPrompt(targeted.getName());
-            } else {
+            if (targeted == null) {
                 hud.hideInteractionPrompt();
+            } else if (targeted.canTrade()) {
+                hud.showInteractionPrompt(
+                    "[E] Trade with " + targeted.getName()
+                );
+            } else {
+                hud.showInteractionPrompt(
+                    targeted.getName() + " does not want to trade."
+                );
             }
         } else {
             hud.hideInteractionPrompt();

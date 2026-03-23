@@ -1,14 +1,18 @@
 package com.simpulator.game.ExploreScene;
 
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.utils.Disposable;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import com.simpulator.engine.Widget;
 import com.simpulator.engine.graphics.GraphicsManager;
+import com.simpulator.engine.ui.UIRelativeLayout;
+import com.simpulator.engine.ui.UIRelativeLayout.Alignment;
+import com.simpulator.engine.ui.UIRoot;
+import com.simpulator.game.ui.Box;
+import com.simpulator.game.ui.Text;
 
 /**
  * In-game HUD overlay showing mission objective, player inventory,
@@ -16,63 +20,107 @@ import com.simpulator.engine.graphics.GraphicsManager;
  */
 public class GameHUD implements Widget, Disposable {
 
-    private final Stage stage;
-    private final Skin skin;
+    private static final Color inventoryBackgroundColor = new Color(
+        0.2f,
+        0.2f,
+        0.2f,
+        0.7f
+    );
+
+    private final Viewport viewport;
+    private BitmapFont font;
+    private UIRoot uiRoot;
 
     // HUD elements
-    private Label objectiveLabel;
-    private Label[] inventorySlots;
-    private Label interactionPrompt;
-    private Label crosshair;
+    private Text objectiveLabel;
+    private Text interactionPrompt;
+    private Text[] inventoryLabels;
 
-    public GameHUD(Skin skin) {
-        this.skin = skin;
-        this.stage = new Stage(new ScreenViewport());
+    public GameHUD() {
+        this.viewport = new ExtendViewport(640, 480);
         buildHUD();
     }
 
     private void buildHUD() {
-        Table root = new Table();
-        root.setFillParent(true);
-        stage.addActor(root);
+        font = new BitmapFont();
+        uiRoot = new UIRoot();
 
         // --- Top row: objective in top-center ---
-        objectiveLabel = new Label("$0 / $50", skin, "title");
-        objectiveLabel.setColor(com.badlogic.gdx.graphics.Color.YELLOW);
-        root.add(objectiveLabel).expandX().top().padTop(20).colspan(2).row();
+        objectiveLabel = new Text(
+            "",
+            font,
+            Text.Alignment.CENTER,
+            Color.YELLOW,
+            new UIRelativeLayout.Builder().padTop(20).height(10.5f).getLayout()
+        );
+        setObjective(0, 0);
+        uiRoot.addChild(objectiveLabel);
 
         // --- Center: crosshair and interaction prompt ---
-        Table centerTable = new Table();
-        crosshair = new Label("+", skin, "title");
-        centerTable.add(crosshair).center().row();
+        uiRoot.addChild(
+            new Text(
+                "+",
+                font,
+                Text.Alignment.CENTER,
+                Color.WHITE,
+                new UIRelativeLayout.Builder()
+                    .yAlignment(Alignment.CENTER)
+                    .height(11)
+                    .getLayout()
+            )
+        );
 
-        interactionPrompt = new Label("", skin, "prompt");
-        interactionPrompt.setVisible(false);
-        centerTable.add(interactionPrompt).center().padTop(30);
-
-        root.add(centerTable).center().colspan(2).row();
+        interactionPrompt = new Text(
+            "",
+            font,
+            Text.Alignment.CENTER,
+            Color.YELLOW,
+            new UIRelativeLayout.Builder()
+                .yAlignment(Alignment.CENTER)
+                .height(10.5f)
+                .padTop(120)
+                .getLayout()
+        );
+        uiRoot.addChild(interactionPrompt);
 
         // --- Bottom row: inventory slots ---
-        Table bottomRow = new Table();
-        inventorySlots = new Label[3];
+        inventoryLabels = new Text[3];
         for (int i = 0; i < 3; i++) {
-            inventorySlots[i] = new Label("[Empty]", skin);
-            Table slotBox = new Table();
-            slotBox.setBackground(
-                skin.newDrawable(
-                    "white",
-                    new com.badlogic.gdx.graphics.Color(0.2f, 0.2f, 0.2f, 0.7f)
-                )
+            final float SLOT_WIDTH = 110;
+            final float SLOT_HEIGHT = 35;
+            final float SLOT_SPACING = 5;
+
+            Box slotBox = new Box(
+                0,
+                Color.CLEAR,
+                inventoryBackgroundColor,
+                new UIRelativeLayout.Builder()
+                    .yAlignment(Alignment.END)
+                    .padBottom(15)
+                    .padLeft(15 + i * (SLOT_WIDTH + SLOT_SPACING))
+                    .width(SLOT_WIDTH)
+                    .height(SLOT_HEIGHT)
+                    .getLayout()
             );
-            slotBox.add(inventorySlots[i]).pad(8);
-            bottomRow.add(slotBox).width(110).height(35).padRight(5);
+            uiRoot.addChild(slotBox);
+
+            inventoryLabels[i] = new Text(
+                "[Empty]",
+                font,
+                Text.Alignment.CENTER,
+                Color.WHITE,
+                new UIRelativeLayout.Builder()
+                    .yAlignment(Alignment.CENTER)
+                    .height(10)
+                    .getLayout()
+            );
+            slotBox.addChild(inventoryLabels[i]);
         }
-        root.add(bottomRow).expand().bottom().left().padBottom(15).padLeft(20);
     }
 
     @Override
     public InputProcessor getInputProcessor() {
-        return stage;
+        return null;
     }
 
     /**
@@ -91,22 +139,18 @@ public class GameHUD implements Widget, Disposable {
      * @param items Array of item names (up to 3).
      */
     public void setInventory(String[] items) {
-        for (int i = 0; i < inventorySlots.length; i++) {
+        for (int i = 0; i < inventoryLabels.length; i++) {
             if (items != null && i < items.length && items[i] != null) {
-                inventorySlots[i].setText(items[i]);
+                inventoryLabels[i].setText(items[i]);
             } else {
-                inventorySlots[i].setText("[Empty]");
+                inventoryLabels[i].setText("[Empty]");
             }
         }
     }
 
-    /**
-     * Show the interaction prompt for an NPC.
-     *
-     * @param npcName The NPC's display name.
-     */
-    public void showInteractionPrompt(String npcName) {
-        interactionPrompt.setText("[E] Trade with " + npcName);
+    /** Show the interaction prompt. */
+    public void showInteractionPrompt(String text) {
+        interactionPrompt.setText(text);
         interactionPrompt.setVisible(true);
     }
 
@@ -117,12 +161,9 @@ public class GameHUD implements Widget, Disposable {
 
     @Override
     public void update(float deltaTime) {
-        stage.act(deltaTime);
+        uiRoot.update(deltaTime);
     }
 
-    /**
-     * Render the HUD. Call after the main scene render.
-     */
     @Override
     public void render(
         GraphicsManager graphics,
@@ -131,15 +172,17 @@ public class GameHUD implements Widget, Disposable {
         int width,
         int height
     ) {
-        stage.getViewport().update(width, height, true);
-        stage.getViewport().setScreenPosition(x, y);
+        viewport.update(width, height, true);
+        viewport.setScreenPosition(x, y);
+        uiRoot.updateBounds(viewport);
 
-        // stage.getViewport().apply();
-        stage.draw();
+        graphics.beginRender(viewport);
+        graphics.render(uiRoot, null);
+        graphics.endRender();
     }
 
     @Override
     public void dispose() {
-        stage.dispose();
+        font.dispose();
     }
 }

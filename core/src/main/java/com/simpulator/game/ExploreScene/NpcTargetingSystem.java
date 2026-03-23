@@ -3,6 +3,7 @@ package com.simpulator.game.ExploreScene;
 import com.badlogic.gdx.math.Vector3;
 import java.util.List;
 
+// TODO: use center of the screen instead of top for targetting
 /**
  * Determines which NPC (if any) the player is currently looking at
  * and is close enough to interact with.
@@ -41,10 +42,6 @@ public class NpcTargetingSystem {
         Vector3 camDir = playerCamera.getCamera().direction.cpy().nor();
 
         for (NpcEntity npc : npcs) {
-            if (!npc.canTrade()) {
-                continue;
-            }
-
             Vector3 npcPos = npc.getPosition();
             Vector3 toNpc = npcPos.sub(camPos);
             float distance = toNpc.len();

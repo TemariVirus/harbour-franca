@@ -141,7 +141,7 @@ public class UIRelativeLayout implements UILayout {
             case START:
                 return Math.min(start + padStart, end);
             case CENTER:
-                return (start + end - size) / 2;
+                return (start + padStart + end - padEnd - size) / 2;
             case END:
                 return Math.max(end - padEnd - size, start);
             default:
