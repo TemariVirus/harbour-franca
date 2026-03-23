@@ -3,7 +3,6 @@ package com.simpulator.game.ui;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.simpulator.engine.graphics.TextureBatch;
-import com.simpulator.engine.input.MouseManager.MouseMoveEvent;
 import com.simpulator.engine.ui.Rect;
 import com.simpulator.engine.ui.UIElement;
 import com.simpulator.engine.ui.UILayout;
@@ -28,30 +27,28 @@ public class Box extends UIElement {
         this.fillColor = fillColor;
     }
 
+    public int getBorderWidth() {
+        return borderWidth;
+    }
+
     public void setBorderWidth(int borderWidth) {
         this.borderWidth = borderWidth;
+    }
+
+    public Color getBorderColor() {
+        return borderColor;
     }
 
     public void setBorderColor(Color borderColor) {
         this.borderColor = borderColor;
     }
 
-    public void setFillColor(Color fillColor) {
-        this.fillColor = fillColor;
+    public Color getFillColor() {
+        return fillColor;
     }
 
-    /**
-     * Adds a listen that changes the fill color when the mouse hovers over the box.
-     * This object is returned to allow for chaining.
-     */
-    public Box addHoverColor(Color normalColor, Color hoverColor) {
-        addListener(MouseMoveEvent.class, e -> {
-            setFillColor(
-                getBounds().contains(e.x, e.y) ? hoverColor : normalColor
-            );
-            return false;
-        });
-        return this;
+    public void setFillColor(Color fillColor) {
+        this.fillColor = fillColor;
     }
 
     @Override

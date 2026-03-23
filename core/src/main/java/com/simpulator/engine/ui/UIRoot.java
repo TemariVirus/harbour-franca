@@ -69,6 +69,9 @@ public class UIRoot extends UIElement implements Renderable {
         walker.push(this);
         while (!walker.isEmpty()) {
             UIElement element = walker.pop();
+            if (!element.isVisible()) {
+                continue;
+            }
             if (!element.handleEvent(event)) {
                 // Parent did not handle event, pass it to children
                 walker.push(element);

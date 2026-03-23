@@ -12,6 +12,9 @@ import com.simpulator.engine.input.MouseManager.MouseButton;
 import com.simpulator.engine.input.MouseManager.MouseButtonEvent;
 import com.simpulator.engine.input.MouseManager.MouseMoveEvent;
 import com.simpulator.engine.input.MouseManager.MouseScrollEvent;
+import com.simpulator.engine.ui.UIListener;
+import com.simpulator.engine.ui.UIRelativeLayout;
+import com.simpulator.engine.ui.UIRelativeLayout.Alignment;
 import com.simpulator.engine.ui.UIRoot;
 
 public final class UiHelper {
@@ -136,5 +139,47 @@ public final class UiHelper {
                 )
             );
         };
+    }
+
+    /**
+     * Adds a listen that changes the fill color when the mouse hovers over the box.
+     */
+    public static Box addHoverColor(Box box, Color hoverColor) {
+        Color normalColor = box.getFillColor();
+        box.addListener(MouseMoveEvent.class, e -> {
+            box.setFillColor(
+                box.getBounds().contains(e.x, e.y) ? hoverColor : normalColor
+            );
+            return false;
+        });
+        return box;
+    }
+
+    public static Box createButton(
+        Box box,
+        Color hoverColor,
+        Text text,
+        float fontSize,
+        UIListener<MouseButtonEvent> onClick
+    ) {
+        text.setLayout(
+            new UIRelativeLayout.Builder()
+                .yAlignment(Alignment.CENTER)
+                .height(fontSize)
+                .getLayout()
+        );
+        box.addChild(text);
+        addHoverColor(box, hoverColor);
+        box.addListener(MouseButtonEvent.class, e -> {
+            if (
+                e.type != ButtonBindType.DOWN ||
+                e.button != MouseButton.LEFT.getCode() ||
+                !box.getBounds().contains(e.x, e.y)
+            ) {
+                return false;
+            }
+            return onClick.handle(e);
+        });
+        return box;
     }
 }

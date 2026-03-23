@@ -73,12 +73,24 @@ public class Text extends UIElement {
         invalidateWidth();
     }
 
+    public Alignment getXAnchor() {
+        return xAnchor;
+    }
+
     public void setXAnchor(Alignment xAnchor) {
         this.xAnchor = xAnchor;
     }
 
+    public Color getColor() {
+        return color;
+    }
+
     public void setColor(Color color) {
         this.color = color;
+    }
+
+    public float getTextWidth() {
+        return width;
     }
 
     @Override

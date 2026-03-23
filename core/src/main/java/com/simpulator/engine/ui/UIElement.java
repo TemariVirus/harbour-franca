@@ -48,8 +48,7 @@ public abstract class UIElement {
     }
 
     /**
-     * Sets whether this element and its children should be rendered.
-     * This does not affect whether the element will receive events.
+     * Sets whether this element and its children should be rendered and receive events.
      * This object is returned to allow for chaining.
      */
     public UIElement setVisible(boolean visible) {

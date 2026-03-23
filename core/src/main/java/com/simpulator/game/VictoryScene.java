@@ -13,7 +13,6 @@ import com.simpulator.engine.input.Action;
 import com.simpulator.engine.input.ButtonManager.ButtonBindType;
 import com.simpulator.engine.input.KeyboardManager;
 import com.simpulator.engine.input.MouseManager;
-import com.simpulator.engine.input.MouseManager.MouseButton;
 import com.simpulator.engine.scene.Scene;
 import com.simpulator.engine.scene.SceneManager;
 import com.simpulator.engine.ui.UIRelativeLayout;
@@ -139,43 +138,33 @@ public class VictoryScene extends Scene {
         final int BORDER_WIDTH = 2;
         final float FONT_SIZE = 13f;
 
-        Box button = new Box(
-            BORDER_WIDTH,
-            TITLE_COLOR,
-            BUTTON_COLOR,
-            new UIRelativeLayout.Builder()
-                .xAlignment(Alignment.CENTER)
-                .yAlignment(Alignment.END)
-                .padBottom(y)
-                .width(WIDTH)
-                .height(HEIGHT)
-                .getLayout()
-        );
-        button.addHoverColor(BUTTON_COLOR, BUTTON_HOVER_COLOR);
-        button.addListener(MouseManager.MouseButtonEvent.class, e -> {
-            if (
-                e.button == MouseButton.LEFT.getCode() &&
-                e.type == ButtonBindType.DOWN &&
-                button.getBounds().contains(e.x, e.y)
-            ) {
-                onClick.act(e);
-            }
-            return true;
-        });
-
-        button.addChild(
+        Box button = UiHelper.createButton(
+            new Box(
+                BORDER_WIDTH,
+                TITLE_COLOR,
+                BUTTON_COLOR,
+                new UIRelativeLayout.Builder()
+                    .xAlignment(Alignment.CENTER)
+                    .yAlignment(Alignment.END)
+                    .padBottom(y)
+                    .width(WIDTH)
+                    .height(HEIGHT)
+                    .getLayout()
+            ),
+            BUTTON_HOVER_COLOR,
             new Text(
                 text,
                 font,
                 Text.Alignment.CENTER,
                 TEXT_COLOR,
-                new UIRelativeLayout.Builder()
-                    .yAlignment(Alignment.CENTER)
-                    .height(FONT_SIZE)
-                    .getLayout()
-            )
+                new UIRelativeLayout()
+            ),
+            FONT_SIZE,
+            e -> {
+                onClick.act(e);
+                return true;
+            }
         );
-
         uiRoot.addChild(button);
     }
 
