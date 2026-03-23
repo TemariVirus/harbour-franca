@@ -23,7 +23,7 @@ public class EntityManager {
         this.entities.add(entity);
     }
 
-    public void addAll(List<Entity> entities) {
+    public void addAll(List<? extends Entity> entities) {
         this.entities.addAll(entities);
     }
 

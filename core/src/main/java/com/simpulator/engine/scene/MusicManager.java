@@ -4,6 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Disposable;
+import java.util.HashSet;
+import java.util.Set;
 
 /** Manages streaming music files. */
 public class MusicManager implements Disposable {
@@ -28,6 +30,7 @@ public class MusicManager implements Disposable {
     }
 
     private final MusicCache musicCache = new MusicCache();
+    private final Set<String> playingMusics = new HashSet<>();
     private float volume = 1f;
 
     /** Get the current volume. */
@@ -55,6 +58,7 @@ public class MusicManager implements Disposable {
         if (!music.isPlaying()) {
             music.setVolume(volume);
             music.play();
+            playingMusics.add(path);
         }
     }
 
@@ -63,6 +67,7 @@ public class MusicManager implements Disposable {
         Music music = musicCache.get(path);
         if (music.isPlaying()) {
             music.pause();
+            playingMusics.remove(path);
         }
     }
 
@@ -71,7 +76,19 @@ public class MusicManager implements Disposable {
         Music music = musicCache.get(path);
         if (music.isPlaying()) {
             music.stop();
+            playingMusics.remove(path);
         }
+    }
+
+    /** Stop playback of all currently playing music files. startMusic() will start from the beginning. */
+    public void stopAllMusic() {
+        for (String path : playingMusics) {
+            Music music = musicCache.get(path);
+            if (music.isPlaying()) {
+                music.stop();
+            }
+        }
+        playingMusics.clear();
     }
 
     @Override
