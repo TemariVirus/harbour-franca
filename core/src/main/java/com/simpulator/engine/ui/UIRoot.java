@@ -33,6 +33,18 @@ public class UIRoot extends UIElement implements Renderable {
     }
 
     @Override
+    public void update(float deltaTime) {
+        UIWalker walker = new UIWalker();
+        walker.push(this);
+
+        while (!walker.isEmpty()) {
+            UIElement element = walker.pop();
+            element.update(deltaTime);
+            walker.push(element);
+        }
+    }
+
+    @Override
     public void render(TextureBatch batch) {
         UIWalker walker = new UIWalker();
         walker.push(this);

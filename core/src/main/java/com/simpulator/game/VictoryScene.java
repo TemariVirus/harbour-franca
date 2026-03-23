@@ -202,6 +202,7 @@ public class VictoryScene extends Scene {
     public void update(float deltaTime) {
         km.update(deltaTime, Float.NaN);
         mm.update(deltaTime, Float.NaN);
+        uiRoot.update(deltaTime);
     }
 
     @Override
