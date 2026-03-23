@@ -2,31 +2,32 @@ package com.simpulator.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.GlyphLayout;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import com.simpulator.engine.Widget;
 import com.simpulator.engine.graphics.GraphicsManager;
-import com.simpulator.engine.graphics.Renderable;
-import com.simpulator.engine.graphics.TextureBatch;
+import com.simpulator.engine.input.ButtonManager.ButtonBindType;
+import com.simpulator.engine.input.MouseManager;
+import com.simpulator.engine.input.MouseManager.MouseButton;
+import com.simpulator.engine.input.MouseManager.MouseButtonEvent;
+import com.simpulator.engine.input.MouseManager.MouseMoveEvent;
+import com.simpulator.engine.ui.UIRelativeLayout;
+import com.simpulator.engine.ui.UIRelativeLayout.Alignment;
+import com.simpulator.engine.ui.UIRoot;
+import com.simpulator.game.ui.Box;
+import com.simpulator.game.ui.Text;
+import com.simpulator.game.ui.UiHelper;
 
-public class TradingUI
-    implements InputProcessor, Widget, Renderable, Disposable
-{
+public class TradingUI implements Widget, Disposable {
 
     public enum State {
         HIDDEN,
         CHOOSING_DIALOGUE,
         TRADE_READY,
-        TRADE_RESULT
+        TRADE_RESULT,
     }
 
     public interface TradingUIListener {
@@ -37,142 +38,555 @@ public class TradingUI
         void onTimeUp();
     }
 
+    private static final int CHOICE_COUNT = 3;
+
+    // TODO: make skin class and skin factory
+    // --- Colors for Ancient France Maritime Vibe ---
+    private static final Color TEXT_BACKGROUND = new Color(0, 0, 0, 0.6f);
+    private static final Color goldTrim = new Color(0.83f, 0.68f, 0.21f, 1f);
+    private static final Color navyPanel = new Color(
+        0.10f,
+        0.15f,
+        0.23f,
+        0.92f
+    );
+    private static final Color parchmentText = new Color(
+        0.96f,
+        0.87f,
+        0.70f,
+        1f
+    );
+    private static final Color highlightGold = new Color(
+        0.95f,
+        0.81f,
+        0.24f,
+        1f
+    ); // for active
+    private static final Color crimsonCancel = new Color(0.6f, 0.15f, 0.2f, 1f);
+    private static final Color cancelHover = new Color(0.7f, 0.2f, 0.25f, 1f);
+    private static final Color seaGreenConfirm = new Color(
+        0.17f,
+        0.5f,
+        0.33f,
+        1f
+    );
+    private static final Color confirmHover = new Color(0.2f, 0.6f, 0.4f, 1f);
+    private static final Color BUTTON_HOVER_COLOR = new Color(
+        0.16f,
+        0.22f,
+        0.32f,
+        1f
+    );
+
+    final float SIDE_MARGIN = 30;
+    final float TOP_MARGIN = 70;
+    final float FONT_SIZE = 12;
+
+    final float ITEM_BOX_WIDTH = 160;
+    final float ITEM_BOX_HEIGHT = 160;
+    final float RARITY_BOX_HEIGHT = 40;
+    final float LEFT_BOX_GAP = 10;
+
+    final float CHOICE_SPACE = 15;
+    final float CHOICE_TOTAL_HEIGHT =
+        ITEM_BOX_HEIGHT + LEFT_BOX_GAP + RARITY_BOX_HEIGHT;
+    final float CHOICE_WIDTH = 220;
+    final float CHOICE_HEIGHT =
+        (CHOICE_TOTAL_HEIGHT - (CHOICE_COUNT - 1) * CHOICE_SPACE) /
+        CHOICE_COUNT;
+
+    final float CONFIRM_CANCEL_WIDTH = 120;
+    final float CONFIRM_CANCEL_HEIGHT = 45;
+    final float CONFIRM_CANCEL_GAP = 30;
+    final float DIALOGUE_MARGIN = 8;
+    final float DIALOGUE_HEIGHT = 120;
+
     private State state;
-    private TradingUIListener listener;
+    private TradingUIListener listener = null;
+    private MouseManager mouse;
 
-    // Fonts per language — loaded once, reused for every trade interaction
-    private BitmapFont jpFont;  // Japanese + ASCII (jp.fnt)
-    private BitmapFont zhFont;  // Chinese + ASCII  (zh.fnt)
-    private BitmapFont viFont;  // Vietnamese + ASCII (vi.fnt)
-    private BitmapFont font;    // Active font — swapped per NPC in show()
-    private GlyphLayout layout;
-    private ExtendViewport viewport;
-    private TextureRegion white;
+    private Viewport viewport;
+    private BitmapFont font;
+    private UIRoot uiRoot;
 
-    // Timer
-    private float timeLeft;
-    private boolean timerActive;
-
-    private String npcName = "";
-    private String[] dialogueOptions = new String[3];
+    private float timeLeft = 0;
     private String[] offeredItemNames = new String[0];
     private String[] offeredItemRarities = new String[0];
-    private int currentItemIndex = 0;
-    private int carouselSize = 0;
-    private String innerThought = "";
-    private String resultText = "";
+    private int offeredItemIndex = 0;
     private int selectedDialogueIndex = -1;
 
-    // Layout regions
-    private Rectangle[] btnRects = new Rectangle[3];
-    private Rectangle confirmRect = new Rectangle();
-    private Rectangle cancelRect = new Rectangle();
-    private Rectangle prevBtnRect = new Rectangle();
-    private Rectangle nextBtnRect = new Rectangle();
+    private Text timerText;
+    private Text offeredItemText;
+    private Text rarityText;
+    private Text choiceTexts[] = new Text[CHOICE_COUNT];
+    private Text nameText;
+    private Text dialogueText;
+    private Box confirmButton;
+    private Box cancelButton;
 
-    public TradingUI(Skin skin) {
+    public TradingUI() {
         this.state = State.HIDDEN;
+        this.mouse = new MouseManager();
+        this.viewport = new ExtendViewport(720, 480);
 
-        // Load Japanese font (used by Japanese merchant + all ASCII UI labels)
-        this.jpFont = new BitmapFont(Gdx.files.internal("fonts/jp.fnt"));
-        this.jpFont.getData().setScale(0.67f);
+        buildUI();
+    }
 
-        // Load Chinese font if available; fall back to jpFont if not yet generated
-        if (Gdx.files.internal("fonts/zh.fnt").exists()) {
-            this.zhFont = new BitmapFont(Gdx.files.internal("fonts/zh.fnt"));
-            this.zhFont.getData().setScale(0.67f);
+    private void buildUI() {
+        this.font = new BitmapFont(Gdx.files.internal("fonts/jp.fnt"));
+        uiRoot = new UIRoot();
+        UiHelper.setupUiMouseHandlers(mouse, viewport, uiRoot);
+
+        // --- Top ---
+        // Title
+        uiRoot.addChild(
+            new Text(
+                "Trade Offer",
+                font,
+                Text.Alignment.CENTER,
+                goldTrim,
+                new UIRelativeLayout.Builder()
+                    .padTop(60)
+                    .height(FONT_SIZE)
+                    .getLayout()
+            )
+        );
+        // Timer
+        timerText = new Text(
+            "",
+            font,
+            Text.Alignment.CENTER,
+            parchmentText,
+            new UIRelativeLayout.Builder()
+                .padTop(90)
+                .height(FONT_SIZE)
+                .getLayout()
+        );
+        uiRoot.addChild(timerText);
+
+        // --- Left Column ---
+        uiRoot.addChild(
+            new Box(
+                0,
+                null,
+                TEXT_BACKGROUND,
+                new UIRelativeLayout.Builder()
+                    .padLeft(SIDE_MARGIN - 5)
+                    .padTop(TOP_MARGIN - 35)
+                    .width(ITEM_BOX_WIDTH + 10)
+                    .height(FONT_SIZE + 10)
+                    .getLayout()
+            ).addChild(
+                new Text(
+                    "Merchant Receives",
+                    font,
+                    Text.Alignment.CENTER,
+                    parchmentText,
+                    new UIRelativeLayout.Builder()
+                        .yAlignment(Alignment.CENTER)
+                        .height(FONT_SIZE)
+                        .getLayout()
+                )
+            )
+        );
+
+        // Item box
+        offeredItemText = new Text(
+            // TODO: replace with item image
+            "",
+            font,
+            Text.Alignment.CENTER,
+            parchmentText,
+            new UIRelativeLayout.Builder()
+                .yAlignment(Alignment.CENTER)
+                .height(FONT_SIZE)
+                .getLayout()
+        );
+        uiRoot.addChild(
+            new Box(
+                2,
+                goldTrim,
+                navyPanel,
+                new UIRelativeLayout.Builder()
+                    .padLeft(SIDE_MARGIN)
+                    .padTop(TOP_MARGIN)
+                    .width(ITEM_BOX_WIDTH)
+                    .height(ITEM_BOX_HEIGHT)
+                    .getLayout()
+            )
+                .addChild(offeredItemText)
+                .addChild(makeItemArrowButton(true))
+                .addChild(makeItemArrowButton(false))
+        );
+
+        // Rarity box
+        rarityText = new Text(
+            "",
+            font,
+            Text.Alignment.CENTER,
+            parchmentText,
+            new UIRelativeLayout.Builder()
+                .yAlignment(Alignment.CENTER)
+                .height(FONT_SIZE)
+                .getLayout()
+        );
+        uiRoot.addChild(
+            new Box(
+                2,
+                goldTrim,
+                navyPanel,
+                new UIRelativeLayout.Builder()
+                    .padLeft(SIDE_MARGIN)
+                    .padTop(TOP_MARGIN + ITEM_BOX_HEIGHT + LEFT_BOX_GAP)
+                    .width(ITEM_BOX_WIDTH)
+                    .height(RARITY_BOX_HEIGHT)
+                    .getLayout()
+            ).addChild(rarityText)
+        );
+
+        // --- Right Column ---
+        uiRoot.addChild(
+            new Box(
+                0,
+                null,
+                TEXT_BACKGROUND,
+                new UIRelativeLayout.Builder()
+                    .xAlignment(Alignment.END)
+                    .padRight(SIDE_MARGIN + (CHOICE_WIDTH - 110) / 2)
+                    .padTop(TOP_MARGIN - 35)
+                    .width(110)
+                    .height(FONT_SIZE + 10)
+                    .getLayout()
+            ).addChild(
+                new Text(
+                    "You Receive",
+                    font,
+                    Text.Alignment.CENTER,
+                    parchmentText,
+                    new UIRelativeLayout.Builder()
+                        .yAlignment(Alignment.CENTER)
+                        .height(FONT_SIZE)
+                        .getLayout()
+                )
+            )
+        );
+
+        // Choice buttons
+        for (int i = 0; i < choiceTexts.length; i++) {
+            Box button = makeDialogueOptionButton(
+                TOP_MARGIN + i * (CHOICE_HEIGHT + CHOICE_SPACE),
+                i
+            );
+            choiceTexts[i] = new Text(
+                "",
+                font,
+                Text.Alignment.CENTER,
+                parchmentText,
+                new UIRelativeLayout.Builder()
+                    .yAlignment(Alignment.CENTER)
+                    .height(FONT_SIZE)
+                    .getLayout()
+            );
+            button.addChild(choiceTexts[i]);
+            uiRoot.addChild(button);
+        }
+
+        // --- Bottom Area ---
+        // Confirm/cancel buttons
+        confirmButton = UiHelper.createButton(
+            new Box(
+                2,
+                goldTrim,
+                seaGreenConfirm,
+                new UIRelativeLayout.Builder()
+                    .xAlignment(Alignment.CENTER)
+                    .yAlignment(Alignment.END)
+                    .padBottom(SIDE_MARGIN + DIALOGUE_HEIGHT + 24)
+                    .padRight(CONFIRM_CANCEL_WIDTH + CONFIRM_CANCEL_GAP / 2)
+                    .width(CONFIRM_CANCEL_WIDTH)
+                    .height(CONFIRM_CANCEL_HEIGHT)
+                    .getLayout()
+            ),
+            confirmHover,
+            new Text(
+                "Confirm",
+                font,
+                Text.Alignment.CENTER,
+                parchmentText,
+                new UIRelativeLayout()
+            ),
+            FONT_SIZE,
+            e -> {
+                if (!isInteractive()) return false;
+                if (listener != null) listener.onTradeConfirmed(
+                    offeredItemIndex
+                );
+                return true;
+            }
+        );
+        confirmButton.setVisible(false);
+        uiRoot.addChild(confirmButton);
+
+        cancelButton = UiHelper.createButton(
+            new Box(
+                2,
+                goldTrim,
+                crimsonCancel,
+                new UIRelativeLayout.Builder()
+                    .xAlignment(Alignment.CENTER)
+                    .yAlignment(Alignment.END)
+                    .padBottom(SIDE_MARGIN + DIALOGUE_HEIGHT + 24)
+                    .padLeft(CONFIRM_CANCEL_WIDTH + CONFIRM_CANCEL_GAP / 2)
+                    .width(CONFIRM_CANCEL_WIDTH)
+                    .height(CONFIRM_CANCEL_HEIGHT)
+                    .getLayout()
+            ),
+            cancelHover,
+            new Text(
+                "Cancel",
+                font,
+                Text.Alignment.CENTER,
+                parchmentText,
+                new UIRelativeLayout()
+            ),
+            FONT_SIZE,
+            e -> {
+                if (!isInteractive()) return false;
+                if (listener != null) listener.onTradeCancelled();
+                hide();
+                return true;
+            }
+        );
+        cancelButton.setVisible(false);
+        uiRoot.addChild(cancelButton);
+
+        // Dialogue box
+        nameText = new Text(
+            "",
+            font,
+            Text.Alignment.START,
+            goldTrim,
+            new UIRelativeLayout.Builder()
+                .padLeft(DIALOGUE_MARGIN)
+                .padTop(DIALOGUE_MARGIN)
+                .height(FONT_SIZE)
+                .getLayout()
+        );
+        dialogueText = new Text(
+            "",
+            font,
+            Text.Alignment.START,
+            parchmentText,
+            new UIRelativeLayout.Builder()
+                .padLeft(DIALOGUE_MARGIN)
+                .padTop(DIALOGUE_MARGIN + FONT_SIZE + 12)
+                .height(FONT_SIZE)
+                .getLayout()
+        );
+        uiRoot.addChild(
+            new Box(
+                2,
+                goldTrim,
+                navyPanel,
+                new UIRelativeLayout.Builder()
+                    .yAlignment(Alignment.END)
+                    .padLeft(SIDE_MARGIN)
+                    .padRight(SIDE_MARGIN)
+                    .padBottom(SIDE_MARGIN)
+                    .height(DIALOGUE_HEIGHT)
+                    .getLayout()
+            )
+                .addChild(nameText)
+                .addChild(dialogueText)
+        );
+    }
+
+    private Box makeItemArrowButton(boolean isLeft) {
+        final float WIDTH = 30;
+        final float HEIGHT = 40;
+        final float X_OFFSET = 5;
+        final int step = isLeft ? -1 : 1;
+
+        UIRelativeLayout.Builder layout = new UIRelativeLayout.Builder()
+            .xAlignment(isLeft ? Alignment.START : Alignment.END)
+            .yAlignment(Alignment.CENTER)
+            .width(WIDTH)
+            .height(HEIGHT);
+        if (isLeft) {
+            layout.padLeft(-WIDTH + X_OFFSET);
         } else {
-            Gdx.app.log("TradingUI", "zh.fnt not found — falling back to jp.fnt for Chinese");
-            this.zhFont = this.jpFont;
+            layout.padRight(-WIDTH + X_OFFSET);
         }
 
-        // Load Vietnamese font if available; fall back to jpFont if not yet generated
-        if (Gdx.files.internal("fonts/vi.fnt").exists()) {
-            this.viFont = new BitmapFont(Gdx.files.internal("fonts/vi.fnt"));
-            this.viFont.getData().setScale(0.67f);
-        } else {
-            Gdx.app.log("TradingUI", "vi.fnt not found — falling back to jp.fnt for Vietnamese");
-            this.viFont = this.jpFont;
-        }
+        Box button = UiHelper.createButton(
+            new Box(2, goldTrim, navyPanel, layout.getLayout()),
+            BUTTON_HOVER_COLOR,
+            new Text(
+                isLeft ? "<" : ">",
+                font,
+                Text.Alignment.CENTER,
+                parchmentText,
+                new UIRelativeLayout()
+            ),
+            12,
+            e -> {
+                if (!isInteractive()) return false;
+                setOfferedItemIndex(offeredItemIndex + step);
+                return true;
+            }
+        );
 
-        // Default to Japanese font until show() is called
-        this.font = jpFont;
+        return button;
+    }
 
-        this.layout = new GlyphLayout();
-        this.white = new TextureRegion(skin.get("white", Texture.class));
-
-        // Use a logical scaling resolution.
-        // Window scales proportionally upwards retaining original item proportions without clipping!
-        this.viewport = new ExtendViewport(640, 480);
-
-        for (int i = 0; i < 3; i++) {
-            btnRects[i] = new Rectangle();
-        }
+    private Box makeDialogueOptionButton(float y, int index) {
+        Box button = new Box(
+            2,
+            goldTrim,
+            navyPanel,
+            new UIRelativeLayout.Builder()
+                .xAlignment(Alignment.END)
+                .padRight(SIDE_MARGIN)
+                .padTop(y)
+                .width(CHOICE_WIDTH)
+                .height(CHOICE_HEIGHT)
+                .getLayout()
+        );
+        button
+            .addListener(MouseButtonEvent.class, e -> {
+                if (
+                    !isInteractive() ||
+                    e.button != MouseButton.LEFT.getCode() ||
+                    e.type != ButtonBindType.DOWN ||
+                    !button.getBounds().contains(e.x, e.y)
+                ) return false;
+                if (
+                    state != State.TRADE_READY || selectedDialogueIndex != index
+                ) {
+                    state = State.TRADE_READY;
+                    selectedDialogueIndex = index;
+                    button.setFillColor(highlightGold);
+                    if (listener != null) listener.onDialogueSelected(index);
+                }
+                confirmButton.setVisible(true);
+                cancelButton.setVisible(true);
+                return true;
+            })
+            .addListener(MouseMoveEvent.class, e -> {
+                if (!isInteractive()) return false;
+                if (
+                    state == State.TRADE_READY && selectedDialogueIndex == index
+                ) {
+                    button.setFillColor(highlightGold);
+                } else {
+                    button.setFillColor(
+                        button.getBounds().contains(e.x, e.y)
+                            ? BUTTON_HOVER_COLOR
+                            : navyPanel
+                    );
+                }
+                return false;
+            });
+        return button;
     }
 
     @Override
     public InputProcessor getInputProcessor() {
-        return this;
+        return mouse;
     }
 
     public void setListener(TradingUIListener listener) {
         this.listener = listener;
     }
 
-    public void show(String npcName, String language, String[] options, String[] itemNames, String[] itemRarities) {
-        this.state = State.CHOOSING_DIALOGUE;
-        this.timeLeft = 90f; // 1 min 30 sec
-        this.timerActive = true;
-        this.npcName = npcName;
-        this.carouselSize = (itemNames != null) ? itemNames.length : 0;
-        this.offeredItemNames = (itemNames != null) ? itemNames.clone() : new String[0];
-        this.offeredItemRarities = (itemRarities != null) ? itemRarities.clone() : new String[0];
-        this.currentItemIndex = 0;
-        this.innerThought = "";
-        this.selectedDialogueIndex = -1;
+    public void show(
+        String npcName,
+        String[] options,
+        String[] itemNames,
+        String[] itemRarities
+    ) {
+        state = State.CHOOSING_DIALOGUE;
+        timeLeft = 90f; // 1 min 30 sec
+        updateTimer(0);
+        offeredItemNames = itemNames.clone();
+        offeredItemRarities = itemRarities.clone();
+        offeredItemIndex = 0;
+        selectedDialogueIndex = -1;
 
-        // Switch to the correct font for this NPC's language
-        if ("Chinese".equals(language)) {
-            this.font = zhFont;
-        } else if ("Vietnamese".equals(language)) {
-            this.font = viFont;
-        } else {
-            this.font = jpFont; // Japanese + default
+        for (int i = 0; i < choiceTexts.length && i < options.length; i++) {
+            choiceTexts[i].setText(options[i]);
         }
+        nameText.setText(npcName);
 
-        for (int i = 0; i < 3 && i < options.length; i++) {
-            this.dialogueOptions[i] = options[i];
+        confirmButton.setVisible(false);
+        cancelButton.setVisible(false);
+        setOfferedItemIndex(offeredItemIndex);
+    }
+
+    private void setOfferedItemIndex(int i) {
+        if (i < 0) {
+            i = (i % offeredItemNames.length) + offeredItemNames.length;
         }
+        offeredItemIndex = i % offeredItemNames.length;
+
+        offeredItemText.setText(
+            "Picture of:\n" + offeredItemNames[offeredItemIndex]
+        );
+
+        String currentRarity =
+            offeredItemRarities[offeredItemIndex].toLowerCase();
+        Color rarityColor = Color.WHITE;
+        if (currentRarity.contains("common")) rarityColor = Color.LIGHT_GRAY;
+        else if (currentRarity.contains("rare")) rarityColor = Color.ROYAL;
+        else if (currentRarity.contains("epic")) rarityColor = Color.PURPLE;
+        else if (currentRarity.contains("legendary")) rarityColor = Color.GOLD;
+        rarityText.setColor(rarityColor);
+        rarityText.setText("Rarity: " + offeredItemRarities[offeredItemIndex]);
+
+        if (listener != null) listener.onNpcItemChanged(offeredItemIndex);
+    }
+
+    private void updateTimer(float deltaTime) {
+        timeLeft -= deltaTime;
+        if (timeLeft < 0) timeLeft = 0;
+        int m = (int) (timeLeft / 60);
+        int s = (int) (timeLeft % 60);
+        timerText.setText(String.format("%d:%02d", m, s));
     }
 
     public void setInnerThoughts(String text) {
-        this.innerThought = text;
+        dialogueText.setText(text);
     }
 
     public void showTradeResult(String resultText) {
-        this.state = State.TRADE_RESULT;
-        this.timerActive = false;
-        this.resultText = resultText;
+        state = State.TRADE_RESULT;
+        confirmButton.setVisible(false);
+        cancelButton.setVisible(false);
+        dialogueText.setText(resultText);
     }
 
     public void hide() {
-        this.state = State.HIDDEN;
-        this.timerActive = false;
+        state = State.HIDDEN;
     }
 
     public boolean isVisible() {
         return state != State.HIDDEN;
     }
 
+    public boolean isInteractive() {
+        return state == State.CHOOSING_DIALOGUE || state == State.TRADE_READY;
+    }
+
     @Override
     public void update(float deltaTime) {
         if (state == State.HIDDEN) return;
 
-        if (timerActive) {
-            timeLeft -= deltaTime;
+        mouse.update(deltaTime, Float.NaN);
+        uiRoot.update(deltaTime);
+        if (isInteractive()) {
+            updateTimer(deltaTime);
             if (timeLeft <= 0) {
-                timeLeft = 0;
-                timerActive = false;
+                state = State.TRADE_RESULT;
                 if (listener != null) listener.onTimeUp();
             }
         }
@@ -188,255 +602,17 @@ public class TradingUI
     ) {
         if (!isVisible()) return;
 
-        // Apply dynamic projection to prevent maximizing distortion
         viewport.update(width, height, true);
         viewport.setScreenPosition(x, y);
+        uiRoot.updateBounds(viewport);
 
         graphics.beginRender(viewport);
-        graphics.render(this, null);
+        graphics.render(uiRoot, null);
         graphics.endRender();
     }
 
     @Override
-    public boolean isVisible(Camera camera) {
-        return this.isVisible();
-    }
-
-    @Override
-    public void render(TextureBatch batch, Camera camera) {
-        // TODO: split this into a Renderable for each box/text
-        float w = viewport.getWorldWidth();
-        float h = viewport.getWorldHeight();
-
-        // --- Colors for Ancient France Maritime Vibe ---
-        Color goldTrim = new Color(0.83f, 0.68f, 0.21f, 1f);
-        Color navyPanel = new Color(0.10f, 0.15f, 0.23f, 0.92f);
-        Color parchmentText = new Color(0.96f, 0.87f, 0.70f, 1f);
-        Color highlightGold = new Color(0.95f, 0.81f, 0.24f, 1f); // for hovered/active
-        Color crimsonCancel = new Color(0.6f, 0.15f, 0.2f, 1f);
-        Color seaGreenConfirm = new Color(0.17f, 0.5f, 0.33f, 1f);
-
-        // --- Left Column ---
-        float leftMargin = 30;
-        float itemBoxY = h / 2 + 10; // moved up
-        
-        // Item Box
-        drawBox(batch, leftMargin, itemBoxY, 160, 160, goldTrim, navyPanel);
-        
-        // Rarity Box
-        drawBox(batch, leftMargin, itemBoxY - 50, 160, 40, goldTrim, navyPanel);
-
-        // Arrow Buttons
-        float itemBoxW = 160;
-        float itemBoxH = 160;
-        prevBtnRect.set(leftMargin - 25, itemBoxY + itemBoxH / 2 - 20, 30, 40);
-        nextBtnRect.set(leftMargin + itemBoxW - 5, itemBoxY + itemBoxH / 2 - 20, 30, 40);
-
-        drawBox(batch, prevBtnRect.x, prevBtnRect.y, prevBtnRect.width, prevBtnRect.height, goldTrim, navyPanel);
-        drawBox(batch, nextBtnRect.x, nextBtnRect.y, nextBtnRect.width, nextBtnRect.height, goldTrim, navyPanel);
-
-        // --- Bottom Area: Dialogue Box ---
-        float dialogueBoxY = 50;
-        float dialogueBoxH = 100;
-        drawBox(batch, 100, dialogueBoxY, w - 200, dialogueBoxH, goldTrim, navyPanel);
-
-        // --- Right Column: Dialogue Buttons ---
-        float rightMargin = w - 280; 
-        float btnYStart = h / 2 + 100;
-        float btnW = 250;
-        float btnH = 60;
-        
-        for (int i = 0; i < 3; i++) {
-            btnRects[i].set(rightMargin, btnYStart - (i * 75), btnW, btnH);
-            Color fill = (state == State.TRADE_READY && selectedDialogueIndex == i) ? highlightGold : navyPanel;
-            drawBox(batch, btnRects[i].x, btnRects[i].y, btnRects[i].width, btnRects[i].height, goldTrim, fill);
-        }
-
-        // --- Center: Confirm/Cancel Buttons ---
-        if (state == State.TRADE_READY) {
-            float cx = w / 2;
-            float cy = 195; 
-            float confirmW = 120;
-            float confirmH = 45;
-            
-            // Moved closer to center to avoid overlap with side columns
-            confirmRect.set(cx - 130, cy, confirmW, confirmH);
-            cancelRect.set(cx + 10, cy, confirmW, confirmH);
-            
-            drawBox(batch, confirmRect.x, confirmRect.y, confirmRect.width, confirmRect.height, goldTrim, seaGreenConfirm);
-            drawBox(batch, cancelRect.x, cancelRect.y, cancelRect.width, cancelRect.height, goldTrim, crimsonCancel);
-        }
-
-        // --- Draw Text ---
-        // Top text
-        font.setColor(goldTrim);
-        layout.setText(font, "Trade Offer");
-        font.draw(batch, "Trade Offer", w / 2 - layout.width / 2, h - 60); 
-
-        // Timer
-        font.setColor(parchmentText);
-        int m = (int)(timeLeft / 60);
-        int s = (int)(timeLeft % 60);
-        String timerStr = String.format("%d:%02d", m, s);
-        layout.setText(font, timerStr);
-        font.draw(batch, timerStr, w / 2 - layout.width / 2, h - 90); 
-
-        // Left text
-        layout.setText(font, "Merchant Receive");
-        font.draw(batch, "Merchant Receive", leftMargin + 80 - layout.width/2, itemBoxY + 190);
-        
-        String currentName = offeredItemNames[currentItemIndex];
-        String currentRarity = offeredItemRarities[currentItemIndex];
-
-        layout.setText(font, "Picture of:\n" + currentName);
-        font.draw(batch, "Picture of:\n" + currentName, leftMargin + 80 - layout.width/2, itemBoxY + 80 + layout.height/2);
-        
-        Color rarityColor = parchmentText;
-        if (currentRarity != null) {
-            String r = currentRarity.toLowerCase();
-            if (r.contains("common")) rarityColor = Color.LIGHT_GRAY;
-            else if (r.contains("rare")) rarityColor = Color.ROYAL;
-            else if (r.contains("epic")) rarityColor = Color.PURPLE;
-            else if (r.contains("legendary")) rarityColor = Color.GOLD;
-        }
-        
-        font.setColor(rarityColor);
-        layout.setText(font, "Rarity: " + currentRarity);
-        font.draw(batch, "Rarity: " + currentRarity, leftMargin + 80 - layout.width/2, itemBoxY - 30 + layout.height/2);
-        font.setColor(parchmentText);
-
-        layout.setText(font, "<");
-        font.draw(batch, "<", prevBtnRect.x + prevBtnRect.width/2 - layout.width/2, prevBtnRect.y + prevBtnRect.height/2 + layout.height/2);
-        layout.setText(font, ">");
-        font.draw(batch, ">", nextBtnRect.x + nextBtnRect.width/2 - layout.width/2, nextBtnRect.y + nextBtnRect.height/2 + layout.height/2);
-
-        // Right text
-        layout.setText(font, "I Receive");
-        font.draw(batch, "I Receive", rightMargin + 125 - layout.width/2, btnYStart + 90);
-        
-        for (int i = 0; i < 3; i++) {
-            if (state == State.TRADE_READY && selectedDialogueIndex == i) font.setColor(Color.BLACK);
-            else font.setColor(parchmentText);
-            
-            layout.setText(font, dialogueOptions[i]);
-            font.draw(batch, dialogueOptions[i], btnRects[i].x + btnRects[i].width/2 - layout.width/2, btnRects[i].y + btnRects[i].height/2 + layout.height/2);
-        }
-        font.setColor(parchmentText);
-
-        // Center text
-        if (state == State.TRADE_READY) {
-            layout.setText(font, "Confirm");
-            font.draw(batch, "Confirm", confirmRect.x + confirmRect.width/2 - layout.width/2, confirmRect.y + confirmRect.height/2 + layout.height/2);
-            
-            layout.setText(font, "Cancel");
-            font.draw(batch, "Cancel", cancelRect.x + cancelRect.width/2 - layout.width/2, cancelRect.y + cancelRect.height/2 + layout.height/2);
-        }
-
-        // Bottom text
-        if (state == State.TRADE_RESULT) {
-            layout.setText(font, resultText);
-            font.draw(batch, resultText, w/2 - layout.width/2, dialogueBoxY + 50 + layout.height/2);
-        } else {
-            String primary = "Trading with " + npcName;
-            layout.setText(font, primary);
-            font.draw(batch, primary, w/2 - layout.width/2, dialogueBoxY + 65 + layout.height/2);
-            
-            if (state == State.TRADE_READY && !innerThought.isEmpty()) {
-                font.setColor(goldTrim);
-                layout.setText(font, innerThought);
-                font.draw(batch, innerThought, w/2 - layout.width/2, dialogueBoxY + 35 + layout.height/2);
-            }
-        }
-    }
-
-    private void drawBox(TextureBatch batch, float x, float y, float width, float height, Color border, Color fill) {
-        batch.setColor(border);
-        batch.draw(white, x - 2, y - 2, width + 4, height + 4);
-        batch.setColor(fill);
-        batch.draw(white, x, y, width, height);
-        batch.setColor(Color.WHITE);
-    }
-
     public void dispose() {
-        jpFont.dispose();
-        if (zhFont != jpFont) {
-            zhFont.dispose();
-        }
-        if (viFont != jpFont) {
-            viFont.dispose();
-        }
+        font.dispose();
     }
-
-    // --- Manual GUI Hitbox Detection ---
-
-    @Override
-    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        // TODO: check for left click
-        // TODO: use MouseManager instead of rolling our own input
-        if (state == State.HIDDEN || state == State.TRADE_RESULT) return false;
-
-        // Use the viewport to correctly unproject real screen touches to virtual coordinates
-        Vector2 worldCoords = viewport.unproject(new Vector2(screenX, screenY));
-        float x = worldCoords.x;
-        float y = worldCoords.y;
-
-        if (state == State.CHOOSING_DIALOGUE || state == State.TRADE_READY) {
-            if (prevBtnRect.contains(x, y)) {
-                currentItemIndex--;
-                if (currentItemIndex < 0) currentItemIndex = carouselSize - 1;
-                if (listener != null) listener.onNpcItemChanged(currentItemIndex);
-                return true;
-            }
-            if (nextBtnRect.contains(x, y)) {
-                currentItemIndex++;
-                if (currentItemIndex >= carouselSize) currentItemIndex = 0;
-                if (listener != null) listener.onNpcItemChanged(currentItemIndex); 
-                return true;
-            }
-        }
-
-        // Check dialogue buttons
-        for (int i = 0; i < 3; i++) {
-            if (btnRects[i].contains(x, y)) {
-                if (state != State.TRADE_READY || selectedDialogueIndex != i) {
-                    state = State.TRADE_READY;
-                    selectedDialogueIndex = i;
-                    if (listener != null) listener.onDialogueSelected(i);
-                }
-                return true;
-            }
-        }
-
-        // Check confirm/cancel
-        if (state == State.TRADE_READY) {
-            if (confirmRect.contains(x, y)) {
-                if (listener != null) listener.onTradeConfirmed(currentItemIndex);
-                return true;
-            }
-            if (cancelRect.contains(x, y)) {
-                if (listener != null) listener.onTradeCancelled();
-                hide();
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    @Override
-    public boolean keyDown(int keycode) { return false; }
-    @Override
-    public boolean keyUp(int keycode) { return false; }
-    @Override
-    public boolean keyTyped(char character) { return false; }
-    @Override
-    public boolean touchUp(int screenX, int screenY, int pointer, int button) { return false; }
-    @Override
-    public boolean touchCancelled(int screenX, int screenY, int pointer, int button) { return false; }
-    @Override
-    public boolean touchDragged(int screenX, int screenY, int pointer) { return false; }
-    @Override
-    public boolean mouseMoved(int screenX, int screenY) { return false; }
-    @Override
-    public boolean scrolled(float amountX, float amountY) { return false; }
 }

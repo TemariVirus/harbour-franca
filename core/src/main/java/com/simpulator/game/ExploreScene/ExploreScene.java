@@ -154,7 +154,7 @@ public class ExploreScene extends Scene {
         hud = new GameHUD();
         syncHUD();
 
-        tradingUI = new TradingUI(hudSkin);
+        tradingUI = new TradingUI();
         tradingUI.setListener(
                 new TradingUI.TradingUIListener() {
                     @Override
@@ -442,7 +442,7 @@ public class ExploreScene extends Scene {
 
         String[] npcDialogue = currentOffer.getNpcDialogueLabels().toArray(new String[0]);
 
-        tradingUI.show(target.getName(), target.getLanguage(), npcDialogue, playerNames, playerRarities);
+        tradingUI.show(target.getName(), npcDialogue, playerNames, playerRarities);
         InputMultiplexer inputMux = new InputMultiplexer();
         inputMux.addProcessor(tradingUI.getInputProcessor());
         inputMux.addProcessor(keyboard);
