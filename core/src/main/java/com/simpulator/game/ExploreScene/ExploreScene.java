@@ -34,6 +34,7 @@ import com.simpulator.game.CuboidEntity;
 import com.simpulator.game.Level;
 import com.simpulator.game.Scenes;
 import com.simpulator.game.SimpleSkin;
+import com.simpulator.game.SkyboxLoader;
 import com.simpulator.game.TiledRenderer;
 import com.simpulator.game.Trading.Item;
 import com.simpulator.game.Trading.PlayerInventory;
@@ -100,29 +101,12 @@ public class ExploreScene extends Scene {
         entityManager.add(playerCamera);
 
         // Load the Sky box
-        if (currentLevel.skyboxTexturePrefix != null) {
-            // TODO: encapsulate
-            TextureRegion[] faces = new TextureRegion[6];
-            faces[0] = new TextureRegion(
-                textures.get(currentLevel.skyboxTexturePrefix + "_ft.png")
+        if (currentLevel.skyboxPath != null) {
+            skybox = SkyboxLoader.load(
+                textures,
+                currentLevel.skyboxPath,
+                camera.far
             );
-            faces[1] = new TextureRegion(
-                textures.get(currentLevel.skyboxTexturePrefix + "_bk.png")
-            );
-            faces[2] = new TextureRegion(
-                textures.get(currentLevel.skyboxTexturePrefix + "_lf.png")
-            );
-            faces[3] = new TextureRegion(
-                textures.get(currentLevel.skyboxTexturePrefix + "_rt.png")
-            );
-            faces[4] = new TextureRegion(
-                textures.get(currentLevel.skyboxTexturePrefix + "_up.png")
-            );
-            faces[5] = new TextureRegion(
-                textures.get(currentLevel.skyboxTexturePrefix + "_dn.png")
-            );
-
-            skybox = new Skybox(faces, camera.far);
         }
 
         sounds.setVolume(Config.volume * 0.01f);

@@ -13,7 +13,7 @@ import com.simpulator.game.Trading.PlayerInventory;
 public class Level {
     public String levelId;
     public String displayName;
-    public String skyboxTexturePrefix;
+    public String skyboxPath;
     public String backgroundMusic;
     public int startInventoryValue;
 

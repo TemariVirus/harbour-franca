@@ -19,7 +19,7 @@ public class LevelManager {
         level1.levelId = "level_01";
         level1.displayName = "The Beginning";
 
-        level1.skyboxTexturePrefix = "Skybox/miramar";
+        level1.skyboxPath = "Skyboxes/miramar";
 
         level1.backgroundMusic = "GameAudio.mp3";
         level1.playerStartX = 0f;
