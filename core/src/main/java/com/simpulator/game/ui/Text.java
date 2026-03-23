@@ -21,6 +21,8 @@ public class Text extends UIElement {
     private Alignment xAnchor;
     private Color color;
 
+    private float width;
+
     public Text(
         CharSequence text,
         BitmapFont font,
@@ -29,18 +31,46 @@ public class Text extends UIElement {
         UILayout layout
     ) {
         super(layout);
-        setText(text);
+        this.text = text;
         this.font = font;
         this.xAnchor = xAnchor;
         this.color = color;
+
+        invalidateWidth();
+    }
+
+    private void invalidateWidth() {
+        Rect bounds = getBounds();
+        float height = bounds.bottom - bounds.top;
+        if (height <= 0) {
+            width = 0;
+            return;
+        }
+
+        font.getData().setScale(1);
+        font.getData().setScale(height / font.getCapHeight());
+        GlyphLayout layout = new GlyphLayout(font, text);
+        width = layout.width;
+    }
+
+    @Override
+    public void updateBounds(Rect parentBounds) {
+        float oldHeight = getBounds().bottom - getBounds().top;
+        super.updateBounds(parentBounds);
+        float newHeight = getBounds().bottom - getBounds().top;
+        if (newHeight != oldHeight) {
+            invalidateWidth();
+        }
     }
 
     public void setText(CharSequence text) {
         this.text = text;
+        invalidateWidth();
     }
 
     public void setFont(BitmapFont font) {
         this.font = font;
+        invalidateWidth();
     }
 
     public void setXAnchor(Alignment xAnchor) {
@@ -61,19 +91,16 @@ public class Text extends UIElement {
 
         font.getData().setScale(1);
         font.getData().setScale(height / font.getCapHeight());
-        GlyphLayout layout = new GlyphLayout(font, text);
         float x;
         switch (xAnchor) {
             case START:
                 x = bounds.left;
                 break;
             case CENTER:
-                x =
-                    bounds.left +
-                    (bounds.right - bounds.left - layout.width) / 2f;
+                x = bounds.left + (bounds.right - bounds.left - width) / 2f;
                 break;
             case END:
-                x = bounds.right - layout.width;
+                x = bounds.right - width;
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + xAnchor);
