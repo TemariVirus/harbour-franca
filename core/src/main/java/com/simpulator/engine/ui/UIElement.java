@@ -47,10 +47,20 @@ public abstract class UIElement {
         return visible;
     }
 
-    public void setVisible(boolean visible) {
+    /**
+     * Sets whether this element and its children should be rendered.
+     * This does not affect whether the element will receive events.
+     * This object is returned to allow for chaining.
+     */
+    public UIElement setVisible(boolean visible) {
         this.visible = visible;
+        return this;
     }
 
+    /**
+     * Inserts a new child to the end of the children list.
+     * This object is returned to allow for chaining.
+     */
     public UIElement addChild(UIElement child) {
         children.add(child);
         return this;
@@ -60,19 +70,31 @@ public abstract class UIElement {
         children.remove(child);
     }
 
-    public void insertChild(int index, UIElement child) {
+    /**
+     * Inserts a new child at the specified index in the children list.
+     * This object is returned to allow for chaining.
+     */
+    public UIElement insertChild(int index, UIElement child) {
         children.add(index, child);
+        return this;
     }
 
     protected Iterable<UIElement> getChildrenReversed() {
         return children.reversed();
     }
 
-    /** Adds an event listener for the specified event type. */
-    public <T> void addListener(Class<T> eventType, UIListener<T> handler) {
+    /**
+     * Adds an event listener for the specified event type.
+     * This object is returned to allow for chaining.
+     */
+    public <T> UIElement addListener(
+        Class<T> eventType,
+        UIListener<T> handler
+    ) {
         eventHandlers
             .computeIfAbsent(eventType, k -> new ArrayList<>())
             .add(handler);
+        return this;
     }
 
     /**

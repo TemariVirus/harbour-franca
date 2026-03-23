@@ -40,13 +40,18 @@ public class Box extends UIElement {
         this.fillColor = fillColor;
     }
 
-    public void addHoverColor(Color normalColor, Color hoverColor) {
+    /**
+     * Adds a listen that changes the fill color when the mouse hovers over the box.
+     * This object is returned to allow for chaining.
+     */
+    public Box addHoverColor(Color normalColor, Color hoverColor) {
         addListener(MouseMoveEvent.class, e -> {
             setFillColor(
                 getBounds().contains(e.x, e.y) ? hoverColor : normalColor
             );
             return false;
         });
+        return this;
     }
 
     @Override
