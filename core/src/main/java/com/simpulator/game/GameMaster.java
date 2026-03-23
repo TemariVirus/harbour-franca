@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.simpulator.engine.scene.MusicManager;
 import com.simpulator.engine.scene.SceneManager;
 import com.simpulator.game.ExploreScene.ExploreScene;
+import com.simpulator.game.levels.LevelManager;
 
 public class GameMaster extends ApplicationAdapter {
 
@@ -30,7 +31,11 @@ public class GameMaster extends ApplicationAdapter {
             new SoundMenu(sceneManager, musics)
         );
         sceneManager.addScene(Scenes.Explore, () ->
-            new ExploreScene(sceneManager, levelManager.getCurrentLevel())
+            new ExploreScene(
+                sceneManager,
+                levelManager.getCurrentLevel(),
+                musics
+            )
         );
         sceneManager.addScene(Scenes.Victory, () ->
             new VictoryScene(sceneManager)

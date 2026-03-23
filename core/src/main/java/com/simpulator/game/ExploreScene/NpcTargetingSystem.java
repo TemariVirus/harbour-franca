@@ -1,5 +1,6 @@
 package com.simpulator.game.ExploreScene;
 
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.Vector3;
 import java.util.List;
 
@@ -20,12 +21,12 @@ public class NpcTargetingSystem {
     */
     private static final float AIM_THRESHOLD = 0.95f;
 
-    private final CameraEntity playerCamera;
-    private final List<NpcEntity> npcs;
-    private NpcEntity targetedNpc;
+    private final Camera camera;
+    private final List<MerchantEntity> npcs;
+    private MerchantEntity targetedNpc;
 
-    public NpcTargetingSystem(CameraEntity playerCamera, List<NpcEntity> npcs) {
-        this.playerCamera = playerCamera;
+    public NpcTargetingSystem(Camera camera, List<MerchantEntity> npcs) {
+        this.camera = camera;
         this.npcs = npcs;
         this.targetedNpc = null;
     }
@@ -38,10 +39,10 @@ public class NpcTargetingSystem {
         targetedNpc = null;
         float bestDot = AIM_THRESHOLD;
 
-        Vector3 camPos = playerCamera.getCamera().position.cpy();
-        Vector3 camDir = playerCamera.getCamera().direction.cpy().nor();
+        Vector3 camPos = camera.position.cpy();
+        Vector3 camDir = camera.direction.cpy().nor();
 
-        for (NpcEntity npc : npcs) {
+        for (MerchantEntity npc : npcs) {
             Vector3 npcPos = npc.getPosition();
             Vector3 toNpc = npcPos.sub(camPos);
             float distance = toNpc.len();
@@ -64,7 +65,7 @@ public class NpcTargetingSystem {
      * Returns the NPC the player is currently looking at and within range of,
      * or null if no NPC is targeted.
      */
-    public NpcEntity getTargetedNpc() {
+    public MerchantEntity getTargetedNpc() {
         return targetedNpc;
     }
 }

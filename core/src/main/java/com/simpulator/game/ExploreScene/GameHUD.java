@@ -11,6 +11,8 @@ import com.simpulator.engine.graphics.GraphicsManager;
 import com.simpulator.engine.ui.UIRelativeLayout;
 import com.simpulator.engine.ui.UIRelativeLayout.Alignment;
 import com.simpulator.engine.ui.UIRoot;
+import com.simpulator.game.trading.Inventory;
+import com.simpulator.game.trading.Item;
 import com.simpulator.game.ui.Box;
 import com.simpulator.game.ui.Text;
 
@@ -20,7 +22,7 @@ import com.simpulator.game.ui.Text;
  */
 public class GameHUD implements Widget, Disposable {
 
-    private static final Color inventoryBackgroundColor = new Color(
+    private static final Color BACKGROUD_COLOR = new Color(
         0.2f,
         0.2f,
         0.2f,
@@ -31,13 +33,18 @@ public class GameHUD implements Widget, Disposable {
     private BitmapFont font;
     private UIRoot uiRoot;
 
+    private int levelGoal;
+    private Inventory playerInventory;
+
     // HUD elements
     private Text objectiveLabel;
     private Text interactionPrompt;
     private Text[] inventoryLabels;
 
-    public GameHUD() {
+    public GameHUD(int levelGoal, Inventory playerInventory) {
         this.viewport = new ExtendViewport(640, 480);
+        this.levelGoal = levelGoal;
+        this.playerInventory = playerInventory;
         buildHUD();
     }
 
@@ -53,7 +60,7 @@ public class GameHUD implements Widget, Disposable {
             Color.YELLOW,
             new UIRelativeLayout.Builder().padTop(20).height(10.5f).getLayout()
         );
-        setObjective(0, 0);
+        updateObjectiveText();
         uiRoot.addChild(objectiveLabel);
 
         // --- Center: crosshair and interaction prompt ---
@@ -84,8 +91,8 @@ public class GameHUD implements Widget, Disposable {
         uiRoot.addChild(interactionPrompt);
 
         // --- Bottom row: inventory slots ---
-        inventoryLabels = new Text[3];
-        for (int i = 0; i < 3; i++) {
+        inventoryLabels = new Text[Inventory.MAX_ITEMS];
+        for (int i = 0; i < Inventory.MAX_ITEMS; i++) {
             final float SLOT_WIDTH = 110;
             final float SLOT_HEIGHT = 35;
             final float SLOT_SPACING = 5;
@@ -93,7 +100,7 @@ public class GameHUD implements Widget, Disposable {
             Box slotBox = new Box(
                 0,
                 Color.CLEAR,
-                inventoryBackgroundColor,
+                BACKGROUD_COLOR,
                 new UIRelativeLayout.Builder()
                     .yAlignment(Alignment.END)
                     .padBottom(15)
@@ -102,10 +109,11 @@ public class GameHUD implements Widget, Disposable {
                     .height(SLOT_HEIGHT)
                     .getLayout()
             );
+            slotBox.setVisible(false);
             uiRoot.addChild(slotBox);
 
             inventoryLabels[i] = new Text(
-                "[Empty]",
+                "",
                 font,
                 Text.Alignment.CENTER,
                 Color.WHITE,
@@ -123,29 +131,10 @@ public class GameHUD implements Widget, Disposable {
         return null;
     }
 
-    /**
-     * Update the mission objective display.
-     *
-     * @param current Current dollar value accumulated.
-     * @param target  Target dollar value to win.
-     */
-    public void setObjective(int current, int target) {
-        objectiveLabel.setText("$" + current + " / $" + target);
-    }
-
-    /**
-     * Update the inventory display.
-     *
-     * @param items Array of item names (up to 3).
-     */
-    public void setInventory(String[] items) {
-        for (int i = 0; i < inventoryLabels.length; i++) {
-            if (items != null && i < items.length && items[i] != null) {
-                inventoryLabels[i].setText(items[i]);
-            } else {
-                inventoryLabels[i].setText("[Empty]");
-            }
-        }
+    private void updateObjectiveText() {
+        objectiveLabel.setText(
+            "$" + playerInventory.getTotalValue() + " / $" + levelGoal
+        );
     }
 
     /** Show the interaction prompt. */
@@ -161,6 +150,15 @@ public class GameHUD implements Widget, Disposable {
 
     @Override
     public void update(float deltaTime) {
+        int i = 0;
+        for (Item item : playerInventory.getItems()) {
+            inventoryLabels[i].setText(item.toString());
+            inventoryLabels[i].getParent().setVisible(true);
+            i++;
+        }
+        for (; i < inventoryLabels.length; i++) {
+            inventoryLabels[i].getParent().setVisible(false);
+        }
         uiRoot.update(deltaTime);
     }
 
