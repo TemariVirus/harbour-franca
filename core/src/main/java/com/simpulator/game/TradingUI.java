@@ -40,7 +40,11 @@ public class TradingUI
     private State state;
     private TradingUIListener listener;
 
-    private BitmapFont font;
+    // Fonts per language — loaded once, reused for every trade interaction
+    private BitmapFont jpFont;  // Japanese + ASCII (jp.fnt)
+    private BitmapFont zhFont;  // Chinese + ASCII  (zh.fnt)
+    private BitmapFont viFont;  // Vietnamese + ASCII (vi.fnt)
+    private BitmapFont font;    // Active font — swapped per NPC in show()
     private GlyphLayout layout;
     private ExtendViewport viewport;
     private TextureRegion white;
@@ -68,15 +72,39 @@ public class TradingUI
 
     public TradingUI(Skin skin) {
         this.state = State.HIDDEN;
-        this.font = new BitmapFont(Gdx.files.internal("fonts/jp.fnt")); // TODO: cache fonts
-        this.font.getData().setScale(0.67f); // Solid scale perfectly balanced for virtual viewport
+
+        // Load Japanese font (used by Japanese merchant + all ASCII UI labels)
+        this.jpFont = new BitmapFont(Gdx.files.internal("fonts/jp.fnt"));
+        this.jpFont.getData().setScale(0.67f);
+
+        // Load Chinese font if available; fall back to jpFont if not yet generated
+        if (Gdx.files.internal("fonts/zh.fnt").exists()) {
+            this.zhFont = new BitmapFont(Gdx.files.internal("fonts/zh.fnt"));
+            this.zhFont.getData().setScale(0.67f);
+        } else {
+            Gdx.app.log("TradingUI", "zh.fnt not found — falling back to jp.fnt for Chinese");
+            this.zhFont = this.jpFont;
+        }
+
+        // Load Vietnamese font if available; fall back to jpFont if not yet generated
+        if (Gdx.files.internal("fonts/vi.fnt").exists()) {
+            this.viFont = new BitmapFont(Gdx.files.internal("fonts/vi.fnt"));
+            this.viFont.getData().setScale(0.67f);
+        } else {
+            Gdx.app.log("TradingUI", "vi.fnt not found — falling back to jp.fnt for Vietnamese");
+            this.viFont = this.jpFont;
+        }
+
+        // Default to Japanese font until show() is called
+        this.font = jpFont;
+
         this.layout = new GlyphLayout();
         this.white = new TextureRegion(skin.get("white", Texture.class));
-        
-        // Use a logical scaling resolution. 
+
+        // Use a logical scaling resolution.
         // Window scales proportionally upwards retaining original item proportions without clipping!
         this.viewport = new ExtendViewport(640, 480);
-        
+
         for (int i = 0; i < 3; i++) {
             btnRects[i] = new Rectangle();
         }
@@ -91,7 +119,7 @@ public class TradingUI
         this.listener = listener;
     }
 
-    public void show(String npcName, String[] options, String[] itemNames, String[] itemRarities) {
+    public void show(String npcName, String language, String[] options, String[] itemNames, String[] itemRarities) {
         this.state = State.CHOOSING_DIALOGUE;
         this.timeLeft = 90f; // 1 min 30 sec
         this.timerActive = true;
@@ -102,7 +130,16 @@ public class TradingUI
         this.currentItemIndex = 0;
         this.innerThought = "";
         this.selectedDialogueIndex = -1;
-        
+
+        // Switch to the correct font for this NPC's language
+        if ("Chinese".equals(language)) {
+            this.font = zhFont;
+        } else if ("Vietnamese".equals(language)) {
+            this.font = viFont;
+        } else {
+            this.font = jpFont; // Japanese + default
+        }
+
         for (int i = 0; i < 3 && i < options.length; i++) {
             this.dialogueOptions[i] = options[i];
         }
@@ -245,8 +282,8 @@ public class TradingUI
         font.draw(batch, timerStr, w / 2 - layout.width / 2, h - 90); 
 
         // Left text
-        layout.setText(font, "You Receive");
-        font.draw(batch, "You Receive", leftMargin + 80 - layout.width/2, itemBoxY + 190);
+        layout.setText(font, "Merchant Receive");
+        font.draw(batch, "Merchant Receive", leftMargin + 80 - layout.width/2, itemBoxY + 190);
         
         String currentName = offeredItemNames[currentItemIndex];
         String currentRarity = offeredItemRarities[currentItemIndex];
@@ -321,7 +358,13 @@ public class TradingUI
     }
 
     public void dispose() {
-        font.dispose();
+        jpFont.dispose();
+        if (zhFont != jpFont) {
+            zhFont.dispose();
+        }
+        if (viFont != jpFont) {
+            viFont.dispose();
+        }
     }
 
     // --- Manual GUI Hitbox Detection ---

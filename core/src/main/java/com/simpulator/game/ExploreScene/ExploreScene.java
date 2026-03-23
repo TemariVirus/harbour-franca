@@ -268,7 +268,7 @@ public class ExploreScene extends Scene {
             new RectangleRenderer(brickRegion, Color.RED),
             "Chinese Merchant",
             "Chinese",
-            new String[] { "更值錢", "公平", "不值錢" },
+            new String[] { "这更有价值", "等值价值", "这价值较低" },
             new String[] { "Yes", "Hmm", "No" }
         );
         NpcEntity npc2 = new NpcEntity(
@@ -442,7 +442,7 @@ public class ExploreScene extends Scene {
 
         String[] npcDialogue = currentOffer.getNpcDialogueLabels().toArray(new String[0]);
 
-        tradingUI.show(target.getName(), npcDialogue, playerNames, playerRarities);
+        tradingUI.show(target.getName(), target.getLanguage(), npcDialogue, playerNames, playerRarities);
         InputMultiplexer inputMux = new InputMultiplexer();
         inputMux.addProcessor(tradingUI.getInputProcessor());
         inputMux.addProcessor(keyboard);
