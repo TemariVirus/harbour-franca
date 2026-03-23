@@ -13,6 +13,7 @@ public abstract class UIElement {
     private Rect bounds;
     private boolean visible = true;
 
+    private UIElement parent = null;
     private final List<UIElement> children = new ArrayList<>();
     private final Map<Class<?>, List<UIListener<?>>> eventHandlers =
         new HashMap<>();
@@ -56,17 +57,23 @@ public abstract class UIElement {
         return this;
     }
 
+    public UIElement getParent() {
+        return parent;
+    }
+
     /**
      * Inserts a new child to the end of the children list.
      * This object is returned to allow for chaining.
      */
     public UIElement addChild(UIElement child) {
         children.add(child);
+        child.parent = this;
         return this;
     }
 
     public void removeChild(UIElement child) {
         children.remove(child);
+        child.parent = null;
     }
 
     /**
@@ -75,6 +82,7 @@ public abstract class UIElement {
      */
     public UIElement insertChild(int index, UIElement child) {
         children.add(index, child);
+        child.parent = this;
         return this;
     }
 
