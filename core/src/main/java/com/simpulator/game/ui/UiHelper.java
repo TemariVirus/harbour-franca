@@ -16,35 +16,69 @@ import com.simpulator.engine.ui.UIRoot;
 
 public final class UiHelper {
 
-    private static Texture whiteTexture = null;
+    public static class MouseHandlers {
+
+        private final Action<MouseMoveEvent> moveHandler;
+        private final Action<MouseButtonEvent> buttonHandler;
+        private final Action<MouseScrollEvent> scrollHandler;
+
+        private MouseHandlers(
+            Action<MouseMoveEvent> moveHandler,
+            Action<MouseButtonEvent> buttonHandler,
+            Action<MouseScrollEvent> scrollHandler
+        ) {
+            this.moveHandler = moveHandler;
+            this.buttonHandler = buttonHandler;
+            this.scrollHandler = scrollHandler;
+        }
+    }
 
     public static Texture getWhiteTexture() {
-        if (whiteTexture == null) {
-            Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-            pixmap.setColor(Color.WHITE);
-            pixmap.fill();
-            whiteTexture = new Texture(pixmap);
-            pixmap.dispose();
-        }
+        Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+        pixmap.setColor(Color.WHITE);
+        pixmap.fill();
+        Texture whiteTexture = new Texture(pixmap);
+        pixmap.dispose();
         return whiteTexture;
     }
 
-    public static void setupUiMouseHandlers(
+    public static MouseHandlers setupUiMouseHandlers(
         MouseManager mm,
         Viewport viewport,
         UIRoot root
     ) {
-        mm.bindMove(uiMouseMoveHandler(viewport, root));
+        Action<MouseMoveEvent> moveHandler = uiMouseMoveHandler(viewport, root);
+        Action<MouseButtonEvent> buttonHandler = uiMouseButtonHandler(
+            viewport,
+            root
+        );
+        Action<MouseScrollEvent> scrollHandler = uiMouseScrollHandler(
+            viewport,
+            root
+        );
+
+        mm.bindMove(moveHandler);
         for (ButtonBindType type : ButtonBindType.values()) {
             for (MouseButton button : MouseButton.values()) {
-                mm.bindButton(
-                    type,
-                    button.getCode(),
-                    uiMouseButtonHandler(viewport, root)
-                );
+                mm.bindButton(type, button.getCode(), buttonHandler);
             }
         }
-        mm.bindScroll(uiMouseScrollHandler(viewport, root));
+        mm.bindScroll(scrollHandler);
+
+        return new MouseHandlers(moveHandler, buttonHandler, scrollHandler);
+    }
+
+    public static void removeUiMouseHandlers(
+        MouseManager mm,
+        MouseHandlers handlers
+    ) {
+        mm.unbindMove(handlers.moveHandler);
+        for (ButtonBindType type : ButtonBindType.values()) {
+            for (MouseButton button : MouseButton.values()) {
+                mm.unbindButton(type, button.getCode(), handlers.buttonHandler);
+            }
+        }
+        mm.unbindScroll(handlers.scrollHandler);
     }
 
     public static Action<MouseMoveEvent> uiMouseMoveHandler(

@@ -1,6 +1,7 @@
 package com.simpulator.game.ui;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.simpulator.engine.graphics.TextureBatch;
 import com.simpulator.engine.input.MouseManager.MouseMoveEvent;
 import com.simpulator.engine.ui.Rect;
@@ -8,6 +9,8 @@ import com.simpulator.engine.ui.UIElement;
 import com.simpulator.engine.ui.UILayout;
 
 public class Box extends UIElement {
+
+    private static final Texture texture = UiHelper.getWhiteTexture();
 
     private int borderWidth;
     private Color borderColor;
@@ -57,7 +60,7 @@ public class Box extends UIElement {
         if (borderWidth > 0 && outerWidth > 0 && outerHeight > 0) {
             batch.setColor(borderColor);
             batch.draw(
-                UiHelper.getWhiteTexture(),
+                texture,
                 bounds.left - borderWidth,
                 bounds.top - borderWidth,
                 outerWidth,
@@ -67,7 +70,7 @@ public class Box extends UIElement {
         if (innerWidth > 0 && innerHeight > 0) {
             batch.setColor(fillColor);
             batch.draw(
-                UiHelper.getWhiteTexture(),
+                texture,
                 bounds.left,
                 bounds.top,
                 innerWidth,

@@ -1,6 +1,7 @@
 package com.simpulator.game.ui;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.simpulator.engine.graphics.TextureBatch;
 import com.simpulator.engine.input.Action;
 import com.simpulator.engine.input.MouseManager.MouseButton;
@@ -12,6 +13,8 @@ import com.simpulator.engine.ui.UILayout;
 import java.util.ArrayList;
 
 public class Slider extends UIElement {
+
+    private static final Texture texture = UiHelper.getWhiteTexture();
 
     private float value;
     private float min;
@@ -151,7 +154,7 @@ public class Slider extends UIElement {
         if (width > 0 && backGroundHeight > 0) {
             batch.setColor(backgroundColor);
             batch.draw(
-                UiHelper.getWhiteTexture(),
+                texture,
                 bounds.left,
                 bounds.top + (height - backGroundHeight) / 2,
                 width,
@@ -163,7 +166,7 @@ public class Slider extends UIElement {
             float knobX = bounds.left + t * width;
             batch.setColor(knobColor);
             batch.draw(
-                UiHelper.getWhiteTexture(),
+                texture,
                 knobX - knobSize / 2,
                 bounds.top + (height - knobSize) / 2,
                 knobSize,
