@@ -118,7 +118,7 @@ public class MouseManager extends InputAdapter {
             this.code = code;
         }
 
-        public int getCode() {
+        public int code() {
             return code;
         }
     }

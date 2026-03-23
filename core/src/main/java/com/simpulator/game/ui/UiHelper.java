@@ -63,7 +63,7 @@ public final class UiHelper {
         mm.bindMove(moveHandler);
         for (ButtonBindType type : ButtonBindType.values()) {
             for (MouseButton button : MouseButton.values()) {
-                mm.bindButton(type, button.getCode(), buttonHandler);
+                mm.bindButton(type, button.code(), buttonHandler);
             }
         }
         mm.bindScroll(scrollHandler);
@@ -78,7 +78,7 @@ public final class UiHelper {
         mm.unbindMove(handlers.moveHandler);
         for (ButtonBindType type : ButtonBindType.values()) {
             for (MouseButton button : MouseButton.values()) {
-                mm.unbindButton(type, button.getCode(), handlers.buttonHandler);
+                mm.unbindButton(type, button.code(), handlers.buttonHandler);
             }
         }
         mm.unbindScroll(handlers.scrollHandler);
@@ -173,7 +173,7 @@ public final class UiHelper {
         box.addListener(MouseButtonEvent.class, e -> {
             if (
                 e.type != ButtonBindType.DOWN ||
-                e.button != MouseButton.LEFT.getCode() ||
+                e.button != MouseButton.LEFT.code() ||
                 !box.getBounds().contains(e.x, e.y)
             ) {
                 return false;

@@ -109,6 +109,7 @@ public class TradingUI implements Widget, Disposable {
     private BitmapFont font;
     private UIRoot uiRoot;
 
+    // TODO: encapsulate timer
     private float timeLeft = 0;
     private String[] offeredItemNames = new String[0];
     private String[] offeredItemRarities = new String[0];
@@ -456,7 +457,7 @@ public class TradingUI implements Widget, Disposable {
             .addListener(MouseButtonEvent.class, e -> {
                 if (
                     !isInteractive() ||
-                    e.button != MouseButton.LEFT.getCode() ||
+                    e.button != MouseButton.LEFT.code() ||
                     e.type != ButtonBindType.DOWN ||
                     !button.getBounds().contains(e.x, e.y)
                 ) return false;

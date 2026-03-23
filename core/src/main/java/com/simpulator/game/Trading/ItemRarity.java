@@ -12,7 +12,7 @@ public enum ItemRarity {
         this.tier = tier;
     }
 
-    public int getTier() {
+    public int tier() {
         return tier;
     }
 }
