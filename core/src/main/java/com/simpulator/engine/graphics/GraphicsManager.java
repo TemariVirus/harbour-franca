@@ -1,6 +1,7 @@
 package com.simpulator.engine.graphics;
 
 import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import java.util.Arrays;
@@ -26,6 +27,8 @@ public class GraphicsManager implements Disposable {
         }
 
         batch.begin();
+        batch.enableBlending();
+        batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         this.viewport = viewport;
         this.viewport.apply();
     }

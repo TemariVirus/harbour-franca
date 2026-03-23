@@ -184,10 +184,7 @@ public class TextureBatch implements Batch {
 			+ "uniform sampler2D u_texture;\n"
 			+ "void main()\n"
 			+ "{\n"
-			+ "  vec4 texColor = v_color * texture2D(u_texture, v_texCoords);\n"
-			+ "  if(texColor.a < 0.1)\n" // Discard low alpha pixels to make them transparent
-			+ "      discard;\n"
-			+ "  gl_FragColor = texColor;\n"
+			+ "  gl_FragColor = v_color * texture2D(u_texture, v_texCoords);\n"
 			+ "}";
         // @formatter:on
 

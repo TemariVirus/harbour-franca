@@ -58,6 +58,9 @@ public class Lwjgl3Launcher {
             0
         );
 
+        // 0 alpha bits to make window opaque
+        configuration.setBackBufferConfig(8, 8, 8, 0, 16, 0, 0);
+
         return configuration;
     }
 }
