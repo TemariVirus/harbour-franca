@@ -76,6 +76,6 @@ public class MerchantEntity extends CuboidEntity {
         // Face player
         Vector3 toPlayer = player.getPosition().sub(position);
         float targetAngle = (float) Math.atan2(toPlayer.x, toPlayer.z);
-        rotation.setFromAxis(Vector3.Y, targetAngle);
+        setRotation(Vector3.Y, targetAngle);
     }
 }
