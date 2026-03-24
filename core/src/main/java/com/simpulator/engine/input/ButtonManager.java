@@ -3,6 +3,7 @@ package com.simpulator.engine.input;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map.Entry;
 import java.util.Set;
 
 /** Invokes actions from button inputs. */
@@ -27,8 +28,40 @@ public class ButtonManager<T> {
         );
     }
 
+    private final class QueueNode {
+
+        public final ButtonBindType type;
+        public final int button;
+        public final Action<T> action;
+
+        public QueueNode(ButtonBindType type, int button, Action<T> action) {
+            this.type = type;
+            this.button = button;
+            this.action = action;
+        }
+
+        public void bind(ButtonManager<T> manager) {
+            manager
+                .getBindings(type)
+                .computeIfAbsent(button, k -> new ArrayList<>())
+                .add(action);
+        }
+
+        public void unbind(ButtonManager<T> manager) {
+            if (manager.getBindings(type).containsKey(button)) {
+                manager
+                    .getBindings(type)
+                    .get(button)
+                    // Check reference instead of using .equals()
+                    .removeIf(a -> a == action);
+            }
+        }
+    }
+
     private HashSet<Integer> lastFrameButtons = new HashSet<>();
     private HashSet<Integer> thisFrameButtons = new HashSet<>();
+    private final ArrayList<QueueNode> queuedBindings = new ArrayList<>();
+    private final ArrayList<QueueNode> queuedUnbindings = new ArrayList<>();
 
     private final HashMap<Integer, ArrayList<Action<T>>> downBindings =
         new HashMap<>();
@@ -84,28 +117,33 @@ public class ButtonManager<T> {
 
     /** Bind the given action to a button and event type. */
     public void bind(ButtonBindType type, int button, Action<T> action) {
-        getBindings(type).putIfAbsent(button, new ArrayList<>());
-        getBindings(type).get(button).add(action);
+        queuedBindings.add(new QueueNode(type, button, action));
     }
 
     /** Unbind all instances of the given action from a button and event type. */
     public void unbind(ButtonBindType type, int button, Action<T> action) {
-        if (getBindings(type).containsKey(button)) {
-            getBindings(type)
-                .get(button)
-                // Check reference instead of using .equals()
-                .removeIf(a -> a == action);
-        }
+        queuedUnbindings.add(new QueueNode(type, button, action));
     }
 
     /** Unbind all actions from the given event type */
     public void unbindAll(ButtonBindType type) {
-        getBindings(type).clear();
+        for (Entry<Integer, ArrayList<Action<T>>> kv : getBindings(
+            type
+        ).entrySet()) {
+            for (Action<T> a : kv.getValue()) {
+                queuedUnbindings.add(new QueueNode(type, kv.getKey(), a));
+            }
+        }
     }
 
     /** Unbind all actions from the given button and event type. */
     public void unbindAll(ButtonBindType type, int button) {
-        getBindings(type).remove(button);
+        for (Action<T> a : getBindings(type).getOrDefault(
+            button,
+            new ArrayList<>()
+        )) {
+            queuedUnbindings.add(new QueueNode(type, button, a));
+        }
     }
 
     private HashSet<Integer> computeButtons(ButtonBindType type) {
@@ -137,6 +175,15 @@ public class ButtonManager<T> {
      * @param constructor Creates events from the button, bind type, and current button states.
      */
     public void update(ButtonEventConstructor<T> constructor) {
+        for (QueueNode node : queuedBindings) {
+            node.bind(this);
+        }
+        queuedBindings.clear();
+        for (QueueNode node : queuedUnbindings) {
+            node.unbind(this);
+        }
+        queuedUnbindings.clear();
+
         for (ButtonBindType type : ButtonBindType.values()) {
             HashSet<Integer> buttons = computeButtons(type);
             HashMap<Integer, ArrayList<Action<T>>> bindings = getBindings(type);
