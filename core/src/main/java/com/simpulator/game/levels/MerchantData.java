@@ -14,6 +14,8 @@ public class MerchantData {
     private final String imagePath;
     private final Language language;
     private final String dialogue;
+    private final float wantsThreshold;
+    private final float normalThreshold;
     private final List<Item> items;
     private final Set<Item> wants;
 
@@ -22,6 +24,8 @@ public class MerchantData {
         String imagePath,
         Language language,
         String dialogue,
+        float wantsThreshold,
+        float normalThreshold,
         Item[] items,
         Set<Item> wants
     ) {
@@ -29,6 +33,8 @@ public class MerchantData {
         this.imagePath = imagePath;
         this.language = language;
         this.dialogue = dialogue;
+        this.wantsThreshold = wantsThreshold;
+        this.normalThreshold = normalThreshold;
         this.items = Arrays.asList(items);
         this.wants = new HashSet<>(wants);
     }
@@ -47,6 +53,14 @@ public class MerchantData {
 
     public String getDialogue() {
         return dialogue;
+    }
+
+    public float getWantsThreshold() {
+        return wantsThreshold;
+    }
+
+    public float getNormalThreshold() {
+        return normalThreshold;
     }
 
     public List<Item> getItems() {

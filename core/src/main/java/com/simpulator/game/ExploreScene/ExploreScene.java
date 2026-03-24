@@ -25,7 +25,6 @@ import com.simpulator.game.SkyboxLoader;
 import com.simpulator.game.TradingUI;
 import com.simpulator.game.levels.Level;
 import com.simpulator.game.trading.Inventory;
-import com.simpulator.game.trading.TradeManager;
 import java.util.List;
 
 public class ExploreScene extends Scene {
@@ -47,7 +46,6 @@ public class ExploreScene extends Scene {
     private NpcTargetingSystem npcTargetingSystem;
 
     private final Inventory playerInventory;
-    private final TradeManager tradeManager;
     private final GameHUD hud;
     private TradingUI tradingUI;
     private int valueGoal;
@@ -104,7 +102,6 @@ public class ExploreScene extends Scene {
         );
 
         playerInventory = level.createInventory();
-        tradeManager = level.createTradeManager();
 
         hud = new GameHUD(level.valueGoal, playerInventory);
         tradingUI = new TradingUI();

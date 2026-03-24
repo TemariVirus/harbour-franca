@@ -6,7 +6,6 @@ import com.simpulator.engine.scene.TextureCache;
 import com.simpulator.game.ExploreScene.MerchantEntity;
 import com.simpulator.game.trading.Inventory;
 import com.simpulator.game.trading.Item;
-import com.simpulator.game.trading.TradeManager;
 import java.util.ArrayList;
 
 // TODO: encapsulation
@@ -36,17 +35,11 @@ public class Level {
     public String bgmPath;
 
     public int valueGoal;
-    public float wantsThreshold;
-    public float normalThreshold;
     public Item[] startingItems;
 
     public Vector3 playerStart;
     public LevelMap map;
     public MerchantConfig[] merchants;
-
-    public TradeManager createTradeManager() {
-        return new TradeManager(wantsThreshold, normalThreshold);
-    }
 
     public Inventory createInventory() {
         Inventory inventory = new Inventory();

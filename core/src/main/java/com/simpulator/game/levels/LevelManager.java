@@ -31,8 +31,6 @@ public class LevelManager {
         level1.bgmPath = "GameAudio.mp3";
 
         level1.valueGoal = 50;
-        level1.wantsThreshold = 4f;
-        level1.normalThreshold = 1.4f;
         level1.startingItems = new Item[] {
             Item.FISH,
             Item.CLOTH,
@@ -50,6 +48,8 @@ public class LevelManager {
                     "Lam.jpeg",
                     Language.CHINESE,
                     "我很饿。有食物的话我什么都愿意给！",
+                    4,
+                    1.4f,
                     new Item[] { Item.MAP, Item.CANDLE, Item.SPICE },
                     new HashSet<>(Arrays.asList(Item.FISH))
                 )
@@ -62,6 +62,8 @@ public class LevelManager {
                     "Nisha.jpeg",
                     Language.VIETNAMESE,
                     "Có dây thừng không? Có người thích kiểu\nchơi *đó* đấy.",
+                    4,
+                    1.4f,
                     new Item[] { Item.PENDANT, Item.CANDLE, Item.FISH },
                     new HashSet<>(Arrays.asList(Item.ROPE))
                 )
@@ -74,6 +76,8 @@ public class LevelManager {
                     "Oran.jpeg",
                     Language.JAPANESE,
                     "家にもうちょっと光が欲しいなあ。",
+                    4,
+                    1.4f,
                     new Item[] { Item.ROPE, Item.LENS, Item.COMPASS },
                     new HashSet<>(Arrays.asList(Item.CANDLE))
                 )

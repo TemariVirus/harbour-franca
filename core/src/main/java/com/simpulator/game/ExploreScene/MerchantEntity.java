@@ -8,10 +8,9 @@ import com.simpulator.engine.graphics.RectangleRenderer;
 import com.simpulator.engine.scene.TextureCache;
 import com.simpulator.game.CuboidEntity;
 import com.simpulator.game.levels.MerchantData;
-import com.simpulator.game.trading.Inventory;
-import com.simpulator.game.trading.TradeManager;
-import com.simpulator.game.trading.TradeManager.TradeResult;
-import com.simpulator.game.trading.TradeOffer;
+import com.simpulator.game.trading.Item;
+import com.simpulator.game.trading.TradeProcessor;
+import com.simpulator.game.trading.TradeProcessor.TradeResult;
 
 /**
  * A static Merchant entity that the player can interact with to trade.
@@ -20,6 +19,7 @@ import com.simpulator.game.trading.TradeOffer;
 public class MerchantEntity extends CuboidEntity {
 
     private MerchantData data;
+    private TradeProcessor tradeManager;
     private Entity player;
     private boolean canTrade = true;
 
@@ -39,6 +39,11 @@ public class MerchantEntity extends CuboidEntity {
             false
         );
         this.data = data;
+        this.tradeManager = new TradeProcessor(
+            data.getWantsThreshold(),
+            data.getNormalThreshold(),
+            data.getWants()
+        );
         this.player = player;
     }
 
@@ -51,12 +56,7 @@ public class MerchantEntity extends CuboidEntity {
         return data;
     }
 
-    public TradeResult trade(
-        TradeManager tradeManager,
-        Inventory theirInventory,
-        int theirItemIndex,
-        int ourItemIndex
-    ) {
+    public TradeResult trade(int giveIndex, Item receive) {
         if (!canTrade) {
             throw new IllegalStateException(
                 "Merchant has already been traded with."
@@ -64,12 +64,7 @@ public class MerchantEntity extends CuboidEntity {
         }
         canTrade = false;
 
-        TradeOffer offer = new TradeOffer(
-            getData().getItems().get(ourItemIndex),
-            theirInventory.getItems().get(theirItemIndex),
-            getData().getWants()
-        );
-        return tradeManager.trade(offer, null, theirInventory);
+        return tradeManager.trade(getData().getItems().get(giveIndex), receive);
     }
 
     @Override
