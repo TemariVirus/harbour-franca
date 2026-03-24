@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import com.simpulator.engine.graphics.GraphicsManager;
 import com.simpulator.engine.input.Action;
 import com.simpulator.engine.input.ButtonManager.ButtonBindType;
@@ -22,7 +23,7 @@ import com.simpulator.game.ui.Box;
 import com.simpulator.game.ui.Text;
 import com.simpulator.game.ui.UiHelper;
 
-public class VictoryScene extends Scene {
+public class VictoryScene implements Scene {
 
     private static final Color BACKGROUND_COLOR = new Color(
         0.08f,
@@ -47,17 +48,16 @@ public class VictoryScene extends Scene {
     );
 
     private final SceneManager sceneManager;
-    private final KeyboardManager km;
-    private final MouseManager mm;
+    private final KeyboardManager km = new KeyboardManager();
+    private final MouseManager mm = new MouseManager();
 
-    private UIRoot uiRoot;
-    private BitmapFont font;
+    private final Viewport viewport = new FitViewport(640, 480);
+    private final UIRoot uiRoot = new UIRoot();
+    private final BitmapFont font;
 
     public VictoryScene(SceneManager sceneManager) {
-        super(new FitViewport(640, 480));
         this.sceneManager = sceneManager;
 
-        km = new KeyboardManager();
         km.bind(ButtonBindType.DOWN, Keys.ENTER, e ->
             sceneManager.setScene(Scenes.Explore)
         );
@@ -66,15 +66,11 @@ public class VictoryScene extends Scene {
         );
         km.bind(ButtonBindType.DOWN, Keys.ESCAPE, e -> Gdx.app.exit());
 
-        mm = new MouseManager();
-
+        font = new BitmapFont();
         buildUI();
     }
 
     private void buildUI() {
-        uiRoot = new UIRoot();
-        font = new BitmapFont();
-
         UiHelper.setupUiMouseHandlers(mm, viewport, uiRoot);
 
         uiRoot.addChild(
@@ -177,13 +173,13 @@ public class VictoryScene extends Scene {
     }
 
     @Override
-    public void onFocus() {
+    public boolean onFocus() {
         Gdx.input.setCursorCatched(false);
+        return true;
     }
 
     @Override
     public void dispose() {
-        super.dispose();
         font.dispose();
     }
 
@@ -195,9 +191,16 @@ public class VictoryScene extends Scene {
     }
 
     @Override
-    public void render(GraphicsManager graphics, int width, int height) {
+    public void render(
+        GraphicsManager graphics,
+        int x,
+        int y,
+        int width,
+        int height
+    ) {
         ScreenUtils.clear(BACKGROUND_COLOR);
         viewport.update(width, height, true);
+        viewport.setScreenPosition(x, y);
         uiRoot.updateBounds(viewport);
 
         graphics.beginRender(viewport);

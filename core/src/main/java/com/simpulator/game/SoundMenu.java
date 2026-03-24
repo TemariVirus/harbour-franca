@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import com.simpulator.engine.graphics.GraphicsManager;
 import com.simpulator.engine.input.ButtonManager.ButtonBindType;
 import com.simpulator.engine.input.KeyboardManager;
@@ -23,7 +24,7 @@ import com.simpulator.game.ui.Text;
 import com.simpulator.game.ui.UiHelper;
 
 // TODO: beautify this scene
-public class SoundMenu extends Scene {
+public class SoundMenu implements Scene {
 
     private static final Color BACKGROUND_COLOR = new Color(
         0.2f,
@@ -34,19 +35,19 @@ public class SoundMenu extends Scene {
     private static final Color TEXT_COLOR = Color.YELLOW;
 
     private MusicManager musics;
-    private KeyboardManager km;
-    private MouseManager mm;
+    private final KeyboardManager km = new KeyboardManager();
+    private final MouseManager mm = new MouseManager();
 
-    private BitmapFont font;
-    private UIRoot uiRoot;
+    private final Viewport viewport = new FitViewport(640, 480);
+    private final UIRoot uiRoot = new UIRoot();
+    private final BitmapFont font;
+
     private Text volumeText;
     private Slider volumeSlider;
 
     public SoundMenu(SceneManager sceneManager, MusicManager musicManager) {
-        super(new FitViewport(640, 480));
         this.musics = musicManager;
 
-        this.km = new KeyboardManager();
         km.bind(ButtonBindType.DOWN, Keys.ESCAPE, e ->
             sceneManager.setScene(Scenes.MainMenu)
         );
@@ -60,16 +61,13 @@ public class SoundMenu extends Scene {
             updateVolume(Config.volume + 10)
         );
 
-        this.mm = new MouseManager();
-
+        font = new BitmapFont();
         buildUI(sceneManager);
     }
 
     private void buildUI(SceneManager sceneManager) {
         final float FONT_SIZE = 22;
 
-        font = new BitmapFont();
-        uiRoot = new UIRoot();
         UiHelper.setupUiMouseHandlers(mm, viewport, uiRoot);
 
         uiRoot.addChild(
@@ -155,7 +153,6 @@ public class SoundMenu extends Scene {
         Config.volume = Math.round(volumeSlider.getValue());
         volumeText.setText(formatVolumeText(Config.volume));
         float volume = Config.volume * 0.01f;
-        sounds.setVolume(volume);
         musics.setVolume(volume);
     }
 
@@ -168,13 +165,13 @@ public class SoundMenu extends Scene {
     }
 
     @Override
-    public void onFocus() {
+    public boolean onFocus() {
         Gdx.input.setCursorCatched(false);
+        return true;
     }
 
     @Override
     public void dispose() {
-        super.dispose();
         font.dispose();
     }
 
@@ -186,9 +183,16 @@ public class SoundMenu extends Scene {
     }
 
     @Override
-    public void render(GraphicsManager graphics, int width, int height) {
+    public void render(
+        GraphicsManager graphics,
+        int x,
+        int y,
+        int width,
+        int height
+    ) {
         ScreenUtils.clear(BACKGROUND_COLOR);
         viewport.update(width, height, true);
+        viewport.setScreenPosition(x, y);
         uiRoot.updateBounds(viewport);
 
         graphics.beginRender(viewport);

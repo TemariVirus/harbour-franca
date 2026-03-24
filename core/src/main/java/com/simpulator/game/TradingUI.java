@@ -4,16 +4,15 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.simpulator.engine.Widget;
 import com.simpulator.engine.graphics.GraphicsManager;
 import com.simpulator.engine.input.ButtonManager.ButtonBindType;
 import com.simpulator.engine.input.MouseManager;
 import com.simpulator.engine.input.MouseManager.MouseButton;
 import com.simpulator.engine.input.MouseManager.MouseButtonEvent;
 import com.simpulator.engine.input.MouseManager.MouseMoveEvent;
+import com.simpulator.engine.scene.Scene;
 import com.simpulator.engine.ui.UIRelativeLayout;
 import com.simpulator.engine.ui.UIRelativeLayout.Alignment;
 import com.simpulator.engine.ui.UIRoot;
@@ -25,7 +24,7 @@ import com.simpulator.game.ui.Box;
 import com.simpulator.game.ui.Text;
 import com.simpulator.game.ui.UiHelper;
 
-public class TradingUI implements Widget, Disposable {
+public class TradingUI implements Scene {
 
     private enum State {
         HIDDEN,
@@ -97,19 +96,19 @@ public class TradingUI implements Widget, Disposable {
     final float DIALOGUE_HEIGHT = 120;
 
     private State state;
-    private MouseManager mouse;
+    private final MouseManager mouse = new MouseManager();
 
-    private Viewport viewport;
-    private BitmapFont font;
-    private UIRoot uiRoot;
+    private final Viewport viewport = new ExtendViewport(720, 480);
+    private final BitmapFont font;
+    private final UIRoot uiRoot = new UIRoot();
 
     // TODO: encapsulate timer
     private float timeLeft = 0;
     private Text timerText;
 
-    private Inventory playerInventory;
+    private final Inventory playerInventory;
     private int offeredItemIndex;
-    private MerchantEntity merchant;
+    private final MerchantEntity merchant;
     private int choiceIndex;
 
     private Text offeredItemText;
@@ -127,11 +126,10 @@ public class TradingUI implements Widget, Disposable {
         }
 
         this.state = State.TRADING;
-        this.mouse = new MouseManager();
-        this.viewport = new ExtendViewport(720, 480);
         this.playerInventory = playerInventory;
         this.merchant = merchant;
 
+        this.font = new BitmapFont(Gdx.files.internal("fonts/jp.fnt"));
         buildUI();
         for (int i = 0; i < choiceTexts.length; i++) {
             choiceTexts[i].setText(
@@ -147,8 +145,6 @@ public class TradingUI implements Widget, Disposable {
     }
 
     private void buildUI() {
-        this.font = new BitmapFont(Gdx.files.internal("fonts/jp.fnt"));
-        uiRoot = new UIRoot();
         UiHelper.setupUiMouseHandlers(mouse, viewport, uiRoot);
 
         // --- Top ---
@@ -487,6 +483,12 @@ public class TradingUI implements Widget, Disposable {
     @Override
     public InputProcessor getInputProcessor() {
         return mouse;
+    }
+
+    @Override
+    public boolean onFocus() {
+        Gdx.input.setCursorCatched(false);
+        return true;
     }
 
     private void setChoiceIndex(int i) {

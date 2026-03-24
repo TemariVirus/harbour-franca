@@ -3,11 +3,10 @@ package com.simpulator.game.ExploreScene;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.simpulator.engine.Widget;
 import com.simpulator.engine.graphics.GraphicsManager;
+import com.simpulator.engine.scene.Scene;
 import com.simpulator.engine.ui.UIRelativeLayout;
 import com.simpulator.engine.ui.UIRelativeLayout.Alignment;
 import com.simpulator.engine.ui.UIRoot;
@@ -20,7 +19,7 @@ import com.simpulator.game.ui.Text;
  * In-game HUD overlay showing mission objective, player inventory,
  * interaction prompts, and a crosshair.
  */
-public class GameHUD implements Widget, Disposable {
+public class GameHUD implements Scene {
 
     private static final Color BACKGROUD_COLOR = new Color(
         0.2f,
@@ -29,12 +28,12 @@ public class GameHUD implements Widget, Disposable {
         0.7f
     );
 
-    private final Viewport viewport;
-    private BitmapFont font;
-    private UIRoot uiRoot;
+    private final Viewport viewport = new ExtendViewport(640, 480);
+    private final BitmapFont font;
+    private final UIRoot uiRoot = new UIRoot();
 
-    private int levelGoal;
-    private Inventory playerInventory;
+    private final int levelGoal;
+    private final Inventory playerInventory;
 
     // HUD elements
     private Text objectiveLabel;
@@ -42,16 +41,14 @@ public class GameHUD implements Widget, Disposable {
     private Text[] inventoryLabels;
 
     public GameHUD(int levelGoal, Inventory playerInventory) {
-        this.viewport = new ExtendViewport(640, 480);
         this.levelGoal = levelGoal;
         this.playerInventory = playerInventory;
+
+        font = new BitmapFont();
         buildHUD();
     }
 
     private void buildHUD() {
-        font = new BitmapFont();
-        uiRoot = new UIRoot();
-
         // --- Top row: objective in top-center ---
         objectiveLabel = new Text(
             "",
@@ -129,6 +126,11 @@ public class GameHUD implements Widget, Disposable {
     @Override
     public InputProcessor getInputProcessor() {
         return null;
+    }
+
+    @Override
+    public boolean onFocus() {
+        return false;
     }
 
     private void updateObjectiveText() {

@@ -58,7 +58,7 @@ public class SceneManager implements Disposable {
     /** Render the current scene to the screen. */
     public void render(int width, int height) {
         if (currentScene != null) {
-            currentScene.render(graphics, width, height);
+            currentScene.render(graphics, 0, 0, width, height);
         }
     }
 

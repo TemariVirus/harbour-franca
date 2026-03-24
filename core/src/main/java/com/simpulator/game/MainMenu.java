@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import com.simpulator.engine.graphics.GraphicsManager;
 import com.simpulator.engine.input.Action;
 import com.simpulator.engine.input.ButtonManager.ButtonBindType;
@@ -15,6 +16,7 @@ import com.simpulator.engine.input.KeyboardManager;
 import com.simpulator.engine.input.MouseManager;
 import com.simpulator.engine.scene.Scene;
 import com.simpulator.engine.scene.SceneManager;
+import com.simpulator.engine.scene.SoundManager;
 import com.simpulator.engine.ui.UIRelativeLayout;
 import com.simpulator.engine.ui.UIRelativeLayout.Alignment;
 import com.simpulator.engine.ui.UIRoot;
@@ -22,7 +24,7 @@ import com.simpulator.game.ui.Box;
 import com.simpulator.game.ui.Text;
 import com.simpulator.game.ui.UiHelper;
 
-public class MainMenu extends Scene {
+public class MainMenu implements Scene {
 
     private static final Color BACKGROUND_COLOR = new Color(
         0.08f,
@@ -46,16 +48,17 @@ public class MainMenu extends Scene {
         1f
     );
 
-    private final KeyboardManager km;
-    private final MouseManager mm;
-    private UIRoot uiRoot;
-    private BitmapFont font;
+    private final SoundManager sounds = new SoundManager();
+    private final KeyboardManager km = new KeyboardManager();
+    private final MouseManager mm = new MouseManager();
+
+    private final Viewport viewport = new FitViewport(640, 480);
+    private final UIRoot uiRoot = new UIRoot();
+    private final BitmapFont font;
 
     public MainMenu(SceneManager sceneManager) {
-        super(new FitViewport(640, 480));
         sounds.setVolume(Config.volume * 0.01f);
 
-        km = new KeyboardManager();
         km.bind(ButtonBindType.DOWN, Keys.ENTER, e ->
             sceneManager.setScene(Scenes.Explore)
         );
@@ -67,14 +70,11 @@ public class MainMenu extends Scene {
         );
         km.bind(ButtonBindType.DOWN, Keys.ESCAPE, e -> Gdx.app.exit());
 
-        mm = new MouseManager();
-
+        font = new BitmapFont();
         buildUI(sceneManager);
     }
 
     private void buildUI(SceneManager sceneManager) {
-        uiRoot = new UIRoot();
-        font = new BitmapFont();
         UiHelper.setupUiMouseHandlers(mm, viewport, uiRoot);
 
         uiRoot.addChild(
@@ -176,13 +176,13 @@ public class MainMenu extends Scene {
     }
 
     @Override
-    public void onFocus() {
+    public boolean onFocus() {
         Gdx.input.setCursorCatched(false);
+        return true;
     }
 
     @Override
     public void dispose() {
-        super.dispose();
         font.dispose();
     }
 
@@ -194,9 +194,16 @@ public class MainMenu extends Scene {
     }
 
     @Override
-    public void render(GraphicsManager graphics, int width, int height) {
+    public void render(
+        GraphicsManager graphics,
+        int x,
+        int y,
+        int width,
+        int height
+    ) {
         ScreenUtils.clear(BACKGROUND_COLOR);
         viewport.update(width, height, true);
+        viewport.setScreenPosition(x, y);
         uiRoot.updateBounds(viewport);
 
         graphics.beginRender(viewport);

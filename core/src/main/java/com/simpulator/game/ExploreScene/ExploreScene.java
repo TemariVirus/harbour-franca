@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import com.simpulator.engine.EntityManager;
 import com.simpulator.engine.graphics.GraphicsManager;
 import com.simpulator.engine.graphics.Skybox;
@@ -17,7 +18,11 @@ import com.simpulator.engine.input.KeyboardManager;
 import com.simpulator.engine.input.MouseManager;
 import com.simpulator.engine.scene.MusicManager;
 import com.simpulator.engine.scene.Scene;
+import com.simpulator.engine.scene.SceneCompositor;
 import com.simpulator.engine.scene.SceneManager;
+import com.simpulator.engine.scene.SoundManager;
+import com.simpulator.engine.scene.TextureCache;
+import com.simpulator.engine.ui.UIRelativeLayout;
 import com.simpulator.game.Clock;
 import com.simpulator.game.Config;
 import com.simpulator.game.Scenes;
@@ -27,28 +32,29 @@ import com.simpulator.game.levels.Level;
 import com.simpulator.game.trading.Inventory;
 import java.util.List;
 
-public class ExploreScene extends Scene {
+public class ExploreScene implements Scene {
 
     private static final float PLAYER_SPEED = 4f;
 
-    private int selectedDialogueIndex = -1;
-    private int selectedPlayerItemIndex = 0;
+    private final TextureCache textures = new TextureCache();
+    private final SoundManager sounds = new SoundManager();
+    private final EntityManager entityManager = new EntityManager();
+    private final KeyboardManager keyboard = new KeyboardManager();
+    private final MouseManager mouse = new MouseManager();
+
+    private final Viewport viewport = new ExtendViewport(640, 480);
+    private final CameraEntity playerCamera;
+
+    private final Skybox skybox;
+    private final SceneCompositor overlays = new SceneCompositor();
+    private final GameHUD hud;
 
     private final Clock clock = new Clock(0);
-    private final CameraEntity playerCamera;
-    private final Skybox skybox;
-
-    private final EntityManager entityManager;
-    private final KeyboardManager keyboard;
-    private final MouseManager mouse;
-
-    private List<MerchantEntity> npcs;
-    private NpcTargetingSystem npcTargetingSystem;
+    private final List<MerchantEntity> npcs;
+    private final NpcTargetingSystem npcTargetingSystem;
 
     private final Inventory playerInventory;
-    private final GameHUD hud;
-    private TradingUI tradingUI;
-    private int valueGoal;
+    private final int valueGoal;
     private boolean victoryQueued = false;
 
     public ExploreScene(
@@ -56,11 +62,9 @@ public class ExploreScene extends Scene {
         Level level,
         MusicManager musics
     ) {
-        super(new ExtendViewport(640, 480));
         musics.stopAllMusic();
         musics.startMusic(level.bgmPath);
         sounds.setVolume(Config.volume * 0.01f);
-        this.entityManager = new EntityManager();
 
         PerspectiveCamera camera = new PerspectiveCamera(
             70,
@@ -82,17 +86,9 @@ public class ExploreScene extends Scene {
         skybox = SkyboxLoader.load(textures, level.skyboxPath, camera.far);
         level.map.load(entityManager, textures);
 
-        keyboard = new KeyboardManager();
-        setupKeybinds(sceneManager);
-
-        mouse = new MouseManager();
-        mouse.bindMove(new RotateCameraAction(playerCamera, 0.15f));
-        mouse.bindButton(ButtonBindType.DOWN, Input.Buttons.RIGHT, event -> {
-            MerchantEntity target = npcTargetingSystem.getTargetedNpc();
-            if (target != null && !tradingUI.isVisible()) {
-                openTradingUI(target);
-            }
-        });
+        playerInventory = level.createInventory();
+        hud = new GameHUD(level.valueGoal, playerInventory);
+        overlays.push(hud, new UIRelativeLayout());
 
         npcs = level.createMerchants(textures, playerCamera);
         entityManager.addAll(npcs);
@@ -101,9 +97,11 @@ public class ExploreScene extends Scene {
             npcs
         );
 
-        playerInventory = level.createInventory();
-
-        hud = new GameHUD(level.valueGoal, playerInventory);
+        setupKeybinds(sceneManager);
+        mouse.bindMove(new RotateCameraAction(playerCamera, 0.15f));
+        mouse.bindButton(ButtonBindType.DOWN, Input.Buttons.RIGHT, event ->
+            openTradingUI(npcTargetingSystem.getTargetedNpc())
+        );
 
         //             if (tradeManager.isLevelComplete() && !victoryQueued) {
         //                 victoryQueued = true;
@@ -181,81 +179,85 @@ public class ExploreScene extends Scene {
     @Override
     public InputProcessor getInputProcessor() {
         InputMultiplexer inputMux = new InputMultiplexer();
+        inputMux.addProcessor(overlays.getInputProcessor());
         inputMux.addProcessor(keyboard);
         inputMux.addProcessor(mouse);
         return inputMux;
     }
 
     @Override
-    public void onFocus() {
+    public boolean onFocus() {
+        if (overlays.onFocus()) {
+            return true;
+        }
         Gdx.input.setCursorCatched(true);
+        return true;
     }
 
     @Override
     public void dispose() {
-        super.dispose();
-        hud.dispose();
-        if (tradingUI != null) {
-            tradingUI.dispose();
-        }
+        overlays.dispose();
+        sounds.dispose();
+        textures.dispose();
     }
 
     private void openTradingUI(MerchantEntity target) {
-        if (target == null || !target.canTrade() || tradingUI != null) return;
+        if (target == null || !target.canTrade()) return;
 
-        tradingUI = new TradingUI(playerInventory, target);
-
-        InputMultiplexer inputMux = new InputMultiplexer();
-        inputMux.addProcessor(tradingUI.getInputProcessor());
-        inputMux.addProcessor(keyboard);
-        inputMux.addProcessor(mouse);
-        Gdx.input.setCursorCatched(false);
-        Gdx.input.setInputProcessor(inputMux);
+        hud.hideInteractionPrompt();
+        overlays.push(
+            new TradingUI(playerInventory, target),
+            new UIRelativeLayout()
+        );
+        Gdx.input.setInputProcessor(overlays.getInputProcessor());
+        onFocus();
     }
 
     private void closeTradingUI() {
-        tradingUI.dispose();
-        tradingUI = null;
-
-        Gdx.input.setCursorCatched(true);
+        Scene removed = overlays.pop();
+        removed.dispose();
         Gdx.input.setInputProcessor(getInputProcessor());
+        onFocus();
     }
 
     @Override
     public void update(float deltaTime) {
         clock.forward(deltaTime);
-        if (tradingUI == null) {
-            keyboard.update(deltaTime, clock.getSeconds());
-            mouse.update(deltaTime, clock.getSeconds());
+        // TODO
+        // if (tradingUI == null) {
+        keyboard.update(deltaTime, clock.getSeconds());
+        mouse.update(deltaTime, clock.getSeconds());
 
-            npcTargetingSystem.update();
-            MerchantEntity targeted = npcTargetingSystem.getTargetedNpc();
-            if (targeted == null) {
-                hud.hideInteractionPrompt();
-            } else if (targeted.canTrade()) {
-                hud.showInteractionPrompt(
-                    "[E] Trade with " + targeted.getData().getName()
-                );
-            } else {
-                hud.showInteractionPrompt(
-                    targeted.getData().getName() + " does not want to trade."
-                );
-            }
-        } else {
+        npcTargetingSystem.update();
+        MerchantEntity targeted = npcTargetingSystem.getTargetedNpc();
+        if (targeted == null) {
             hud.hideInteractionPrompt();
+        } else if (targeted.canTrade()) {
+            hud.showInteractionPrompt(
+                "[E] Trade with " + targeted.getData().getName()
+            );
+        } else {
+            hud.showInteractionPrompt(
+                targeted.getData().getName() + " does not want to trade."
+            );
         }
+        // }
 
         entityManager.updateCollisions();
         entityManager.update(deltaTime);
-        hud.update(deltaTime);
-        if (tradingUI != null) {
-            tradingUI.update(deltaTime);
-        }
+        overlays.update(deltaTime);
     }
 
     @Override
-    public void render(GraphicsManager graphics, int width, int height) {
+    public void render(
+        GraphicsManager graphics,
+        int x,
+        int y,
+        int width,
+        int height
+    ) {
         viewport.update(width, height);
+        viewport.setScreenPosition(x, y);
 
         // Render Sky box first
         graphics.beginRender(viewport);
@@ -271,21 +273,12 @@ public class ExploreScene extends Scene {
         graphics.endRender();
 
         // Render UI on top
-        hud.render(
+        overlays.render(
             graphics,
             viewport.getScreenX(),
             viewport.getScreenY(),
             viewport.getScreenWidth(),
             viewport.getScreenHeight()
         );
-        if (tradingUI != null) {
-            tradingUI.render(
-                graphics,
-                viewport.getScreenX(),
-                viewport.getScreenY(),
-                viewport.getScreenWidth(),
-                viewport.getScreenHeight()
-            );
-        }
     }
 }
