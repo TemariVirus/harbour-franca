@@ -22,6 +22,7 @@ import com.simpulator.game.trading.Item;
 import com.simpulator.game.trading.TradeProcessor.TradeResult;
 import com.simpulator.game.ui.Box;
 import com.simpulator.game.ui.Text;
+import com.simpulator.game.ui.Timer;
 import com.simpulator.game.ui.UiHelper;
 
 public class TradingUI implements Scene {
@@ -34,7 +35,6 @@ public class TradingUI implements Scene {
 
     private static final int CHOICE_COUNT = 3;
 
-    // TODO: make skin class and skin factory
     // --- Colors for Ancient France Maritime Vibe ---
     private static final Color TEXT_BACKGROUND = new Color(0, 0, 0, 0.6f);
     private static final Color goldTrim = new Color(0.83f, 0.68f, 0.21f, 1f);
@@ -102,15 +102,12 @@ public class TradingUI implements Scene {
     private final BitmapFont font;
     private final UIRoot uiRoot = new UIRoot();
 
-    // TODO: encapsulate timer
-    private float timeLeft = 0;
-    private Text timerText;
-
     private final Inventory playerInventory;
     private int offeredItemIndex;
     private final MerchantEntity merchant;
     private int choiceIndex;
 
+    private Timer timer;
     private Text offeredItemText;
     private Text rarityText;
     private Text choiceTexts[] = new Text[CHOICE_COUNT];
@@ -139,9 +136,6 @@ public class TradingUI implements Scene {
         dialogueText.setText(merchant.getData().getDialogue());
         setChoiceIndex(-1);
         setOfferedItemIndex(0);
-
-        this.timeLeft = 90f; // 1 min 30 sec
-        updateTimer(0);
     }
 
     private void buildUI() {
@@ -162,17 +156,16 @@ public class TradingUI implements Scene {
             )
         );
         // Timer
-        timerText = new Text(
-            "",
+        timer = new Timer(
             font,
-            Text.Alignment.CENTER,
             parchmentText,
+            90, // 1 min 30 sec
             new UIRelativeLayout.Builder()
                 .padTop(90)
                 .height(FONT_SIZE)
                 .getLayout()
         );
-        uiRoot.addChild(timerText);
+        uiRoot.addChild(timer);
 
         // --- Left Column ---
         uiRoot.addChild(
@@ -517,6 +510,7 @@ public class TradingUI implements Scene {
 
     private void setTradeResult(String dialogue) {
         state = State.TRADE_RESULT;
+        timer.setRunning(false);
         dialogueText.setText(dialogue);
         mouse.unbindAllMove();
         mouse.bindButton(ButtonBindType.DOWN, MouseButton.LEFT.code(), e -> {
@@ -561,14 +555,6 @@ public class TradingUI implements Scene {
         return true;
     }
 
-    private void updateTimer(float deltaTime) {
-        timeLeft -= deltaTime;
-        if (timeLeft < 0) timeLeft = 0;
-        int m = (int) (timeLeft / 60);
-        int s = (int) (timeLeft % 60);
-        timerText.setText(String.format("%d:%02d", m, s));
-    }
-
     public boolean isInteractive() {
         return state == State.TRADING;
     }
@@ -584,8 +570,7 @@ public class TradingUI implements Scene {
         if (!isInteractive()) return;
 
         uiRoot.update(deltaTime);
-        updateTimer(deltaTime);
-        if (timeLeft <= 0) {
+        if (timer.isFinished()) {
             // TODO: custom lines for each merchant?
             setTradeResult("Too slow! Don't waste my time!");
             merchant.setCanTrade(false);
