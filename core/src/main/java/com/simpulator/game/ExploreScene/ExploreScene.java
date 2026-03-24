@@ -51,8 +51,8 @@ public class ExploreScene implements Scene {
     private TradingUI tradingUI = null;
 
     private final Clock clock = new Clock(0);
-    private final List<MerchantEntity> npcs;
-    private final NpcTargetingSystem npcTargetingSystem;
+    private final List<MerchantEntity> merchants;
+    private final EntityTargeter<MerchantEntity> merchantTargeter;
 
     private final Inventory playerInventory;
     private final int valueGoal;
@@ -90,17 +90,14 @@ public class ExploreScene implements Scene {
         hud = new GameHUD(level.valueGoal, playerInventory);
         overlays.push(hud, new UIRelativeLayout());
 
-        npcs = level.createMerchants(textures, playerCamera);
-        entityManager.addAll(npcs);
-        npcTargetingSystem = new NpcTargetingSystem(
-            playerCamera.getCamera(),
-            npcs
-        );
+        merchants = level.createMerchants(textures, playerCamera);
+        entityManager.addAll(merchants);
+        merchantTargeter = new EntityTargeter<>(merchants, 2);
 
         setupKeybinds(sceneManager);
         mouse.bindMove(new RotateCameraAction(playerCamera, 0.15f));
         mouse.bindButton(ButtonBindType.DOWN, Input.Buttons.RIGHT, event ->
-            openTradingUI(npcTargetingSystem.getTargetedNpc())
+            openTradingUIWithLookingAt()
         );
 
         // TODO
@@ -160,7 +157,7 @@ public class ExploreScene implements Scene {
             sceneManager.setScene(Scenes.MainMenu)
         );
         keyboard.bind(ButtonBindType.DOWN, Keys.E, event ->
-            openTradingUI(npcTargetingSystem.getTargetedNpc())
+            openTradingUIWithLookingAt()
         );
     }
 
@@ -190,7 +187,11 @@ public class ExploreScene implements Scene {
         textures.dispose();
     }
 
-    private void openTradingUI(MerchantEntity target) {
+    private void openTradingUIWithLookingAt() {
+        MerchantEntity target = merchantTargeter.getClosest(
+            playerCamera.getCamera()
+        );
+
         if (target == null || !target.canTrade()) return;
         if (isTradingUIOpen()) {
             throw new IllegalStateException("Trading UI is already open");
@@ -223,8 +224,9 @@ public class ExploreScene implements Scene {
     private void updateTargeted() {
         if (isTradingUIOpen()) return;
 
-        npcTargetingSystem.update();
-        MerchantEntity targeted = npcTargetingSystem.getTargetedNpc();
+        MerchantEntity targeted = merchantTargeter.getClosest(
+            playerCamera.getCamera()
+        );
         if (targeted == null) {
             hud.hideInteractionPrompt();
         } else if (targeted.canTrade()) {

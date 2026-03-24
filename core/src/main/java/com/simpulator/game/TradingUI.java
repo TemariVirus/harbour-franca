@@ -518,6 +518,7 @@ public class TradingUI implements Scene {
     private void setTradeResult(String dialogue) {
         state = State.TRADE_RESULT;
         dialogueText.setText(dialogue);
+        mouse.unbindAllMove();
         mouse.bindButton(ButtonBindType.DOWN, MouseButton.LEFT.code(), e -> {
             state = State.SHOULD_CLOSE;
         });
