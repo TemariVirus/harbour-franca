@@ -1,4 +1,4 @@
-package com.simpulator.game;
+package com.simpulator.game.scenes;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
@@ -16,7 +16,7 @@ import com.simpulator.engine.scene.Scene;
 import com.simpulator.engine.ui.UIRelativeLayout;
 import com.simpulator.engine.ui.UIRelativeLayout.Alignment;
 import com.simpulator.engine.ui.UIRoot;
-import com.simpulator.game.ExploreScene.MerchantEntity;
+import com.simpulator.game.entities.MerchantEntity;
 import com.simpulator.game.trading.Inventory;
 import com.simpulator.game.trading.Item;
 import com.simpulator.game.trading.TradeProcessor.TradeResult;

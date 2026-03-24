@@ -1,4 +1,4 @@
-package com.simpulator.game;
+package com.simpulator.game.entities;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;

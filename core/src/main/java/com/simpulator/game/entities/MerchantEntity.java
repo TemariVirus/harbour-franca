@@ -1,4 +1,4 @@
-package com.simpulator.game.ExploreScene;
+package com.simpulator.game.entities;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Quaternion;
@@ -6,7 +6,6 @@ import com.badlogic.gdx.math.Vector3;
 import com.simpulator.engine.Entity;
 import com.simpulator.engine.graphics.RectangleRenderer;
 import com.simpulator.engine.scene.TextureCache;
-import com.simpulator.game.CuboidEntity;
 import com.simpulator.game.levels.MerchantData;
 import com.simpulator.game.trading.Item;
 import com.simpulator.game.trading.TradeProcessor;

@@ -1,4 +1,4 @@
-package com.simpulator.game.ExploreScene;
+package com.simpulator.game.scenes;
 
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;

@@ -1,4 +1,4 @@
-package com.simpulator.game.ExploreScene;
+package com.simpulator.game.scenes;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -25,9 +25,13 @@ import com.simpulator.engine.scene.TextureCache;
 import com.simpulator.engine.ui.UIRelativeLayout;
 import com.simpulator.game.Clock;
 import com.simpulator.game.Config;
+import com.simpulator.game.EntityTargeter;
+import com.simpulator.game.RotateCameraAction;
 import com.simpulator.game.Scenes;
 import com.simpulator.game.SkyboxLoader;
-import com.simpulator.game.TradingUI;
+import com.simpulator.game.TranslateCameraAction;
+import com.simpulator.game.entities.CameraEntity;
+import com.simpulator.game.entities.MerchantEntity;
 import com.simpulator.game.levels.Level;
 import com.simpulator.game.trading.Inventory;
 import java.util.List;

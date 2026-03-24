@@ -3,7 +3,7 @@ package com.simpulator.game.levels;
 import com.badlogic.gdx.math.Vector3;
 import com.simpulator.engine.Entity;
 import com.simpulator.engine.scene.TextureCache;
-import com.simpulator.game.ExploreScene.MerchantEntity;
+import com.simpulator.game.entities.MerchantEntity;
 import com.simpulator.game.trading.Inventory;
 import com.simpulator.game.trading.Item;
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package com.simpulator.game.ExploreScene;
+package com.simpulator.game;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.Vector3;

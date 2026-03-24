@@ -1,7 +1,7 @@
 package com.simpulator.game.levels;
 
 import com.badlogic.gdx.math.Vector3;
-import com.simpulator.game.ExploreScene.MerchantEntity;
+import com.simpulator.game.entities.MerchantEntity;
 import com.simpulator.game.language.Language;
 import com.simpulator.game.levels.Level.MerchantConfig;
 import com.simpulator.game.levels.maps.MiramarMap;

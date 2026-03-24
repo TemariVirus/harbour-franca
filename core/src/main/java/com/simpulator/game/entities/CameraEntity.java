@@ -1,4 +1,4 @@
-package com.simpulator.game.ExploreScene;
+package com.simpulator.game.entities;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.Quaternion;
@@ -8,7 +8,6 @@ import com.badlogic.gdx.math.collision.OrientedBoundingBox;
 import com.simpulator.engine.CollidableEntity;
 import com.simpulator.engine.collision.Cuboid;
 import com.simpulator.engine.collision.GJKShape;
-import com.simpulator.game.EmptyRenderer;
 import java.util.Arrays;
 
 public class CameraEntity extends CollidableEntity {

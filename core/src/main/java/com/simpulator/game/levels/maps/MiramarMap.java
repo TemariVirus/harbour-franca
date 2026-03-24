@@ -6,8 +6,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.simpulator.engine.EntityManager;
 import com.simpulator.engine.scene.TextureCache;
-import com.simpulator.game.CuboidEntity;
-import com.simpulator.game.TiledRenderer;
+import com.simpulator.game.entities.CuboidEntity;
+import com.simpulator.game.entities.TiledRenderer;
 import com.simpulator.game.levels.LevelMap;
 
 public class MiramarMap implements LevelMap {

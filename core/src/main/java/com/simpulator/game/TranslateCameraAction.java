@@ -1,8 +1,9 @@
-package com.simpulator.game.ExploreScene;
+package com.simpulator.game;
 
 import com.badlogic.gdx.math.Vector3;
 import com.simpulator.engine.input.Action;
 import com.simpulator.engine.input.KeyboardManager;
+import com.simpulator.game.entities.CameraEntity;
 
 public class TranslateCameraAction implements Action<KeyboardManager.KeyEvent> {
 

@@ -1,4 +1,4 @@
-package com.simpulator.game;
+package com.simpulator.game.scenes;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -19,6 +19,7 @@ import com.simpulator.engine.scene.SceneManager;
 import com.simpulator.engine.ui.UIRelativeLayout;
 import com.simpulator.engine.ui.UIRelativeLayout.Alignment;
 import com.simpulator.engine.ui.UIRoot;
+import com.simpulator.game.Scenes;
 import com.simpulator.game.ui.Box;
 import com.simpulator.game.ui.Text;
 import com.simpulator.game.ui.UiHelper;

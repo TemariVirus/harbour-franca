@@ -1,9 +1,10 @@
-package com.simpulator.game.ExploreScene;
+package com.simpulator.game;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.simpulator.engine.input.Action;
 import com.simpulator.engine.input.MouseManager;
+import com.simpulator.game.entities.CameraEntity;
 
 public class RotateCameraAction implements Action<MouseManager.MouseMoveEvent> {
 

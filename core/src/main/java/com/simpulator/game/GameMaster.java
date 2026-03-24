@@ -4,8 +4,11 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.simpulator.engine.scene.MusicManager;
 import com.simpulator.engine.scene.SceneManager;
-import com.simpulator.game.ExploreScene.ExploreScene;
 import com.simpulator.game.levels.LevelManager;
+import com.simpulator.game.scenes.ExploreScene;
+import com.simpulator.game.scenes.MainMenu;
+import com.simpulator.game.scenes.SoundMenu;
+import com.simpulator.game.scenes.VictoryScene;
 
 public class GameMaster extends ApplicationAdapter {
 

@@ -1,4 +1,4 @@
-package com.simpulator.game;
+package com.simpulator.game.entities;
 
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
@@ -8,7 +8,6 @@ import com.simpulator.engine.CollidableEntity;
 import com.simpulator.engine.collision.Cuboid;
 import com.simpulator.engine.collision.GJKShape;
 import com.simpulator.engine.graphics.EntityRenderer;
-
 import java.util.Arrays;
 
 public class CuboidEntity extends CollidableEntity {
