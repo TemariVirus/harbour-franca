@@ -40,6 +40,7 @@ public class ExploreScene implements Scene {
 
     private static final float PLAYER_SPEED = 4f;
 
+    private final SceneManager sceneManager;
     private final TextureCache textures = new TextureCache();
     private final SoundManager sounds = new SoundManager();
     private final EntityManager entityManager = new EntityManager();
@@ -66,6 +67,7 @@ public class ExploreScene implements Scene {
         Level level,
         MusicManager musics
     ) {
+        this.sceneManager = sceneManager;
         musics.stopAllMusic();
         musics.startMusic(level.bgmPath);
         sounds.setVolume(Config.volume * 0.01f);
@@ -104,23 +106,7 @@ public class ExploreScene implements Scene {
             openTradingUIWithLookingAt()
         );
 
-        // TODO
-        // if (tradeManager.isLevelComplete() && !victoryQueued) {
-        //     tradingUI.showTradeResult(
-        //         "Level Complete! Goal reached!"
-        //     );
-        //     Timer.schedule(
-        //         new Timer.Task() {
-        //             @Override
-        //             public void run() {
-        //                 sceneManager.setScene(Scenes.Victory);
-        //             }
-        //         },
-        //         2f
-        //     );
-        // }
-
-        this.valueGoal = level.valueGoal;
+        valueGoal = level.valueGoal;
     }
 
     private void setupKeybinds(SceneManager sceneManager) {
@@ -221,6 +207,22 @@ public class ExploreScene implements Scene {
         onFocus();
     }
 
+    private void checkWinCondition() {
+        // TODO: change this to some gatekeeper or smth that the player interacts with to check
+        for (MerchantEntity merchant : merchants) {
+            if (merchant.canTrade()) {
+                return;
+            }
+        }
+
+        if (playerInventory.getTotalValue() >= valueGoal) {
+            // tradingUI.showTradeResult("Level Complete! Goal reached!");
+            sceneManager.setScene(Scenes.Victory);
+        } else {
+            // TODO: lose scene
+        }
+    }
+
     private boolean isTradingUIOpen() {
         return tradingUI != null;
     }
@@ -248,6 +250,7 @@ public class ExploreScene implements Scene {
     public void update(float deltaTime) {
         if (tradingUI != null && tradingUI.shouldClose()) {
             closeTradingUI();
+            checkWinCondition();
         }
 
         clock.forward(deltaTime);
