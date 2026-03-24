@@ -152,6 +152,7 @@ public class GameHUD implements Scene {
 
     @Override
     public void update(float deltaTime) {
+        updateObjectiveText();
         int i = 0;
         for (Item item : playerInventory.getItems()) {
             inventoryLabels[i].setText(item.toString());
