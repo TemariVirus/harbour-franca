@@ -44,7 +44,7 @@ public class Level {
     public Inventory createInventory() {
         Inventory inventory = new Inventory();
         for (Item item : startingItems) {
-            inventory.addItem(item);
+            inventory.add(item);
         }
         return inventory;
     }

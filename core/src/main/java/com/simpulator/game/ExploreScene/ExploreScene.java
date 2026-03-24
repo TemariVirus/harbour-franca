@@ -104,75 +104,12 @@ public class ExploreScene extends Scene {
         playerInventory = level.createInventory();
 
         hud = new GameHUD(level.valueGoal, playerInventory);
-        tradingUI = new TradingUI();
-        // tradingUI.setListener(
-        //     new TradingUI.TradingUIListener() {
-        //         @Override
-        //         public void onDialogueSelected(int optionIndex) {
-        //             selectedDialogueIndex = optionIndex;
-        //             updateInnerThought();
-        //         }
-
-        //         @Override
-        //         public void onNpcItemChanged(int newIndex) {
-        //             selectedPlayerItemIndex = newIndex;
-        //             updateInnerThought();
-        //         }
-
-        //         @Override
-        //         public void onTradeConfirmed(int playerItemIndex) {
-        //             if (
-        //                 currentOffer == null || selectedDialogueIndex < 0
-        //             ) return;
-
-        //             Item playerItem = playerInventory
-        //                 .getItems()
-        //                 .get(playerItemIndex);
-        //             Item npcItem = currentOffer
-        //                 .getNpcChoices()
-        //                 .get(selectedDialogueIndex);
-        //             TradeResult result = tradeManager.attemptTrade(
-        //                 playerItem,
-        //                 npcItem
-        //             );
-
-        //             MerchantEntity target = npcTargetingSystem.getTargetedNpc();
-        //             if (target != null) {
-        //                 switch (result) {
-        //                     case SUCCESS:
-        //                     case NPC_HAPPY:
-        //                         target.setTradeState(
-        //                             NpcEntity.MerchantEntity.TRADED
-        //                         );
-        //                         break;
-        //                     case FAILED:
-        //                         target.setTradeState(
-        //                             NpcEntity.MerchantEntity.ANGRY
-        //                         );
-        //                         break;
-        //                 }
-        //             }
-
-        //             String resultText;
-        //             if (result == TradeResult.NPC_HAPPY) resultText =
-        //                 "NPC is happy with the deal!";
-        //             else if (result == TradeResult.SUCCESS) resultText =
-        //                 "Trade successful!";
-        //             else resultText = "NPC rejected the trade!";
-        //             tradingUI.showTradeResult(resultText);
-
-        //             syncHUD();
-        //             currentOffer = null;
-        //             selectedDialogueIndex = -1;
-        //             selectedPlayerItemIndex = 0;
 
         //             if (tradeManager.isLevelComplete() && !victoryQueued) {
         //                 victoryQueued = true;
         //                 tradingUI.showTradeResult(
         //                     "Level Complete! Goal reached!"
         //                 );
-
-        //                 Gdx.input.setCursorCatched(false);
 
         //                 Timer.schedule(
         //                     new Timer.Task() {
@@ -195,33 +132,6 @@ public class ExploreScene extends Scene {
         //                 );
         //             }
         //         }
-
-        //         @Override
-        //         public void onTradeCancelled() {
-        //             currentOffer = null;
-        //             selectedDialogueIndex = -1;
-        //             selectedPlayerItemIndex = 0;
-        //             closeTradingUI();
-        //         }
-
-        //         @Override
-        //         public void onTimeUp() {
-        //             currentOffer = null;
-        //             selectedDialogueIndex = -1;
-        //             selectedPlayerItemIndex = 0;
-        //             tradingUI.showTradeResult("Too slow!");
-        //             Timer.schedule(
-        //                 new Timer.Task() {
-        //                     @Override
-        //                     public void run() {
-        //                         closeTradingUI();
-        //                     }
-        //                 },
-        //                 2f
-        //             );
-        //         }
-        //     }
-        // );
 
         this.valueGoal = level.valueGoal;
     }
@@ -263,12 +173,9 @@ public class ExploreScene extends Scene {
         keyboard.bind(ButtonBindType.DOWN, Keys.ESCAPE, e ->
             sceneManager.setScene(Scenes.MainMenu)
         );
-        keyboard.bind(ButtonBindType.DOWN, Keys.E, event -> {
-            MerchantEntity target = npcTargetingSystem.getTargetedNpc();
-            if (target != null && !tradingUI.isVisible()) {
-                openTradingUI(target);
-            }
-        });
+        keyboard.bind(ButtonBindType.DOWN, Keys.E, event ->
+            openTradingUI(npcTargetingSystem.getTargetedNpc())
+        );
     }
 
     @Override
@@ -294,67 +201,30 @@ public class ExploreScene extends Scene {
     }
 
     private void openTradingUI(MerchantEntity target) {
-        // if (!target.canTrade() || tradingUI.isVisible()) return;
-        //
-        // if (target.getCachedOffer() == null) {
-        //     try {
-        //         target.setCachedOffer(
-        //             tradeOfferFactory.createOffer(
-        //                 playerInventory,
-        //                 target.getDialogueOptions()
-        //             )
-        //         );
-        //     } catch (IllegalStateException e) {
-        //         Gdx.app.log("Trade", "createOffer failed: " + e.getMessage());
-        //         return;
-        //     }
-        // }
-        // currentOffer = target.getCachedOffer();
-        //
-        // selectedDialogueIndex = -1;
-        // selectedPlayerItemIndex = 0;
-        //
-        // List<Item> allItems = playerInventory.getItems();
-        // String[] playerNames = allItems
-        //     .stream()
-        //     .map(Item::getName)
-        //     .toArray(String[]::new);
-        // String[] playerRarities = allItems
-        //     .stream()
-        //     .map(i -> i.getRarity().name())
-        //     .toArray(String[]::new);
-        //
-        // String[] npcDialogue = currentOffer
-        //     .getNpcDialogueLabels()
-        //     .toArray(new String[0]);
-        //
-        // tradingUI.show(
-        //     target.getName(),
-        //     npcDialogue,
-        //     playerNames,
-        //     playerRarities
-        // );
-        // InputMultiplexer inputMux = new InputMultiplexer();
-        // inputMux.addProcessor(tradingUI.getInputProcessor());
-        // inputMux.addProcessor(keyboard);
-        // inputMux.addProcessor(mouse);
-        // Gdx.input.setCursorCatched(false);
-        // Gdx.input.setInputProcessor(inputMux);
+        if (target == null || !target.canTrade() || tradingUI != null) return;
+
+        tradingUI = new TradingUI(playerInventory, target);
+
+        InputMultiplexer inputMux = new InputMultiplexer();
+        inputMux.addProcessor(tradingUI.getInputProcessor());
+        inputMux.addProcessor(keyboard);
+        inputMux.addProcessor(mouse);
+        Gdx.input.setCursorCatched(false);
+        Gdx.input.setInputProcessor(inputMux);
     }
 
     private void closeTradingUI() {
-        tradingUI.hide();
-        if (!victoryQueued) {
-            Gdx.input.setCursorCatched(true);
-            Gdx.input.setInputProcessor(getInputProcessor());
-            mouse.resetMousePosition();
-        }
+        tradingUI.dispose();
+        tradingUI = null;
+
+        Gdx.input.setCursorCatched(true);
+        Gdx.input.setInputProcessor(getInputProcessor());
     }
 
     @Override
     public void update(float deltaTime) {
         clock.forward(deltaTime);
-        if (!tradingUI.isVisible()) {
+        if (tradingUI == null) {
             keyboard.update(deltaTime, clock.getSeconds());
             mouse.update(deltaTime, clock.getSeconds());
 
@@ -378,7 +248,9 @@ public class ExploreScene extends Scene {
         entityManager.updateCollisions();
         entityManager.update(deltaTime);
         hud.update(deltaTime);
-        tradingUI.update(deltaTime);
+        if (tradingUI != null) {
+            tradingUI.update(deltaTime);
+        }
     }
 
     @Override
@@ -406,12 +278,14 @@ public class ExploreScene extends Scene {
             viewport.getScreenWidth(),
             viewport.getScreenHeight()
         );
-        tradingUI.render(
-            graphics,
-            viewport.getScreenX(),
-            viewport.getScreenY(),
-            viewport.getScreenWidth(),
-            viewport.getScreenHeight()
-        );
+        if (tradingUI != null) {
+            tradingUI.render(
+                graphics,
+                viewport.getScreenX(),
+                viewport.getScreenY(),
+                viewport.getScreenWidth(),
+                viewport.getScreenHeight()
+            );
+        }
     }
 }

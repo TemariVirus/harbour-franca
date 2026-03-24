@@ -52,6 +52,10 @@ public class MerchantEntity extends CuboidEntity {
         return canTrade;
     }
 
+    public void setCanTrade(boolean canTrade) {
+        this.canTrade = canTrade;
+    }
+
     public MerchantData getData() {
         return data;
     }

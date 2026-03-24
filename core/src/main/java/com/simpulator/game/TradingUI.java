@@ -17,25 +17,20 @@ import com.simpulator.engine.input.MouseManager.MouseMoveEvent;
 import com.simpulator.engine.ui.UIRelativeLayout;
 import com.simpulator.engine.ui.UIRelativeLayout.Alignment;
 import com.simpulator.engine.ui.UIRoot;
+import com.simpulator.game.ExploreScene.MerchantEntity;
+import com.simpulator.game.trading.Inventory;
+import com.simpulator.game.trading.Item;
+import com.simpulator.game.trading.TradeProcessor.TradeResult;
 import com.simpulator.game.ui.Box;
 import com.simpulator.game.ui.Text;
 import com.simpulator.game.ui.UiHelper;
 
 public class TradingUI implements Widget, Disposable {
 
-    public enum State {
+    private enum State {
         HIDDEN,
-        CHOOSING_DIALOGUE,
-        TRADE_READY,
+        TRADING,
         TRADE_RESULT,
-    }
-
-    public interface TradingUIListener {
-        void onDialogueSelected(int optionIndex);
-        void onNpcItemChanged(int newIndex);
-        void onTradeConfirmed(int itemIndex);
-        void onTradeCancelled();
-        void onTimeUp();
     }
 
     private static final int CHOICE_COUNT = 3;
@@ -102,7 +97,6 @@ public class TradingUI implements Widget, Disposable {
     final float DIALOGUE_HEIGHT = 120;
 
     private State state;
-    private TradingUIListener listener = null;
     private MouseManager mouse;
 
     private Viewport viewport;
@@ -111,26 +105,45 @@ public class TradingUI implements Widget, Disposable {
 
     // TODO: encapsulate timer
     private float timeLeft = 0;
-    private String[] offeredItemNames = new String[0];
-    private String[] offeredItemRarities = new String[0];
-    private int offeredItemIndex = 0;
-    private int selectedDialogueIndex = -1;
-
     private Text timerText;
+
+    private Inventory playerInventory;
+    private int offeredItemIndex;
+    private MerchantEntity merchant;
+    private int choiceIndex;
+
     private Text offeredItemText;
     private Text rarityText;
     private Text choiceTexts[] = new Text[CHOICE_COUNT];
-    private Text nameText;
     private Text dialogueText;
     private Box confirmButton;
     private Box cancelButton;
 
-    public TradingUI() {
-        this.state = State.HIDDEN;
+    public TradingUI(Inventory playerInventory, MerchantEntity merchant) {
+        if (merchant.getData().getItems().size() != CHOICE_COUNT) {
+            throw new IllegalArgumentException(
+                "Merchant must have exactly " + CHOICE_COUNT + " items."
+            );
+        }
+
+        this.state = State.TRADING;
         this.mouse = new MouseManager();
         this.viewport = new ExtendViewport(720, 480);
+        this.playerInventory = playerInventory;
+        this.merchant = merchant;
 
         buildUI();
+        for (int i = 0; i < choiceTexts.length; i++) {
+            choiceTexts[i].setText(
+                merchant.getData().getItems().get(i).toString()
+            );
+        }
+        dialogueText.setText(merchant.getData().getDialogue());
+        setChoiceIndex(-1);
+        setOfferedItemIndex(0);
+
+        this.timeLeft = 90f; // 1 min 30 sec
+        updateTimer(0);
     }
 
     private void buildUI() {
@@ -317,13 +330,7 @@ public class TradingUI implements Widget, Disposable {
                 new UIRelativeLayout()
             ),
             FONT_SIZE,
-            e -> {
-                if (!isInteractive()) return false;
-                if (listener != null) listener.onTradeConfirmed(
-                    offeredItemIndex
-                );
-                return true;
-            }
+            e -> confirmTrade()
         );
         confirmButton.setVisible(false);
         uiRoot.addChild(confirmButton);
@@ -351,18 +358,13 @@ public class TradingUI implements Widget, Disposable {
                 new UIRelativeLayout()
             ),
             FONT_SIZE,
-            e -> {
-                if (!isInteractive()) return false;
-                if (listener != null) listener.onTradeCancelled();
-                hide();
-                return true;
-            }
+            e -> cancelTrade()
         );
         cancelButton.setVisible(false);
         uiRoot.addChild(cancelButton);
 
         // Dialogue box
-        nameText = new Text(
+        Text nameText = new Text(
             "",
             font,
             Text.Alignment.START,
@@ -430,11 +432,7 @@ public class TradingUI implements Widget, Disposable {
                 new UIRelativeLayout()
             ),
             12,
-            e -> {
-                if (!isInteractive()) return false;
-                setOfferedItemIndex(offeredItemIndex + step);
-                return true;
-            }
+            e -> setOfferedItemIndex(offeredItemIndex + step)
         );
 
         return button;
@@ -461,13 +459,10 @@ public class TradingUI implements Widget, Disposable {
                     e.type != ButtonBindType.DOWN ||
                     !button.getBounds().contains(e.x, e.y)
                 ) return false;
-                if (
-                    state != State.TRADE_READY || selectedDialogueIndex != index
-                ) {
-                    state = State.TRADE_READY;
-                    selectedDialogueIndex = index;
+                if (state != State.TRADING || choiceIndex != index) {
+                    state = State.TRADING;
+                    choiceIndex = index;
                     button.setFillColor(highlightGold);
-                    if (listener != null) listener.onDialogueSelected(index);
                 }
                 confirmButton.setVisible(true);
                 cancelButton.setVisible(true);
@@ -475,9 +470,7 @@ public class TradingUI implements Widget, Disposable {
             })
             .addListener(MouseMoveEvent.class, e -> {
                 if (!isInteractive()) return false;
-                if (
-                    state == State.TRADE_READY && selectedDialogueIndex == index
-                ) {
+                if (state == State.TRADING && choiceIndex == index) {
                     button.setFillColor(highlightGold);
                 } else {
                     button.setFillColor(
@@ -496,55 +489,69 @@ public class TradingUI implements Widget, Disposable {
         return mouse;
     }
 
-    public void setListener(TradingUIListener listener) {
-        this.listener = listener;
-    }
-
-    public void show(
-        String npcName,
-        String[] options,
-        String[] itemNames,
-        String[] itemRarities
-    ) {
-        state = State.CHOOSING_DIALOGUE;
-        timeLeft = 90f; // 1 min 30 sec
-        updateTimer(0);
-        offeredItemNames = itemNames.clone();
-        offeredItemRarities = itemRarities.clone();
-        offeredItemIndex = 0;
-        selectedDialogueIndex = -1;
-
-        for (int i = 0; i < choiceTexts.length && i < options.length; i++) {
-            choiceTexts[i].setText(options[i]);
+    private void setChoiceIndex(int i) {
+        choiceIndex = i;
+        if (choiceIndex >= 0) {
+            choiceTexts[choiceIndex].setColor(highlightGold);
         }
-        nameText.setText(npcName);
-
-        confirmButton.setVisible(false);
-        cancelButton.setVisible(false);
-        setOfferedItemIndex(offeredItemIndex);
     }
 
-    private void setOfferedItemIndex(int i) {
+    private boolean setOfferedItemIndex(int i) {
+        if (!isInteractive()) return false;
+
+        int itemCount = playerInventory.getItems().size();
         if (i < 0) {
-            i = (i % offeredItemNames.length) + offeredItemNames.length;
+            i = (i % itemCount) + itemCount;
         }
-        offeredItemIndex = i % offeredItemNames.length;
+        offeredItemIndex = i % itemCount;
 
-        offeredItemText.setText(
-            "Picture of:\n" + offeredItemNames[offeredItemIndex]
+        Item item = playerInventory.getItems().get(offeredItemIndex);
+        offeredItemText.setText("Picture of:\n" + item.toString());
+        rarityText.setText(item.rarity().toString());
+        rarityText.setColor(item.rarity().color());
+
+        return true;
+    }
+
+    private boolean confirmTrade() {
+        if (!isInteractive()) return false;
+        if (choiceIndex < 0) {
+            throw new IllegalStateException("No choice selected.");
+        }
+
+        TradeResult result = merchant.trade(
+            choiceIndex,
+            playerInventory.getItems().get(offeredItemIndex)
         );
+        if (result != TradeResult.FAILED) {
+            playerInventory.removeAt(offeredItemIndex);
+            playerInventory.add(merchant.getData().getItems().get(choiceIndex));
+        }
 
-        String currentRarity =
-            offeredItemRarities[offeredItemIndex].toLowerCase();
-        Color rarityColor = Color.WHITE;
-        if (currentRarity.contains("common")) rarityColor = Color.LIGHT_GRAY;
-        else if (currentRarity.contains("rare")) rarityColor = Color.ROYAL;
-        else if (currentRarity.contains("epic")) rarityColor = Color.PURPLE;
-        else if (currentRarity.contains("legendary")) rarityColor = Color.GOLD;
-        rarityText.setColor(rarityColor);
-        rarityText.setText("Rarity: " + offeredItemRarities[offeredItemIndex]);
+        state = State.TRADE_RESULT;
+        // TODO: custom lines for each merchant?
+        switch (result) {
+            case GOT_WANTS:
+                dialogueText.setText("Thank you! That's just what I needed!");
+                break;
+            case TRADED:
+                dialogueText.setText("Nice doing business with you.");
+                break;
+            case FAILED:
+                dialogueText.setText(
+                    "Daga kotowaru! This is daylight robbery!"
+                );
+                break;
+        }
 
-        if (listener != null) listener.onNpcItemChanged(offeredItemIndex);
+        return true;
+    }
+
+    private boolean cancelTrade() {
+        if (!isInteractive()) return false;
+
+        state = State.TRADE_RESULT;
+        return true;
     }
 
     private void updateTimer(float deltaTime) {
@@ -553,17 +560,6 @@ public class TradingUI implements Widget, Disposable {
         int m = (int) (timeLeft / 60);
         int s = (int) (timeLeft % 60);
         timerText.setText(String.format("%d:%02d", m, s));
-    }
-
-    public void setInnerThoughts(String text) {
-        dialogueText.setText(text);
-    }
-
-    public void showTradeResult(String resultText) {
-        state = State.TRADE_RESULT;
-        confirmButton.setVisible(false);
-        cancelButton.setVisible(false);
-        dialogueText.setText(resultText);
     }
 
     public void hide() {
@@ -575,22 +571,23 @@ public class TradingUI implements Widget, Disposable {
     }
 
     public boolean isInteractive() {
-        return state == State.CHOOSING_DIALOGUE || state == State.TRADE_READY;
+        return state == State.TRADING;
     }
 
     @Override
     public void update(float deltaTime) {
-        if (state == State.HIDDEN) return;
+        if (!isInteractive()) return;
 
         mouse.update(deltaTime, Float.NaN);
         uiRoot.update(deltaTime);
-        if (isInteractive()) {
-            updateTimer(deltaTime);
-            if (timeLeft <= 0) {
-                state = State.TRADE_RESULT;
-                if (listener != null) listener.onTimeUp();
-            }
-        }
+        // TODO
+        // if (isInteractive()) {
+        //     updateTimer(deltaTime);
+        //     if (timeLeft <= 0) {
+        //         state = State.TRADE_RESULT;
+        // tradingUI.showTradeResult("Too slow!");
+        //     }
+        // }
     }
 
     @Override

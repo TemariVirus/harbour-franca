@@ -10,7 +10,7 @@ public class Inventory {
 
     private final List<Item> items = new ArrayList<>();
 
-    public void addItem(Item item) {
+    public void add(Item item) {
         if (items.size() >= MAX_ITEMS) {
             throw new IllegalStateException(
                 "Inventory is full. Cannot add more items."
@@ -19,10 +19,12 @@ public class Inventory {
         items.add(item);
     }
 
-    public boolean removeItem(Item item) {
-        boolean result = items.remove(item);
+    public boolean remove(Item item) {
+        return items.remove(item);
+    }
 
-        return result;
+    public void removeAt(int index) {
+        items.remove(index);
     }
 
     public List<Item> getItems() {

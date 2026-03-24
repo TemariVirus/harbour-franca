@@ -6,7 +6,7 @@ public class TradeProcessor {
 
     public enum TradeResult {
         FAILED,
-        NORMAL,
+        TRADED,
         GOT_WANTS,
     }
 
@@ -38,6 +38,6 @@ public class TradeProcessor {
         }
         return wants.contains(receive)
             ? TradeResult.GOT_WANTS
-            : TradeResult.NORMAL;
+            : TradeResult.TRADED;
     }
 }
