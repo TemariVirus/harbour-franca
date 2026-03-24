@@ -48,6 +48,7 @@ public class ExploreScene implements Scene {
     private final Skybox skybox;
     private final SceneCompositor overlays = new SceneCompositor();
     private final GameHUD hud;
+    private TradingUI tradingUI = null;
 
     private final Clock clock = new Clock(0);
     private final List<MerchantEntity> npcs;
@@ -55,7 +56,6 @@ public class ExploreScene implements Scene {
 
     private final Inventory playerInventory;
     private final int valueGoal;
-    private boolean victoryQueued = false;
 
     public ExploreScene(
         SceneManager sceneManager,
@@ -103,33 +103,21 @@ public class ExploreScene implements Scene {
             openTradingUI(npcTargetingSystem.getTargetedNpc())
         );
 
-        //             if (tradeManager.isLevelComplete() && !victoryQueued) {
-        //                 victoryQueued = true;
-        //                 tradingUI.showTradeResult(
-        //                     "Level Complete! Goal reached!"
-        //                 );
-
-        //                 Timer.schedule(
-        //                     new Timer.Task() {
-        //                         @Override
-        //                         public void run() {
-        //                             sceneManager.setScene(Scenes.Victory);
-        //                         }
-        //                     },
-        //                     2f
-        //                 );
-        //             } else {
-        //                 Timer.schedule(
-        //                     new Timer.Task() {
-        //                         @Override
-        //                         public void run() {
-        //                             closeTradingUI();
-        //                         }
-        //                     },
-        //                     2f
-        //                 );
+        // TODO
+        // if (tradeManager.isLevelComplete() && !victoryQueued) {
+        //     tradingUI.showTradeResult(
+        //         "Level Complete! Goal reached!"
+        //     );
+        //     Timer.schedule(
+        //         new Timer.Task() {
+        //             @Override
+        //             public void run() {
+        //                 sceneManager.setScene(Scenes.Victory);
         //             }
-        //         }
+        //         },
+        //         2f
+        //     );
+        // }
 
         this.valueGoal = level.valueGoal;
     }
@@ -190,6 +178,7 @@ public class ExploreScene implements Scene {
         if (overlays.onFocus()) {
             return true;
         }
+
         Gdx.input.setCursorCatched(true);
         return true;
     }
@@ -203,30 +192,36 @@ public class ExploreScene implements Scene {
 
     private void openTradingUI(MerchantEntity target) {
         if (target == null || !target.canTrade()) return;
+        if (isTradingUIOpen()) {
+            throw new IllegalStateException("Trading UI is already open");
+        }
 
-        hud.hideInteractionPrompt();
-        overlays.push(
-            new TradingUI(playerInventory, target),
-            new UIRelativeLayout()
-        );
-        Gdx.input.setInputProcessor(overlays.getInputProcessor());
+        tradingUI = new TradingUI(playerInventory, target);
+        overlays.push(tradingUI, new UIRelativeLayout());
+        Gdx.input.setInputProcessor(getInputProcessor());
         onFocus();
+        hud.hideInteractionPrompt();
     }
 
     private void closeTradingUI() {
+        if (!isTradingUIOpen()) {
+            throw new IllegalStateException("Trading UI is not open");
+        }
+
         Scene removed = overlays.pop();
         removed.dispose();
+        tradingUI = null;
+        mouse.resetMousePosition();
         Gdx.input.setInputProcessor(getInputProcessor());
         onFocus();
     }
 
-    @Override
-    public void update(float deltaTime) {
-        clock.forward(deltaTime);
-        // TODO
-        // if (tradingUI == null) {
-        keyboard.update(deltaTime, clock.getSeconds());
-        mouse.update(deltaTime, clock.getSeconds());
+    private boolean isTradingUIOpen() {
+        return tradingUI != null;
+    }
+
+    private void updateTargeted() {
+        if (isTradingUIOpen()) return;
 
         npcTargetingSystem.update();
         MerchantEntity targeted = npcTargetingSystem.getTargetedNpc();
@@ -241,8 +236,20 @@ public class ExploreScene implements Scene {
                 targeted.getData().getName() + " does not want to trade."
             );
         }
-        // }
+    }
 
+    @Override
+    public void update(float deltaTime) {
+        if (tradingUI != null && tradingUI.shouldClose()) {
+            closeTradingUI();
+        }
+
+        clock.forward(deltaTime);
+        if (!isTradingUIOpen()) {
+            keyboard.update(deltaTime, clock.getSeconds());
+            mouse.update(deltaTime, clock.getSeconds());
+            updateTargeted();
+        }
         entityManager.updateCollisions();
         entityManager.update(deltaTime);
         overlays.update(deltaTime);

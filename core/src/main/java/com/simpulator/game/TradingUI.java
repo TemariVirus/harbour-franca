@@ -27,9 +27,9 @@ import com.simpulator.game.ui.UiHelper;
 public class TradingUI implements Scene {
 
     private enum State {
-        HIDDEN,
         TRADING,
         TRADE_RESULT,
+        SHOULD_CLOSE,
     }
 
     private static final int CHOICE_COUNT = 3;
@@ -515,6 +515,14 @@ public class TradingUI implements Scene {
         return true;
     }
 
+    private void setTradeResult(String dialogue) {
+        state = State.TRADE_RESULT;
+        dialogueText.setText(dialogue);
+        mouse.bindButton(ButtonBindType.DOWN, MouseButton.LEFT.code(), e -> {
+            state = State.SHOULD_CLOSE;
+        });
+    }
+
     private boolean confirmTrade() {
         if (!isInteractive()) return false;
         if (choiceIndex < 0) {
@@ -530,29 +538,25 @@ public class TradingUI implements Scene {
             playerInventory.add(merchant.getData().getItems().get(choiceIndex));
         }
 
-        state = State.TRADE_RESULT;
         // TODO: custom lines for each merchant?
         switch (result) {
             case GOT_WANTS:
-                dialogueText.setText("Thank you! That's just what I needed!");
+                setTradeResult("Thank you! That's just what I needed!");
                 break;
             case TRADED:
-                dialogueText.setText("Nice doing business with you.");
+                setTradeResult("Nice doing business with you.");
                 break;
             case FAILED:
-                dialogueText.setText(
-                    "Daga kotowaru! This is daylight robbery!"
-                );
+                setTradeResult("Daga kotowaru! This is daylight robbery!");
                 break;
         }
-
         return true;
     }
 
     private boolean cancelTrade() {
         if (!isInteractive()) return false;
 
-        state = State.TRADE_RESULT;
+        state = State.SHOULD_CLOSE;
         return true;
     }
 
@@ -564,32 +568,27 @@ public class TradingUI implements Scene {
         timerText.setText(String.format("%d:%02d", m, s));
     }
 
-    public void hide() {
-        state = State.HIDDEN;
-    }
-
-    public boolean isVisible() {
-        return state != State.HIDDEN;
-    }
-
     public boolean isInteractive() {
         return state == State.TRADING;
     }
 
+    public boolean shouldClose() {
+        return state == State.SHOULD_CLOSE;
+    }
+
     @Override
     public void update(float deltaTime) {
+        if (shouldClose()) return;
+        mouse.update(deltaTime, Float.NaN);
         if (!isInteractive()) return;
 
-        mouse.update(deltaTime, Float.NaN);
         uiRoot.update(deltaTime);
-        // TODO
-        // if (isInteractive()) {
-        //     updateTimer(deltaTime);
-        //     if (timeLeft <= 0) {
-        //         state = State.TRADE_RESULT;
-        // tradingUI.showTradeResult("Too slow!");
-        //     }
-        // }
+        updateTimer(deltaTime);
+        if (timeLeft <= 0) {
+            // TODO: custom lines for each merchant?
+            setTradeResult("Too slow! Don't waste my time!");
+            merchant.setCanTrade(false);
+        }
     }
 
     @Override
@@ -600,8 +599,6 @@ public class TradingUI implements Scene {
         int width,
         int height
     ) {
-        if (!isVisible()) return;
-
         viewport.update(width, height, true);
         viewport.setScreenPosition(x, y);
         uiRoot.updateBounds(viewport);
