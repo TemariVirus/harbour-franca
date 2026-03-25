@@ -199,9 +199,12 @@ public class ExploreScene implements Scene {
 
         tradingUI = new TradingUI(playerInventory, target);
         overlays.push(tradingUI, new UIRelativeLayout());
+        hud.setCrosshairVisible(false);
+        hud.setPromptVisible(false);
+        hud.setInventoryVisible(false);
+
         Gdx.input.setInputProcessor(getInputProcessor());
         onFocus();
-        hud.hideInteractionPrompt();
     }
 
     protected void closeTradingUI() {
@@ -212,6 +215,9 @@ public class ExploreScene implements Scene {
         Scene removed = overlays.pop();
         removed.dispose();
         tradingUI = null;
+        hud.setCrosshairVisible(true);
+        hud.setInventoryVisible(true);
+
         mouse.resetMousePosition();
         Gdx.input.setInputProcessor(getInputProcessor());
         onFocus();
@@ -251,15 +257,16 @@ public class ExploreScene implements Scene {
             playerCamera.getCamera()
         );
         if (targeted == null) {
-            hud.hideInteractionPrompt();
-        } else if (targeted.canTrade()) {
-            hud.showInteractionPrompt(
-                "[E] Trade with " + targeted.getData().getName()
-            );
+            hud.setPromptVisible(false);
         } else {
-            hud.showInteractionPrompt(
-                targeted.getData().getName() + " does not want to trade."
-            );
+            hud.setPromptVisible(true);
+            if (targeted.canTrade()) {
+                hud.setPrompt("[E] Trade with " + targeted.getData().getName());
+            } else {
+                hud.setPrompt(
+                    targeted.getData().getName() + " does not want to trade."
+                );
+            }
         }
     }
 

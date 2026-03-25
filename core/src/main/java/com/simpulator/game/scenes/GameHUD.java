@@ -38,7 +38,9 @@ public class GameHUD implements Scene {
 
     // HUD elements
     private Text objectiveLabel;
+    private Text crosshair;
     private Text interactionPrompt;
+    private Box inventoryGroup;
     private Text[] inventoryLabels;
 
     public GameHUD(int levelGoal, Inventory playerInventory) {
@@ -62,18 +64,17 @@ public class GameHUD implements Scene {
         uiRoot.addChild(objectiveLabel);
 
         // --- Center: crosshair and interaction prompt ---
-        uiRoot.addChild(
-            new Text(
-                "+",
-                font,
-                Text.Alignment.CENTER,
-                Color.WHITE,
-                new UIRelativeLayout.Builder()
-                    .yAlignment(Alignment.CENTER)
-                    .height(11)
-                    .getLayout()
-            )
+        crosshair = new Text(
+            "+",
+            font,
+            Text.Alignment.CENTER,
+            new Color(1f, 1f, 1f, 0.7f),
+            new UIRelativeLayout.Builder()
+                .yAlignment(Alignment.CENTER)
+                .height(11)
+                .getLayout()
         );
+        uiRoot.addChild(crosshair);
 
         interactionPrompt = new Text(
             "",
@@ -89,6 +90,14 @@ public class GameHUD implements Scene {
         uiRoot.addChild(interactionPrompt);
 
         // --- Bottom row: inventory slots ---
+        inventoryGroup = new Box(
+            0,
+            Color.CLEAR,
+            Color.CLEAR,
+            new UIRelativeLayout()
+        );
+        uiRoot.addChild(inventoryGroup);
+
         inventoryLabels = new Text[Inventory.MAX_ITEMS];
         for (int i = 0; i < Inventory.MAX_ITEMS; i++) {
             final float SLOT_WIDTH = 110;
@@ -108,7 +117,7 @@ public class GameHUD implements Scene {
                     .getLayout()
             );
             slotBox.setVisible(false);
-            uiRoot.addChild(slotBox);
+            inventoryGroup.addChild(slotBox);
 
             inventoryLabels[i] = new Text(
                 "",
@@ -140,15 +149,24 @@ public class GameHUD implements Scene {
         );
     }
 
-    /** Show the interaction prompt. */
-    public void showInteractionPrompt(String text) {
-        interactionPrompt.setText(text);
-        interactionPrompt.setVisible(true);
+    public void setObjectiveVisible(boolean visible) {
+        objectiveLabel.setVisible(visible);
     }
 
-    /** Hide the interaction prompt. */
-    public void hideInteractionPrompt() {
-        interactionPrompt.setVisible(false);
+    public void setCrosshairVisible(boolean visible) {
+        crosshair.setVisible(visible);
+    }
+
+    public void setPrompt(String text) {
+        interactionPrompt.setText(text);
+    }
+
+    public void setPromptVisible(boolean visible) {
+        interactionPrompt.setVisible(visible);
+    }
+
+    public void setInventoryVisible(boolean visible) {
+        inventoryGroup.setVisible(visible);
     }
 
     @Override

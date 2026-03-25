@@ -51,14 +51,15 @@ public class TutorialScene extends ExploreScene {
             return;
         }
 
+        hud.setPromptVisible(true);
         switch (tutorialState) {
             case MOVEMENT:
-                hud.showInteractionPrompt(
+                hud.setPrompt(
                     "Welcome to the Harbour Franca tutorial!\nUse [W, A, S, D] and mouse to move around the harbour."
                 );
                 break;
             case TRADING:
-                hud.showInteractionPrompt("Reach the level goal by trading!");
+                hud.setPrompt("Reach the level goal by trading!");
                 break;
         }
     }
