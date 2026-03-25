@@ -3,7 +3,7 @@ package com.simpulator.game;
 /**
  * Global configuration for the game.
  */
-public class Config {
+public final class Config {
 
     public static int volume = 100;
 }

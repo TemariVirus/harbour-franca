@@ -1,6 +1,6 @@
 package com.simpulator.game;
 
-public class Scenes {
+public final class Scenes {
 
     public static final String MainMenu = "MainMenu";
     public static final String SoundMenu = "SoundMenu";

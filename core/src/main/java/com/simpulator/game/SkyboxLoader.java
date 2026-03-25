@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.simpulator.engine.graphics.Skybox;
 import com.simpulator.engine.scene.TextureCache;
 
-public class SkyboxLoader {
+public final class SkyboxLoader {
 
     public static Skybox load(
         TextureCache textures,
