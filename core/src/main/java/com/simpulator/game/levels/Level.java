@@ -2,8 +2,11 @@ package com.simpulator.game.levels;
 
 import com.badlogic.gdx.math.Vector3;
 import com.simpulator.engine.Entity;
+import com.simpulator.engine.scene.MusicManager;
+import com.simpulator.engine.scene.SceneManager;
 import com.simpulator.engine.scene.TextureCache;
 import com.simpulator.game.entities.MerchantEntity;
+import com.simpulator.game.scenes.ExploreScene;
 import com.simpulator.game.trading.Inventory;
 import com.simpulator.game.trading.Item;
 import java.util.ArrayList;
@@ -29,10 +32,8 @@ public class Level {
     }
 
     public String levelId;
-    public String displayName;
-
-    public String tutorialHint;
     public String nextLevelId;
+    public String displayName;
 
     public String skyboxPath;
     public String bgmPath;
@@ -43,7 +44,6 @@ public class Level {
     public Vector3 playerStart;
     public LevelMap map;
     public MerchantConfig[] merchants;
-    public boolean isTutorial = false;
 
     public Inventory createInventory() {
         Inventory inventory = new Inventory();
@@ -83,5 +83,13 @@ public class Level {
             }
         }
         return outEntities;
+    }
+
+    public ExploreScene createScene(
+        SceneManager sceneManager,
+        LevelManager levelManager,
+        MusicManager musicManager
+    ) {
+        return new ExploreScene(sceneManager, levelManager, musicManager, this);
     }
 }

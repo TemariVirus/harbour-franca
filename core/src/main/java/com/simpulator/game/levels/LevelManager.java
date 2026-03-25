@@ -21,13 +21,16 @@ public class LevelManager {
         initLevels();
     }
 
+    // TODO: create enum for level ids
     private void initLevels() {
         // Level 0 - Tutorial
         Level tutorialLevel = new TutorialLevel();
         levelDatabase.put(tutorialLevel.levelId, tutorialLevel);
+
         // Level 1
         Level level1 = new Level();
         level1.levelId = "level_01";
+        level1.nextLevelId = null;
         level1.displayName = "The Beginning";
 
         level1.skyboxPath = "Skyboxes/miramar";

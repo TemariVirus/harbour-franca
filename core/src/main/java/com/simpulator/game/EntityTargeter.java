@@ -13,6 +13,7 @@ public class EntityTargeter<T extends Entity> {
 
     private final List<T> targets;
     private final float range;
+    private T lastTarget = null;
 
     public EntityTargeter(List<T> targets, float range) {
         this.targets = targets;
@@ -77,6 +78,11 @@ public class EntityTargeter<T extends Entity> {
             }
         }
 
+        lastTarget = closestEntity;
         return closestEntity;
+    }
+
+    public T getLastTarget() {
+        return lastTarget;
     }
 }
