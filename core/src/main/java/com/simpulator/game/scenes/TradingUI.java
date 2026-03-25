@@ -354,7 +354,7 @@ public class TradingUI implements Scene {
 
         // Dialogue box
         Text nameText = new Text(
-            "",
+            merchant.getData().getName(),
             font,
             Text.Alignment.START,
             goldTrim,
