@@ -31,6 +31,9 @@ public class Level {
     public String levelId;
     public String displayName;
 
+    public String tutorialHint;
+    public String nextLevelId;
+
     public String skyboxPath;
     public String bgmPath;
 
@@ -40,6 +43,7 @@ public class Level {
     public Vector3 playerStart;
     public LevelMap map;
     public MerchantConfig[] merchants;
+    public boolean isTutorial = false;
 
     public Inventory createInventory() {
         Inventory inventory = new Inventory();
