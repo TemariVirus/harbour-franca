@@ -21,8 +21,8 @@ public class TutorialLevel extends Level {
 
         this.skyboxPath = "Skyboxes/miramar";
         this.bgmPath = "GameAudio.mp3";
-        this.valueGoal = 7;
-        this.startingItems = new Item[] { Item.TRINKET };
+        this.valueGoal = 13;
+        this.startingItems = new Item[] { Item.TRINKET, Item.FISH };
 
         this.playerStart = new Vector3(0, 1, 0);
 
@@ -36,10 +36,14 @@ public class TutorialLevel extends Level {
                     "Friendly Guide",
                     "guide.png",
                     Language.ENGLISH,
-                    "Welcome to Harbour Franca! Let's make a simple trade.",
+                    "Welcome to Harbour Franca! Let's make a simple trade. I would pay\nanything for a trinket.",
+                    "Thank you!",
+                    "I'll only pay slightly more for that.",
+                    "No, the value difference is too great! Our deal is off.",
+                    "Too slow! It seems you do not have that iron in you!",
+                    1000f,
                     1.5f,
-                    1.0f,
-                    new Item[] { Item.FISH, Item.CLOTH, Item.CANDLE },
+                    new Item[] { Item.FISH, Item.GEMSTONE, Item.CANDLE },
                     new HashSet<>(Arrays.asList(Item.TRINKET))
                 )
             ),

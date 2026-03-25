@@ -533,16 +533,15 @@ public class TradingUI implements Scene {
             playerInventory.add(merchant.getData().getItems().get(choiceIndex));
         }
 
-        // TODO: custom lines for each merchant?
         switch (result) {
             case GOT_WANTS:
-                setTradeResult("Thank you! That's just what I needed!");
+                setTradeResult(merchant.getData().getGotWantsDialogue());
                 break;
             case TRADED:
-                setTradeResult("Nice doing business with you.");
+                setTradeResult(merchant.getData().getTradedDialogue());
                 break;
             case FAILED:
-                setTradeResult("Daga kotowaru! This is daylight robbery!");
+                setTradeResult(merchant.getData().getTradeFailedDialogue());
                 break;
         }
         return true;
@@ -571,8 +570,7 @@ public class TradingUI implements Scene {
 
         uiRoot.update(deltaTime);
         if (timer.isFinished()) {
-            // TODO: custom lines for each merchant?
-            setTradeResult("Too slow! Don't waste my time!");
+            setTradeResult(merchant.getData().getTimesUpDialogue());
             merchant.setCanTrade(false);
         }
     }

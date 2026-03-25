@@ -14,6 +14,10 @@ public class MerchantData {
     private final String imagePath;
     private final Language language;
     private final String dialogue;
+    private final String gotWantsDialogue;
+    private final String tradedDialogue;
+    private final String tradeFailedDialogue;
+    private final String timesUpDialogue;
     private final float wantsThreshold;
     private final float normalThreshold;
     private final List<Item> items;
@@ -24,6 +28,10 @@ public class MerchantData {
         String imagePath,
         Language language,
         String dialogue,
+        String gotWantsDialogue,
+        String tradedDialogue,
+        String tradeFailedDialogue,
+        String timesUpDialogue,
         float wantsThreshold,
         float normalThreshold,
         Item[] items,
@@ -33,6 +41,10 @@ public class MerchantData {
         this.imagePath = imagePath;
         this.language = language;
         this.dialogue = dialogue;
+        this.gotWantsDialogue = gotWantsDialogue;
+        this.tradedDialogue = tradedDialogue;
+        this.tradeFailedDialogue = tradeFailedDialogue;
+        this.timesUpDialogue = timesUpDialogue;
         this.wantsThreshold = wantsThreshold;
         this.normalThreshold = normalThreshold;
         this.items = Arrays.asList(items);
@@ -53,6 +65,22 @@ public class MerchantData {
 
     public String getDialogue() {
         return dialogue;
+    }
+
+    public String getGotWantsDialogue() {
+        return gotWantsDialogue;
+    }
+
+    public String getTradedDialogue() {
+        return tradedDialogue;
+    }
+
+    public String getTradeFailedDialogue() {
+        return tradeFailedDialogue;
+    }
+
+    public String getTimesUpDialogue() {
+        return timesUpDialogue;
     }
 
     public float getWantsThreshold() {
