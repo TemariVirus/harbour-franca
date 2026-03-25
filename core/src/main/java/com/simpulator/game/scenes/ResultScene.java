@@ -24,40 +24,34 @@ import com.simpulator.game.ui.Box;
 import com.simpulator.game.ui.Text;
 import com.simpulator.game.ui.UiHelper;
 
-public class VictoryScene implements Scene {
+public class ResultScene implements Scene {
 
-    private static final Color BACKGROUND_COLOR = new Color(
-        0.08f,
-        0.11f,
-        0.16f,
-        1f
-    );
-    private static final Color TITLE_COLOR = new Color(0.83f, 0.68f, 0.21f, 1f);
-    private static final Color TEXT_COLOR = new Color(0.96f, 0.87f, 0.70f, 1f);
-    private static final Color HINT_COLOR = new Color(0.82f, 0.78f, 0.70f, 1f);
-    private static final Color BUTTON_COLOR = new Color(
-        0.10f,
-        0.15f,
-        0.23f,
-        0.94f
-    );
-    private static final Color BUTTON_HOVER_COLOR = new Color(
-        0.16f,
-        0.22f,
-        0.32f,
-        1f
-    );
+    public enum ResultType {
+        WIN,
+        LOSE
+    }
 
     private final SceneManager sceneManager;
+    private final ResultType resultType;
+
     private final KeyboardManager km = new KeyboardManager();
     private final MouseManager mm = new MouseManager();
 
-    private final Viewport viewport = new FitViewport(640, 480);
+    private final Viewport viewport = new FitViewport(720, 480);
     private final UIRoot uiRoot = new UIRoot();
     private final BitmapFont font;
 
-    public VictoryScene(SceneManager sceneManager) {
+    private Color backgroundColor;
+    private Color titleColor;
+
+    private static final Color TEXT_COLOR = new Color(0.96f, 0.87f, 0.70f, 1f);
+    private static final Color HINT_COLOR = new Color(0.82f, 0.78f, 0.70f, 1f);
+    private static final Color BUTTON_COLOR = new Color(0.10f, 0.15f, 0.23f, 0.94f);
+    private static final Color BUTTON_HOVER_COLOR = new Color(0.16f, 0.22f, 0.32f, 1f);
+
+    public ResultScene(SceneManager sceneManager, ResultType resultType) {
         this.sceneManager = sceneManager;
+        this.resultType = resultType;
 
         km.bind(ButtonBindType.DOWN, Keys.ENTER, e ->
             sceneManager.setScene(Scenes.Explore)
@@ -68,18 +62,35 @@ public class VictoryScene implements Scene {
         km.bind(ButtonBindType.DOWN, Keys.ESCAPE, e -> Gdx.app.exit());
 
         font = new BitmapFont();
+
+        setupColors();
         buildUI();
+    }
+
+    private void setupColors() {
+        if (resultType == ResultType.WIN) {
+            backgroundColor = new Color(0.08f, 0.11f, 0.16f, 1f);
+            titleColor = new Color(0.83f, 0.68f, 0.21f, 1f);
+        } else {
+            backgroundColor = new Color(0.16f, 0.08f, 0.08f, 1f);
+            titleColor = new Color(0.85f, 0.25f, 0.25f, 1f);
+        }
     }
 
     private void buildUI() {
         UiHelper.setupUiMouseHandlers(mm, viewport, uiRoot);
 
+        String title = (resultType == ResultType.WIN) ? "YOU WIN!" : "YOU LOST!";
+        String subtitle = (resultType == ResultType.WIN)
+            ? "Great job completing the level"
+            : "Better luck next time";
+
         uiRoot.addChild(
             new Text(
-                "YOU WIN!",
+                title,
                 font,
                 Text.Alignment.CENTER,
-                TITLE_COLOR,
+                titleColor,
                 new UIRelativeLayout.Builder()
                     .yAlignment(Alignment.START)
                     .padTop(90)
@@ -90,7 +101,7 @@ public class VictoryScene implements Scene {
 
         uiRoot.addChild(
             new Text(
-                "Great job completing the level",
+                subtitle,
                 font,
                 Text.Alignment.CENTER,
                 TEXT_COLOR,
@@ -112,7 +123,7 @@ public class VictoryScene implements Scene {
 
         uiRoot.addChild(
             new Text(
-                "ENTER = Replay   |   M = Main Menu   |   ESC = QUIT ",
+                "ENTER = Replay   |   M = Main Menu   |   ESC = QUIT",
                 font,
                 Text.Alignment.CENTER,
                 HINT_COLOR,
@@ -132,13 +143,11 @@ public class VictoryScene implements Scene {
     ) {
         final float WIDTH = 320f;
         final float HEIGHT = 58f;
-        final int BORDER_WIDTH = 2;
-        final float FONT_SIZE = 13f;
 
         Box button = UiHelper.createButton(
             new Box(
-                BORDER_WIDTH,
-                TITLE_COLOR,
+                2,
+                titleColor,
                 BUTTON_COLOR,
                 new UIRelativeLayout.Builder()
                     .xAlignment(Alignment.CENTER)
@@ -156,7 +165,7 @@ public class VictoryScene implements Scene {
                 TEXT_COLOR,
                 new UIRelativeLayout()
             ),
-            FONT_SIZE,
+            13f,
             e -> {
                 onClick.act(e);
                 return true;
@@ -199,7 +208,7 @@ public class VictoryScene implements Scene {
         int width,
         int height
     ) {
-        ScreenUtils.clear(BACKGROUND_COLOR);
+        ScreenUtils.clear(backgroundColor);
         viewport.update(width, height, true);
         viewport.setScreenPosition(x, y);
         uiRoot.updateBounds(viewport);

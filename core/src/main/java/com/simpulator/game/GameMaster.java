@@ -7,8 +7,8 @@ import com.simpulator.engine.scene.SceneManager;
 import com.simpulator.game.levels.LevelManager;
 import com.simpulator.game.scenes.ExploreScene;
 import com.simpulator.game.scenes.MainMenu;
+import com.simpulator.game.scenes.ResultScene;
 import com.simpulator.game.scenes.SoundMenu;
-import com.simpulator.game.scenes.VictoryScene;
 
 public class GameMaster extends ApplicationAdapter {
 
@@ -40,8 +40,13 @@ public class GameMaster extends ApplicationAdapter {
                 musics
             )
         );
-        sceneManager.addScene(Scenes.Victory, () ->
-            new VictoryScene(sceneManager)
+
+        sceneManager.addScene(Scenes.Win, () ->
+            new ResultScene(sceneManager, ResultScene.ResultType.WIN)
+        );
+
+        sceneManager.addScene(Scenes.Lose, () ->
+            new ResultScene(sceneManager, ResultScene.ResultType.LOSE)
         );
 
         sceneManager.setScene(Scenes.MainMenu);

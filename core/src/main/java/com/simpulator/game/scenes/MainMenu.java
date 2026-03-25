@@ -54,7 +54,7 @@ public class MainMenu implements Scene {
     private final KeyboardManager km = new KeyboardManager();
     private final MouseManager mm = new MouseManager();
 
-    private final Viewport viewport = new FitViewport(640, 480);
+    private final Viewport viewport = new FitViewport(720, 480);
     private final UIRoot uiRoot = new UIRoot();
     private final BitmapFont font;
 

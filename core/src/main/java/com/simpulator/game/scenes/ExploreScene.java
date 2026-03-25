@@ -1,5 +1,7 @@
 package com.simpulator.game.scenes;
 
+import java.util.List;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
@@ -34,7 +36,6 @@ import com.simpulator.game.entities.CameraEntity;
 import com.simpulator.game.entities.MerchantEntity;
 import com.simpulator.game.levels.Level;
 import com.simpulator.game.trading.Inventory;
-import java.util.List;
 
 public class ExploreScene implements Scene {
 
@@ -217,9 +218,10 @@ public class ExploreScene implements Scene {
 
         if (playerInventory.getTotalValue() >= valueGoal) {
             // tradingUI.showTradeResult("Level Complete! Goal reached!");
-            sceneManager.setScene(Scenes.Victory);
+            sceneManager.setScene(Scenes.Win);
         } else {
-            // TODO: lose scene
+            // lose scene
+            sceneManager.setScene(Scenes.Lose);
         }
     }
 
