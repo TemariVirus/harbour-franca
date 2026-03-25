@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import com.simpulator.game.levels.maps.Level1Map;
 
 public class LevelManager {
 
@@ -43,12 +44,13 @@ public class LevelManager {
             Item.CANDLE,
         };
 
-        level1.playerStart = new Vector3(0, 1, 0);
-        level1.map = new MiramarMap();
+        level1.playerStart = new Vector3(14, 1, 8); // Centers the player in the room        
+        level1.map = new Level1Map();
+        
         level1.merchants = new MerchantConfig[] {
             new MerchantConfig(
                 MerchantEntity.class,
-                new Vector3(2, 0, 2),
+                new Vector3(6, 0, 2),
                 new MerchantData(
                     "Chinese Merchant",
                     "Lam.jpeg",
@@ -66,7 +68,7 @@ public class LevelManager {
             ),
             new MerchantConfig(
                 MerchantEntity.class,
-                new Vector3(-2, 0, 2),
+                new Vector3(14, 0, 2),
                 new MerchantData(
                     "Vietnamese Merchant",
                     "Nisha.jpeg",
@@ -84,7 +86,7 @@ public class LevelManager {
             ),
             new MerchantConfig(
                 MerchantEntity.class,
-                new Vector3(0, 0, -2),
+                new Vector3(22, 0, 2),
                 new MerchantData(
                     "Japanese Merchant",
                     "Oran.jpeg",

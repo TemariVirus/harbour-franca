@@ -27,8 +27,8 @@ public class GameMaster extends ApplicationAdapter {
         levelManager.setCurrentLevelId("level_00");
 
         sceneManager.addScene(Scenes.MainMenu, () ->
-            new MainMenu(sceneManager)
-        );
+        new MainMenu(sceneManager, levelManager)
+    );
         sceneManager.addScene(Scenes.SoundMenu, () ->
             new SoundMenu(sceneManager, musics)
         );
