@@ -173,13 +173,21 @@ public class TradingUI implements Scene {
         );
         // Timer
         timer = new Timer(
-            font,
-            parchmentText,
             90, // 1 min 30 sec
+            TEXT_BACKGROUND,
             new UIRelativeLayout.Builder()
-                .padTop(90)
-                .height(FONT_SIZE)
-                .getLayout()
+                .xAlignment(Alignment.CENTER)
+                .padTop(85)
+                .height(FONT_SIZE + 10)
+                .width(50)
+                .getLayout(),
+            new Text(
+                "",
+                font,
+                Text.Alignment.CENTER,
+                parchmentText,
+                new UIRelativeLayout.Builder().padAll(5).getLayout()
+            )
         );
         uiRoot.addChild(timer);
 

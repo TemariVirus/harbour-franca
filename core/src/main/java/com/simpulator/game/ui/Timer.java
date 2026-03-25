@@ -1,33 +1,32 @@
 package com.simpulator.game.ui;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.Texture;
 import com.simpulator.engine.graphics.TextureBatch;
+import com.simpulator.engine.ui.Rect;
 import com.simpulator.engine.ui.UIElement;
 import com.simpulator.engine.ui.UILayout;
-import com.simpulator.engine.ui.UIRelativeLayout;
 
 public class Timer extends UIElement {
 
+    private static final Texture background = UiHelper.getWhiteTexture();
+
     private float timeLeft;
     private boolean isRunning = true;
+
+    private Color backgroundColor;
     private Text text;
 
     public Timer(
-        BitmapFont font,
-        Color color,
         float initialTime,
-        UILayout layout
+        Color backgroundColor,
+        UILayout layout,
+        Text text
     ) {
         super(layout);
         this.timeLeft = initialTime;
-        this.text = new Text(
-            "",
-            font,
-            Text.Alignment.CENTER,
-            color,
-            new UIRelativeLayout()
-        );
+        this.backgroundColor = backgroundColor;
+        this.text = text;
         addChild(text);
     }
 
@@ -69,6 +68,14 @@ public class Timer extends UIElement {
 
     @Override
     public void render(TextureBatch batch) {
-        // TODO: background
+        Rect bounds = getBounds();
+        int width = bounds.right - bounds.left;
+        int height = bounds.bottom - bounds.top;
+
+        if (width > 0 && height > 0) {
+            batch.setColor(backgroundColor);
+            batch.draw(background, bounds.left, bounds.top, width, height);
+            batch.setColor(Color.WHITE);
+        }
     }
 }
