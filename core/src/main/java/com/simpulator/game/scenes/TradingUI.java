@@ -17,6 +17,8 @@ import com.simpulator.engine.ui.UIRelativeLayout;
 import com.simpulator.engine.ui.UIRelativeLayout.Alignment;
 import com.simpulator.engine.ui.UIRoot;
 import com.simpulator.game.entities.MerchantEntity;
+import com.simpulator.game.language.Translator;
+import com.simpulator.game.language.Translators;
 import com.simpulator.game.trading.Inventory;
 import com.simpulator.game.trading.Item;
 import com.simpulator.game.trading.TradeProcessor.TradeResult;
@@ -114,6 +116,7 @@ public class TradingUI implements Scene {
     private Text dialogueText;
     private Box confirmButton;
     private Box cancelButton;
+    private final Translator translator;
 
     public TradingUI(Inventory playerInventory, MerchantEntity merchant) {
         if (merchant.getData().getItems().size() != CHOICE_COUNT) {
@@ -125,6 +128,7 @@ public class TradingUI implements Scene {
         this.state = State.TRADING;
         this.playerInventory = playerInventory;
         this.merchant = merchant;
+        this.translator = Translators.get(merchant.getData().getLanguage());
 
         String fontPath;
         switch (merchant.getData().getLanguage()) {
@@ -144,11 +148,6 @@ public class TradingUI implements Scene {
         }
         this.font = new BitmapFont(Gdx.files.internal(fontPath));
         buildUI();
-        for (int i = 0; i < choiceTexts.length; i++) {
-            choiceTexts[i].setText(
-                merchant.getData().getItems().get(i).toString()
-            );
-        }
         dialogueText.setText(merchant.getData().getDialogue());
         setChoiceIndex(-1);
         setOfferedItemIndex(0);
@@ -304,8 +303,9 @@ public class TradingUI implements Scene {
                 TOP_MARGIN + i * (CHOICE_HEIGHT + CHOICE_SPACE),
                 i
             );
+            Item item = merchant.getData().getItems().get(i);
             choiceTexts[i] = new Text(
-                "",
+                translator.translateItemName(item),
                 font,
                 Text.Alignment.CENTER,
                 parchmentText,
