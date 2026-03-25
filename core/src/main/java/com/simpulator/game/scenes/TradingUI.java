@@ -126,7 +126,23 @@ public class TradingUI implements Scene {
         this.playerInventory = playerInventory;
         this.merchant = merchant;
 
-        this.font = new BitmapFont(Gdx.files.internal("fonts/jp.fnt"));
+        String fontPath;
+        switch (merchant.getData().getLanguage()) {
+            case VIETNAMESE:
+                fontPath = "fonts/vi.fnt";
+                break;
+            case JAPANESE:
+                fontPath = "fonts/jp.fnt";
+                break;
+            case CHINESE:
+                fontPath = "fonts/zh.fnt";
+                break;
+            case ENGLISH:
+            default:
+                fontPath = "fonts/en.fnt";
+                break;
+        }
+        this.font = new BitmapFont(Gdx.files.internal(fontPath));
         buildUI();
         for (int i = 0; i < choiceTexts.length; i++) {
             choiceTexts[i].setText(

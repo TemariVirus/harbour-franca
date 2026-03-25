@@ -63,7 +63,7 @@ public class SoundMenu implements Scene {
             updateVolume(Config.volume + 10)
         );
 
-        font = new BitmapFont();
+        font = new BitmapFont(Gdx.files.internal("fonts/en.fnt"));
         buildUI(sceneManager);
     }
 

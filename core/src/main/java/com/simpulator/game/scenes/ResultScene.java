@@ -28,7 +28,7 @@ public class ResultScene implements Scene {
 
     public enum ResultType {
         WIN,
-        LOSE
+        LOSE,
     }
 
     private final SceneManager sceneManager;
@@ -46,8 +46,18 @@ public class ResultScene implements Scene {
 
     private static final Color TEXT_COLOR = new Color(0.96f, 0.87f, 0.70f, 1f);
     private static final Color HINT_COLOR = new Color(0.82f, 0.78f, 0.70f, 1f);
-    private static final Color BUTTON_COLOR = new Color(0.10f, 0.15f, 0.23f, 0.94f);
-    private static final Color BUTTON_HOVER_COLOR = new Color(0.16f, 0.22f, 0.32f, 1f);
+    private static final Color BUTTON_COLOR = new Color(
+        0.10f,
+        0.15f,
+        0.23f,
+        0.94f
+    );
+    private static final Color BUTTON_HOVER_COLOR = new Color(
+        0.16f,
+        0.22f,
+        0.32f,
+        1f
+    );
 
     public ResultScene(SceneManager sceneManager, ResultType resultType) {
         this.sceneManager = sceneManager;
@@ -61,7 +71,7 @@ public class ResultScene implements Scene {
         );
         km.bind(ButtonBindType.DOWN, Keys.ESCAPE, e -> Gdx.app.exit());
 
-        font = new BitmapFont();
+        font = new BitmapFont(Gdx.files.internal("fonts/en.fnt"));
 
         setupColors();
         buildUI();
@@ -80,7 +90,9 @@ public class ResultScene implements Scene {
     private void buildUI() {
         UiHelper.setupUiMouseHandlers(mm, viewport, uiRoot);
 
-        String title = (resultType == ResultType.WIN) ? "YOU WIN!" : "YOU LOST!";
+        String title = (resultType == ResultType.WIN)
+            ? "YOU WIN!"
+            : "YOU LOST!";
         String subtitle = (resultType == ResultType.WIN)
             ? "Great job completing the level"
             : "Better luck next time";

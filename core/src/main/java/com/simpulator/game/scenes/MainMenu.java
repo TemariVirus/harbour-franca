@@ -72,7 +72,7 @@ public class MainMenu implements Scene {
         );
         km.bind(ButtonBindType.DOWN, Keys.ESCAPE, e -> Gdx.app.exit());
 
-        font = new BitmapFont();
+        font = new BitmapFont(Gdx.files.internal("fonts/en.fnt"));
         buildUI(sceneManager);
     }
 

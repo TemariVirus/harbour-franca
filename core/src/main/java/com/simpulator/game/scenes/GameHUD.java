@@ -1,5 +1,6 @@
 package com.simpulator.game.scenes;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -44,7 +45,7 @@ public class GameHUD implements Scene {
         this.levelGoal = levelGoal;
         this.playerInventory = playerInventory;
 
-        font = new BitmapFont();
+        font = new BitmapFont(Gdx.files.internal("fonts/en.fnt"));
         buildHUD();
     }
 
