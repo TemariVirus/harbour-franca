@@ -35,6 +35,7 @@ import com.simpulator.game.TranslateCameraAction;
 import com.simpulator.game.entities.CameraEntity;
 import com.simpulator.game.entities.MerchantEntity;
 import com.simpulator.game.levels.Level;
+import com.simpulator.game.levels.LevelManager;
 import com.simpulator.game.trading.Inventory;
 
 public class ExploreScene implements Scene {
@@ -62,13 +63,25 @@ public class ExploreScene implements Scene {
 
     private final Inventory playerInventory;
     private final int valueGoal;
+    private final LevelManager levelManager;
+    private final Level level;
+
+    private enum TutorialState {
+    MOVEMENT,
+    TRADING
+    }
+
+    private TutorialState tutorialState = TutorialState.MOVEMENT;
+    private boolean hasMoved = false;
 
     public ExploreScene(
         SceneManager sceneManager,
-        Level level,
+        LevelManager levelManager,
         MusicManager musics
     ) {
         this.sceneManager = sceneManager;
+        this.levelManager = levelManager;
+        this.level = levelManager.getCurrentLevel();
         musics.stopAllMusic();
         musics.startMusic(level.bgmPath);
         sounds.setVolume(Config.volume * 0.01f);
@@ -95,6 +108,7 @@ public class ExploreScene implements Scene {
 
         playerInventory = level.createInventory();
         hud = new GameHUD(level.valueGoal, playerInventory);
+        hud.setTutorialHint(level.tutorialHint);
         overlays.push(hud, new UIRelativeLayout());
 
         merchants = level.createMerchants(textures, playerCamera);
@@ -217,6 +231,11 @@ public class ExploreScene implements Scene {
         }
 
         if (playerInventory.getTotalValue() >= valueGoal) {
+            if (level.nextLevelId != null) {
+                levelManager.setCurrentLevelId(level.nextLevelId);
+                sceneManager.setScene(Scenes.Explore);
+                return;
+            }
             // tradingUI.showTradeResult("Level Complete! Goal reached!");
             sceneManager.setScene(Scenes.Win);
         } else {
@@ -236,7 +255,15 @@ public class ExploreScene implements Scene {
             playerCamera.getCamera()
         );
         if (targeted == null) {
-            hud.hideInteractionPrompt();
+            if (level.isTutorial) {
+                if (tutorialState == TutorialState.MOVEMENT) {
+                    hud.showInteractionPrompt("Welcome to the Harbour Franca tutorial!\nUse [W, A, S, D] and mouse to move around the harbour.");
+                } else {
+                    hud.showInteractionPrompt("Reach the level goal by trading!");
+                }
+            } else {
+                hud.hideInteractionPrompt();
+            }
         } else if (targeted.canTrade()) {
             hud.showInteractionPrompt(
                 "[E] Trade with " + targeted.getData().getName()
@@ -259,11 +286,28 @@ public class ExploreScene implements Scene {
         if (!isTradingUIOpen()) {
             keyboard.update(deltaTime, clock.getSeconds());
             mouse.update(deltaTime, clock.getSeconds());
+            handleTutorialHints();
             updateTargeted();
         }
         entityManager.updateCollisions();
         entityManager.update(deltaTime);
         overlays.update(deltaTime);
+    }
+
+    private void handleTutorialHints() {
+    if (tutorialState == TutorialState.MOVEMENT) {
+        hud.showInteractionPrompt("Welcome to the Harbour Franca tutorial!\nUse [W, A, S, D] and mouse to move around the harbour.");
+        
+        // Check for any movement input
+        if (Gdx.input.isKeyPressed(Keys.W) || Gdx.input.isKeyPressed(Keys.A) || 
+            Gdx.input.isKeyPressed(Keys.S) || Gdx.input.isKeyPressed(Keys.D)) {
+            hasMoved = true;
+            tutorialState = TutorialState.TRADING;
+        }
+    } else if (tutorialState == TutorialState.TRADING) {
+        if (merchantTargeter.getClosest(playerCamera.getCamera()) == null) {
+            hud.showInteractionPrompt("Reach the level goal by trading!");
+        }
     }
 
     @Override
