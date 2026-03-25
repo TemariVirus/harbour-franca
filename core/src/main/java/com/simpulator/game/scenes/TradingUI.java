@@ -190,9 +190,9 @@ public class TradingUI implements Scene {
                 null,
                 TEXT_BACKGROUND,
                 new UIRelativeLayout.Builder()
-                    .padLeft(SIDE_MARGIN - 5)
+                    .padLeft(SIDE_MARGIN - 4)
                     .padTop(TOP_MARGIN - 35)
-                    .width(ITEM_BOX_WIDTH + 10)
+                    .width(ITEM_BOX_WIDTH + 8)
                     .height(FONT_SIZE + 10)
                     .getLayout()
             ).addChild(

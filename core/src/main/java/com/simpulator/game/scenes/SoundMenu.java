@@ -25,7 +25,6 @@ import com.simpulator.game.ui.Slider;
 import com.simpulator.game.ui.Text;
 import com.simpulator.game.ui.UiHelper;
 
-// TODO: beautify this scene
 public class SoundMenu implements Scene {
 
     private static final Color BACKGROUND_COLOR = new Color(
@@ -35,6 +34,11 @@ public class SoundMenu implements Scene {
         1f
     );
     private static final Color TEXT_COLOR = Color.YELLOW;
+
+    final float TOP_MARGIN = 30;
+    final float LEFT_MARGIN = 70;
+    final float TITLE_SIZE = 24;
+    final float FONT_SIZE = 18;
 
     private MusicManager musics;
     private final KeyboardManager km = new KeyboardManager();
@@ -68,8 +72,6 @@ public class SoundMenu implements Scene {
     }
 
     private void buildUI(SceneManager sceneManager) {
-        final float FONT_SIZE = 22;
-
         UiHelper.setupUiMouseHandlers(mm, viewport, uiRoot);
 
         uiRoot.addChild(
@@ -79,9 +81,9 @@ public class SoundMenu implements Scene {
                 Text.Alignment.START,
                 TEXT_COLOR,
                 new UIRelativeLayout.Builder()
-                    .padTop(30)
-                    .padLeft(100)
-                    .height(FONT_SIZE)
+                    .padTop(TOP_MARGIN)
+                    .padLeft(LEFT_MARGIN)
+                    .height(TITLE_SIZE)
                     .getLayout()
             )
         );
@@ -92,8 +94,8 @@ public class SoundMenu implements Scene {
             Text.Alignment.START,
             TEXT_COLOR,
             new UIRelativeLayout.Builder()
-                .padTop(130)
-                .padLeft(100)
+                .padTop(TOP_MARGIN + 100)
+                .padLeft(LEFT_MARGIN)
                 .height(FONT_SIZE)
                 .getLayout()
         );
@@ -105,8 +107,8 @@ public class SoundMenu implements Scene {
                 Text.Alignment.START,
                 TEXT_COLOR,
                 new UIRelativeLayout.Builder()
-                    .padTop(180)
-                    .padLeft(100)
+                    .padTop(TOP_MARGIN + 150)
+                    .padLeft(LEFT_MARGIN)
                     .height(FONT_SIZE)
                     .getLayout()
             )
@@ -122,7 +124,7 @@ public class SoundMenu implements Scene {
             20,
             new UIRelativeLayout.Builder()
                 .xAlignment(Alignment.CENTER)
-                .padTop(225)
+                .padTop(TOP_MARGIN + 195)
                 .width(300)
                 .height(40)
                 .getLayout()
@@ -138,8 +140,8 @@ public class SoundMenu implements Scene {
                 Text.Alignment.START,
                 TEXT_COLOR,
                 new UIRelativeLayout.Builder()
-                    .padTop(280)
-                    .padLeft(100)
+                    .padTop(TOP_MARGIN + 250)
+                    .padLeft(LEFT_MARGIN)
                     .height(FONT_SIZE)
                     .getLayout()
             )
