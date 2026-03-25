@@ -39,8 +39,6 @@ public class GameHUD implements Scene {
     private Text objectiveLabel;
     private Text interactionPrompt;
     private Text[] inventoryLabels;
-    private Text tutorialHintLabel;
-
 
     public GameHUD(int levelGoal, Inventory playerInventory) {
         this.levelGoal = levelGoal;
@@ -48,19 +46,6 @@ public class GameHUD implements Scene {
 
         font = new BitmapFont();
         buildHUD();
-
-        tutorialHintLabel = new Text(
-            "", 
-            font, 
-            Text.Alignment.CENTER, 
-            Color.YELLOW, 
-            new UIRelativeLayout.Builder()
-                .yAlignment(Alignment.END) 
-                .padTop(20f) 
-                .height(24f)
-                .getLayout()
-        );
-        uiRoot.addChild(tutorialHintLabel);
     }
 
     private void buildHUD() {
@@ -163,15 +148,6 @@ public class GameHUD implements Scene {
     /** Hide the interaction prompt. */
     public void hideInteractionPrompt() {
         interactionPrompt.setVisible(false);
-    }
-
-    public void setTutorialHint(String hintText) {
-        if (hintText != null && !hintText.isEmpty()) {
-            tutorialHintLabel.setText(hintText);
-            tutorialHintLabel.setVisible(true);
-        } else {
-            tutorialHintLabel.setVisible(false);
-        }
     }
 
     @Override
