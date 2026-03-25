@@ -309,6 +309,7 @@ public class ExploreScene implements Scene {
             hud.showInteractionPrompt("Reach the level goal by trading!");
         }
     }
+}
 
     @Override
     public void render(
