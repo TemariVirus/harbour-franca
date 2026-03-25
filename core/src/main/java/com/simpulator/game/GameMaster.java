@@ -25,7 +25,7 @@ public class GameMaster extends ApplicationAdapter {
         windowHeight = Gdx.graphics.getHeight();
 
         LevelManager levelManager = new LevelManager();
-        levelManager.setCurrentLevelId("level_01");
+        levelManager.setCurrentLevelId("level_00");
 
         sceneManager.addScene(Scenes.MainMenu, () ->
             new MainMenu(sceneManager)
@@ -36,7 +36,7 @@ public class GameMaster extends ApplicationAdapter {
         sceneManager.addScene(Scenes.Explore, () ->
             new ExploreScene(
                 sceneManager,
-                levelManager.getCurrentLevel(),
+                levelManager,
                 musics
             )
         );
