@@ -22,6 +22,9 @@ public class LevelManager {
     }
 
     private void initLevels() {
+        // Level 0 - Tutorial
+        Level tutorialLevel = new TutorialLevel();
+        levelDatabase.put(tutorialLevel.levelId, tutorialLevel);
         // Level 1
         Level level1 = new Level();
         level1.levelId = "level_01";
