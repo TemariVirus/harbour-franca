@@ -222,7 +222,10 @@ public class ResultScene implements Scene {
     ) {
         ScreenUtils.clear(backgroundColor);
         viewport.update(width, height, true);
-        viewport.setScreenPosition(x, y);
+        viewport.setScreenPosition(
+            viewport.getScreenX() + x,
+            viewport.getScreenY() + y
+        );
         uiRoot.updateBounds(viewport);
 
         graphics.beginRender(viewport);

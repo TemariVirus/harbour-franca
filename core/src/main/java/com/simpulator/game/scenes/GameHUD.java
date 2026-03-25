@@ -175,7 +175,10 @@ public class GameHUD implements Scene {
         int height
     ) {
         viewport.update(width, height, true);
-        viewport.setScreenPosition(x, y);
+        viewport.setScreenPosition(
+            viewport.getScreenX() + x,
+            viewport.getScreenY() + y
+        );
         uiRoot.updateBounds(viewport);
 
         graphics.beginRender(viewport);

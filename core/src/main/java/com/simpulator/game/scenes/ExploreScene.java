@@ -290,7 +290,10 @@ public class ExploreScene implements Scene {
         int height
     ) {
         viewport.update(width, height);
-        viewport.setScreenPosition(x, y);
+        viewport.setScreenPosition(
+            viewport.getScreenX() + y,
+            viewport.getScreenY() + y
+        );
 
         // Render Sky box first
         graphics.beginRender(viewport);

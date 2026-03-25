@@ -205,7 +205,10 @@ public class MainMenu implements Scene {
     ) {
         ScreenUtils.clear(BACKGROUND_COLOR);
         viewport.update(width, height, true);
-        viewport.setScreenPosition(x, y);
+        viewport.setScreenPosition(
+            viewport.getScreenX() + x,
+            viewport.getScreenY() + y
+        );
         uiRoot.updateBounds(viewport);
 
         graphics.beginRender(viewport);
