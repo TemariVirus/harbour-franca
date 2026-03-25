@@ -22,7 +22,9 @@ import com.simpulator.game.language.Translators;
 import com.simpulator.game.trading.Inventory;
 import com.simpulator.game.trading.Item;
 import com.simpulator.game.trading.TradeProcessor.TradeResult;
+import com.simpulator.engine.scene.TextureCache;
 import com.simpulator.game.ui.Box;
+import com.simpulator.game.ui.Image;
 import com.simpulator.game.ui.Text;
 import com.simpulator.game.ui.Timer;
 import com.simpulator.game.ui.UiHelper;
@@ -110,15 +112,18 @@ public class TradingUI implements Scene {
     private int choiceIndex;
 
     private Timer timer;
-    private Text offeredItemText;
+    private Image offeredItemImage;
+    private Text offeredItemNameText;
     private Text rarityText;
+    private Image choiceImages[] = new Image[CHOICE_COUNT];
     private Text choiceTexts[] = new Text[CHOICE_COUNT];
     private Text dialogueText;
     private Box confirmButton;
     private Box cancelButton;
+    private final TextureCache textures;
     private final Translator translator;
 
-    public TradingUI(Inventory playerInventory, MerchantEntity merchant) {
+    public TradingUI(Inventory playerInventory, MerchantEntity merchant, TextureCache textures) {
         if (merchant.getData().getItems().size() != CHOICE_COUNT) {
             throw new IllegalArgumentException(
                 "Merchant must have exactly " + CHOICE_COUNT + " items."
@@ -128,6 +133,7 @@ public class TradingUI implements Scene {
         this.state = State.TRADING;
         this.playerInventory = playerInventory;
         this.merchant = merchant;
+        this.textures = textures;
         this.translator = Translators.get(merchant.getData().getLanguage());
 
         String fontPath;
@@ -148,6 +154,7 @@ public class TradingUI implements Scene {
         }
         this.font = new BitmapFont(Gdx.files.internal(fontPath));
         buildUI();
+
         dialogueText.setText(merchant.getData().getDialogue());
         setChoiceIndex(-1);
         setOfferedItemIndex(0);
@@ -217,17 +224,29 @@ public class TradingUI implements Scene {
         );
 
         // Item box
-        offeredItemText = new Text(
-            // TODO: replace with item image
+        offeredItemImage = new Image(
+            null,
+            new UIRelativeLayout.Builder()
+                .xAlignment(Alignment.CENTER)
+                .yAlignment(Alignment.START)
+                .padTop(10)
+                .width(100)
+                .height(100)
+                .getLayout()
+        );
+        offeredItemNameText = new Text(
             "",
             font,
             Text.Alignment.CENTER,
             parchmentText,
             new UIRelativeLayout.Builder()
-                .yAlignment(Alignment.CENTER)
+                .xAlignment(Alignment.CENTER)
+                .yAlignment(Alignment.END)
+                .padBottom(20)
                 .height(FONT_SIZE)
                 .getLayout()
         );
+
         uiRoot.addChild(
             new Box(
                 2,
@@ -240,7 +259,8 @@ public class TradingUI implements Scene {
                     .height(ITEM_BOX_HEIGHT)
                     .getLayout()
             )
-                .addChild(offeredItemText)
+                .addChild(offeredItemImage)
+                .addChild(offeredItemNameText)
                 .addChild(makeItemArrowButton(true))
                 .addChild(makeItemArrowButton(false))
         );
@@ -304,16 +324,29 @@ public class TradingUI implements Scene {
                 i
             );
             Item item = merchant.getData().getItems().get(i);
+            choiceImages[i] = new Image(
+                item.getTexture(textures),
+                new UIRelativeLayout.Builder()
+                    .xAlignment(Alignment.START)
+                    .yAlignment(Alignment.CENTER)
+                    .padLeft(10)
+                    .width(44)
+                    .height(44)
+                    .getLayout()
+            );
             choiceTexts[i] = new Text(
                 translator.translateItemName(item),
                 font,
-                Text.Alignment.CENTER,
+                Text.Alignment.START,
                 parchmentText,
                 new UIRelativeLayout.Builder()
+                    .xAlignment(Alignment.START)
                     .yAlignment(Alignment.CENTER)
+                    .padLeft(64)
                     .height(FONT_SIZE)
                     .getLayout()
             );
+            button.addChild(choiceImages[i]);
             button.addChild(choiceTexts[i]);
             uiRoot.addChild(button);
         }
@@ -525,7 +558,8 @@ public class TradingUI implements Scene {
         offeredItemIndex = i % itemCount;
 
         Item item = playerInventory.getItems().get(offeredItemIndex);
-        offeredItemText.setText("Picture of:\n" + item.toString());
+        offeredItemImage.setTexture(item.getTexture(textures));
+        offeredItemNameText.setText(translator.translateItemName(item));
         rarityText.setText(item.rarity().toString());
         rarityText.setColor(item.rarity().color());
 
