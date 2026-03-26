@@ -1,4 +1,7 @@
-package com.simpulator.engine.ui;
+package com.simpulator.game.ui;
+
+import com.simpulator.engine.ui.Rect;
+import com.simpulator.engine.ui.UILayout;
 
 /** A layout that calculates bounds relative to its parent. */
 public class UIRelativeLayout implements UILayout {

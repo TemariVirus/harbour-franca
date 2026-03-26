@@ -14,9 +14,8 @@ import com.simpulator.engine.input.MouseManager.MouseMoveEvent;
 import com.simpulator.engine.input.MouseManager.MouseScrollEvent;
 import com.simpulator.engine.scene.SoundManager;
 import com.simpulator.engine.ui.UIListener;
-import com.simpulator.engine.ui.UIRelativeLayout;
-import com.simpulator.engine.ui.UIRelativeLayout.Alignment;
 import com.simpulator.engine.ui.UIRoot;
+import com.simpulator.game.ui.UIRelativeLayout.Alignment;
 
 public final class UiHelper {
 

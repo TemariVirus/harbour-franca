@@ -8,13 +8,13 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.simpulator.engine.graphics.GraphicsManager;
 import com.simpulator.engine.scene.Scene;
-import com.simpulator.engine.ui.UIRelativeLayout;
-import com.simpulator.engine.ui.UIRelativeLayout.Alignment;
 import com.simpulator.engine.ui.UIRoot;
 import com.simpulator.game.trading.Inventory;
 import com.simpulator.game.trading.Item;
 import com.simpulator.game.ui.Box;
 import com.simpulator.game.ui.Text;
+import com.simpulator.game.ui.UIRelativeLayout;
+import com.simpulator.game.ui.UIRelativeLayout.Alignment;
 
 /**
  * In-game HUD overlay showing mission objective, player inventory,

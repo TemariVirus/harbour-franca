@@ -1,8 +1,9 @@
-package com.simpulator.engine.collision;
+package com.simpulator.game;
 
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.math.collision.OrientedBoundingBox;
+import com.simpulator.engine.collision.Polyhedron;
 
 /** Converts an oriented bounding box to the Polyhedron class. */
 public class Cuboid extends Polyhedron {

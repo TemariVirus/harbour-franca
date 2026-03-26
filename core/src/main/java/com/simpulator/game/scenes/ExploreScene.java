@@ -21,7 +21,6 @@ import com.simpulator.engine.scene.SceneCompositor;
 import com.simpulator.engine.scene.SceneManager;
 import com.simpulator.engine.scene.SoundManager;
 import com.simpulator.engine.scene.TextureCache;
-import com.simpulator.engine.ui.UIRelativeLayout;
 import com.simpulator.game.Clock;
 import com.simpulator.game.Config;
 import com.simpulator.game.EntityTargeter;
@@ -38,6 +37,7 @@ import com.simpulator.game.levels.LevelManager;
 import com.simpulator.game.levels.maps.Level1Map;
 import com.simpulator.game.trading.Inventory;
 import com.simpulator.game.ui.Pin;
+import com.simpulator.game.ui.UIRelativeLayout;
 import java.util.ArrayList;
 import com.simpulator.game.levels.maps.Level2Map;
 
