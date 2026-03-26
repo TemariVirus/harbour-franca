@@ -124,7 +124,8 @@ public class LevelManager {
         
         level2.valueGoal = 100; 
         level2.map = new Level2Map();
-    
+        // Turn around player
+        level2.playerStartYaw = 180f;
         level2.playerStart = new Vector3(14, 1, 2); 
         
         level2.startingItems = new Item[] {
@@ -138,20 +139,32 @@ public class LevelManager {
                     MerchantEntity.class,
                     new Vector3(8, 0, 12), // Middle-Left Booth
                     new MerchantData(
-                        "Vietnamese Merchant", "zh-merchant.png", Language.VIETNAMESE,
-                        "Chào mừng! Bạn muốn mua gì?", "Thỏa thuận tuyệt vời!", "Cảm ơn bạn!", "Bạn đang đùa tôi à?", "Không mua thì đi đi!",
+                        "Vietnamese Merchant", 
+                        "zh-merchant.png", 
+                        Language.VIETNAMESE,
+                        "Nó mềm mại. Bạn dùng nó để may áo quần.", //TODO add fnt
+                        "Ồ, tuyệt quá! Cảm ơn nhé.",
+                        "Cảm ơn bạn đã mua hàng!",
+                        "Hơi bị hớ đấy nhỉ? Đồ của tôi đáng giá hơn thế.",
+                        "Nếu bạn không định mua thì đừng có lãng phí thời gian!",
                         8f, 2f,
                         // Sells Rares, wants a specific Common.
                         new Item[] { Item.COMPASS, Item.SPICE, Item.CANDLE },
-                        new HashSet<>(Arrays.asList(Item.ROPE)), "(I need some rope...)" 
+                        new HashSet<>(Arrays.asList(Item.CLOTH)), "(It is soft. You use it to make clothes.)" 
                     )
                 ),
                 new MerchantConfig(
                     MerchantEntity.class,
                     new Vector3(20, 0, 6), // Top-Right Booth
                     new MerchantData(
-                        "Japanese Merchant", "jp-merchant.png", Language.JAPANESE,
-                        "いらっしゃいませ！", "素晴らしい取引だ！", "ありがとうございます。", "ふざけるな！", "冷やかしなら帰ってくれ！",
+                        "Japanese Merchant", 
+                        "jp-merchant.png", 
+                        Language.JAPANESE,
+                        "道に迷いました。", //TODO add fnt
+                        "おお！これはいいね！",
+                        "毎度ありがとうございます。",
+                        "お前さあ…こんなゴミで商売してんの？",
+                        "商売するつもりがないならさっさと消えろ！",
                         9f, 2f,
                         // Sells Epics, wants a specific Rare
                         new Item[] { Item.CHALICE, Item.GEMSTONE, Item.LENS },
@@ -162,12 +175,18 @@ public class LevelManager {
                     MerchantEntity.class,
                     new Vector3(20, 0, 18), // Bottom-Right Booth
                     new MerchantData(
-                        "Chinese Merchant", "vi-merchant.png", Language.CHINESE,
-                        "欢迎！来看看我的货物吧。", "太好了，成交！", "谢谢惠顾。", "你在开玩笑吗？", "没钱就别来烦我！",
+                        "Chinese Merchant",
+                        "vi-merchant.png",
+                        Language.CHINESE,
+                        "它是由金子做的。你可以用它来喝水！", //TODO add fnt
+                        "哦！太好了！谢谢你！这个能多吃六月！",
+                        "谢谢你的购买！",
+                        "我才没有那么笨！给我滚！",
+                        "如果你不打算买的话就别浪费我的时间了！",
                         10f, 2f,
                         // Sells a Legendary, wants a specific Epic
                         new Item[] { Item.DRAGON_SCALE, Item.IDOL, Item.CLOTH },
-                        new HashSet<>(Arrays.asList(Item.CHALICE)), "(A golden cup would be nice...)" 
+                        new HashSet<>(Arrays.asList(Item.CHALICE)), "(It is made of gold. You can use it to drink water.)" 
                     )
                 )
             };
@@ -204,7 +223,11 @@ public class LevelManager {
                     new Vector3(6, 0, 2), 
                     new MerchantData(
                         "Vietnamese Merchant", "zh-merchant.png", Language.VIETNAMESE,
-                        "Chào mừng! Bạn muốn mua gì?", "Thỏa thuận tuyệt vời!", "Cảm ơn bạn!", "Bạn đang đùa tôi à?", "Không mua thì đi đi!",
+                        "Có dây thừng không? Có người thích kiểu\nchơi *đó* đấy.",
+                        "Ồ, tuyệt quá! Cảm ơn nhé.",
+                        "Cảm ơn bạn đã mua hàng!",
+                        "Hơi bị hớ đấy nhỉ? Đồ của tôi đáng giá hơn thế.",
+                        "Nếu bạn không định mua thì đừng có lãng phí thời gian!",
                         8f, 2f,
                         generateRandomInventory(new ItemRarity[] { ItemRarity.RARE, ItemRarity.COMMON, ItemRarity.COMMON }, vietWants),
                         new HashSet<>(Arrays.asList(vietWants)), 
@@ -215,8 +238,14 @@ public class LevelManager {
                     MerchantEntity.class,
                     new Vector3(14, 0, 2), 
                     new MerchantData(
-                        "Japanese Merchant", "jp-merchant.png", Language.JAPANESE,
-                        "いらっしゃいませ！", "素晴らしい取引だ！", "ありがとうございます。", "ふざけるな！", "冷やかしなら帰ってくれ！",
+                        "Japanese Merchant", 
+                        "jp-merchant.png", 
+                        Language.JAPANESE,
+                        "家にもうちょっと光が欲しいなあ。",
+                        "おお！これはいいね！",
+                        "毎度ありがとうございます。",
+                        "お前さあ…こんなゴミで商売してんの？",
+                        "商売するつもりがないならさっさと消えろ！",
                         9f, 2f,
                         generateRandomInventory(new ItemRarity[] { ItemRarity.EPIC, ItemRarity.RARE, ItemRarity.RARE }, japnWants),
                         new HashSet<>(Arrays.asList(japnWants)), 
@@ -227,8 +256,14 @@ public class LevelManager {
                     MerchantEntity.class,
                     new Vector3(22, 0, 2), 
                     new MerchantData(
-                        "Chinese Merchant", "vi-merchant.png", Language.CHINESE,
-                        "欢迎！来看看我的货物吧。", "太好了，成交！", "谢谢惠顾。", "你在开玩笑吗？", "没钱就别来烦我！",
+                        "Chinese Merchant",
+                        "vi-merchant.png",
+                        Language.CHINESE,
+                        "我很饿。有食物的话我什么都愿意给！",
+                        "哦！太好了！谢谢你！这个能多吃六月！",
+                        "谢谢你的购买！",
+                        "我才没有那么笨！给我滚！",
+                        "如果你不打算买的话就别浪费我的时间了！",
                         10f, 2f,
                         generateRandomInventory(new ItemRarity[] { ItemRarity.LEGENDARY, ItemRarity.EPIC, ItemRarity.EPIC }, chinWants),
                         new HashSet<>(Arrays.asList(chinWants)), 

@@ -45,6 +45,8 @@ public class Level {
     public Vector3 playerStart;
     public LevelMap map;
     public MerchantConfig[] merchants;
+    
+    public float playerStartYaw = 0f;
 
     public Inventory createInventory() {
         Inventory inventory = new Inventory();

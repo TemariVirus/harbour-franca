@@ -102,7 +102,7 @@ public class ExploreScene implements Scene {
         playerCamera = new CameraEntity(
             level.playerStart,
             new Vector3(1, 1, 1),
-            new Quaternion().setFromAxis(Vector3.Y, 0),
+            new Quaternion().setFromAxis(Vector3.Y, level.playerStartYaw),
             camera
         );
         entityManager.add(playerCamera);
