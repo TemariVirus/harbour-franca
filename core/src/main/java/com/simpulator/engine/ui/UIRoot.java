@@ -10,7 +10,14 @@ import java.util.ArrayList;
 public class UIRoot extends UIElement implements Renderable {
 
     public UIRoot() {
-        super(new UIRelativeLayout());
+        super(
+            new UILayout() {
+                @Override
+                public Rect computeBounds(Rect parentBounds) {
+                    return parentBounds;
+                }
+            }
+        );
     }
 
     /** Resizes the root to fill the viewport. */

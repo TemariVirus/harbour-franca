@@ -15,8 +15,6 @@ import com.simpulator.engine.input.MouseManager.MouseMoveEvent;
 import com.simpulator.engine.scene.Scene;
 import com.simpulator.engine.scene.SoundManager;
 import com.simpulator.engine.scene.TextureCache;
-import com.simpulator.engine.ui.UIRelativeLayout;
-import com.simpulator.engine.ui.UIRelativeLayout.Alignment;
 import com.simpulator.engine.ui.UIRoot;
 import com.simpulator.game.entities.MerchantEntity;
 import com.simpulator.game.language.Translator;
@@ -28,6 +26,8 @@ import com.simpulator.game.ui.Box;
 import com.simpulator.game.ui.Image;
 import com.simpulator.game.ui.Text;
 import com.simpulator.game.ui.Timer;
+import com.simpulator.game.ui.UIRelativeLayout;
+import com.simpulator.game.ui.UIRelativeLayout.Alignment;
 import com.simpulator.game.ui.UiHelper;
 
 public class TradingUI implements Scene {

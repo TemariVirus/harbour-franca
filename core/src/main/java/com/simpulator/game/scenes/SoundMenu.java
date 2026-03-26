@@ -16,13 +16,13 @@ import com.simpulator.engine.input.MouseManager;
 import com.simpulator.engine.scene.MusicManager;
 import com.simpulator.engine.scene.Scene;
 import com.simpulator.engine.scene.SceneManager;
-import com.simpulator.engine.ui.UIRelativeLayout;
-import com.simpulator.engine.ui.UIRelativeLayout.Alignment;
 import com.simpulator.engine.ui.UIRoot;
 import com.simpulator.game.Config;
 import com.simpulator.game.Scenes;
 import com.simpulator.game.ui.Slider;
 import com.simpulator.game.ui.Text;
+import com.simpulator.game.ui.UIRelativeLayout;
+import com.simpulator.game.ui.UIRelativeLayout.Alignment;
 import com.simpulator.game.ui.UiHelper;
 
 public class SoundMenu implements Scene {
