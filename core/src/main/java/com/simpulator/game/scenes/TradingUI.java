@@ -603,12 +603,15 @@ public class TradingUI implements Scene {
 
         switch (result) {
             case GOT_WANTS:
+                sounds.play("sfx/trade-good.ogg");
                 setTradeResult(merchant.getData().getGotWantsDialogue());
                 break;
             case TRADED:
+                sounds.play("sfx/trade-normal.ogg");
                 setTradeResult(merchant.getData().getTradedDialogue());
                 break;
             case FAILED:
+                sounds.play("sfx/trade-bad.ogg");
                 setTradeResult(merchant.getData().getTradeFailedDialogue());
                 break;
         }
@@ -638,6 +641,7 @@ public class TradingUI implements Scene {
 
         uiRoot.update(deltaTime);
         if (timer.isFinished()) {
+            sounds.play("sfx/trade-timesup.ogg");
             setTradeResult(merchant.getData().getTimesUpDialogue());
             merchant.setCanTrade(false);
         }
