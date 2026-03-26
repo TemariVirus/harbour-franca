@@ -39,6 +39,8 @@ import com.simpulator.game.levels.maps.Level1Map;
 import com.simpulator.game.trading.Inventory;
 import com.simpulator.game.ui.Pin;
 import java.util.ArrayList;
+import com.simpulator.game.levels.maps.Level2Map;
+
 import java.util.List;
 
 public class ExploreScene implements Scene {
@@ -120,6 +122,8 @@ public class ExploreScene implements Scene {
         Vector3 doorPos;
         if (level.map instanceof Level1Map) {
             doorPos = ((Level1Map) level.map).getDoorPosition();
+        } else if (level.map instanceof Level2Map) {
+            doorPos = ((Level2Map) level.map).getDoorPosition(); 
         } else {
             doorPos = new Vector3(0, 0, -10); // Fallback for other maps
         }

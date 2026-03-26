@@ -120,88 +120,48 @@ public class LevelManager {
         
         level2.valueGoal = 100; // Increased difficulty!
         level2.map = new Level2Map();
-        level2.playerStart = new Vector3(16, 1, 8); // Start in the middle of the room
-        
-        // Use the proper Item enums for starting items
+     // Player starts precisely on the pavement at the bottom right
+        level2.playerStart = new Vector3(14, 1, 2);        // Use the proper Item enums for starting items
         level2.startingItems = new Item[] {
             Item.MAP,
             Item.COMPASS
         };
 
         level2.merchants = new MerchantConfig[] {
-            new MerchantConfig(
-                MerchantEntity.class,
-                new Vector3(6, 0, 4), // Top-Left
-                new MerchantData(
-                    "Chinese Merchant",
-                    "vi-merchant.png",
-                    Language.CHINESE,
-                    "欢迎！来看看我的货物吧。",
-                    "太好了，成交！",
-                    "谢谢惠顾。",
-                    "你在开玩笑吗？",
-                    "没钱就别来烦我！",
-                    10f, 2f,
-                    new Item[] { Item.SPICE, Item.CLOTH },
-                    new HashSet<>(Arrays.asList(Item.GEMSTONE)),
-                    "ddsadsa"
+                new MerchantConfig(
+                    MerchantEntity.class,
+                    new Vector3(8, 0, 12), // Middle-Left Booth (Col 4, Row 6)
+                    new MerchantData(
+                        "Vietnamese Merchant", "zh-merchant.png", Language.VIETNAMESE,
+                        "Chào mừng! Bạn muốn mua gì?", "Thỏa thuận tuyệt vời!", "Cảm ơn bạn!", "Bạn đang đùa tôi à?", "Không mua thì đi đi!",
+                        8f, 2f,
+                        new Item[] { Item.FISH, Item.CANDLE },
+                        new HashSet<>(Arrays.asList(Item.COMPASS)), ""
+                    )
+                ),
+                new MerchantConfig(
+                    MerchantEntity.class,
+                    new Vector3(20, 0, 6), // Top-Right Booth (Col 10, Row 3)
+                    new MerchantData(
+                        "Japanese Merchant", "jp-merchant.png", Language.JAPANESE,
+                        "いらっしゃいませ！", "素晴らしい取引だ！", "ありがとうございます。", "ふざけるな！", "冷やかしなら帰ってくれ！",
+                        9f, 2f,
+                        new Item[] { Item.CHALICE, Item.PENDANT },
+                        new HashSet<>(Arrays.asList(Item.MAP)), ""
+                    )
+                ),
+                new MerchantConfig(
+                    MerchantEntity.class,
+                    new Vector3(20, 0, 18), // Bottom-Right Booth (Col 10, Row 9)
+                    new MerchantData(
+                        "Chinese Merchant", "vi-merchant.png", Language.CHINESE,
+                        "欢迎！来看看我的货物吧。", "太好了，成交！", "谢谢惠顾。", "你在开玩笑吗？", "没钱就别来烦我！",
+                        10f, 2f,
+                        new Item[] { Item.SPICE, Item.CLOTH },
+                        new HashSet<>(Arrays.asList(Item.GEMSTONE)), ""
+                    )
                 )
-            ),
-            new MerchantConfig(
-                MerchantEntity.class,
-                new Vector3(26, 0, 4), // Top-Right
-                new MerchantData(
-                    "Japanese Merchant",
-                    "jp-merchant.png",
-                    Language.JAPANESE,
-                    "いらっしゃいませ！",
-                    "素晴らしい取引だ！",
-                    "ありがとうございます。",
-                    "ふざけるな！",
-                    "冷やかしなら帰ってくれ！",
-                    9f, 2f,
-                    new Item[] { Item.CHALICE, Item.PENDANT },
-                    new HashSet<>(Arrays.asList(Item.MAP)),
-                    "PLACE"
-                )
-            ),
-            new MerchantConfig(
-                MerchantEntity.class,
-                new Vector3(6, 0, 10), // Bottom-Left
-                new MerchantData(
-                    "Vietnamese Merchant",
-                    "zh-merchant.png",
-                    Language.VIETNAMESE,
-                    "Chào mừng! Bạn muốn mua gì?",
-                    "Thỏa thuận tuyệt vời!",
-                    "Cảm ơn bạn!",
-                    "Bạn đang đùa tôi à?",
-                    "Không mua thì đi đi!",
-                    8f, 2f,
-                    new Item[] { Item.FISH, Item.CANDLE },
-                    new HashSet<>(Arrays.asList(Item.COMPASS)),
-                    "DSS"
-                )
-            ),
-            new MerchantConfig(
-                MerchantEntity.class,
-                new Vector3(26, 0, 10), // Bottom-Right
-                new MerchantData(
-                    "Foreign Merchant",
-                    "guide.png",
-                    Language.CHINESE,
-                    "你好，朋友。要交易吗？",
-                    "合作愉快！",
-                    "谢谢。",
-                    "这简直是抢劫！",
-                    "再见！",
-                    10f, 2f,
-                    new Item[] { Item.GEMSTONE, Item.ASTROLABE },
-                    new HashSet<>(Arrays.asList(Item.SPICE)),
-                    "ds"
-                )
-            )
-        };
+            };
         
         levelDatabase.put(level2.levelId, level2);
     }
