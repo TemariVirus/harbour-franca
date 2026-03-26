@@ -515,6 +515,7 @@ public class TradingUI implements Scene {
                     e.type != ButtonBindType.DOWN ||
                     !button.getBounds().contains(e.x, e.y)
                 ) return false;
+                sounds.play("sfx/click.ogg");
                 if (state != State.TRADING || choiceIndex != index) {
                     state = State.TRADING;
                     choiceIndex = index;

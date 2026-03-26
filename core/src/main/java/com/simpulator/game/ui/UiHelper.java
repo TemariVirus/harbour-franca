@@ -180,7 +180,7 @@ public final class UiHelper {
             ) {
                 return false;
             }
-            sounds.play("sfx/click.mp3");
+            sounds.play("sfx/click.ogg");
             return onClick.handle(e);
         });
         return box;

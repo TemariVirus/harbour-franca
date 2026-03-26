@@ -4,13 +4,12 @@ import com.badlogic.gdx.math.Vector3;
 import com.simpulator.game.entities.MerchantEntity;
 import com.simpulator.game.language.Language;
 import com.simpulator.game.levels.Level.MerchantConfig;
-import com.simpulator.game.levels.maps.MiramarMap;
+import com.simpulator.game.levels.maps.Level1Map;
 import com.simpulator.game.trading.Item;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import com.simpulator.game.levels.maps.Level1Map;
 
 public class LevelManager {
 
@@ -35,7 +34,7 @@ public class LevelManager {
         level1.displayName = "The Beginning";
 
         level1.skyboxPath = "Skyboxes/miramar";
-        level1.bgmPath = "GameAudio.mp3";
+        level1.bgmPath = "GameAudio.ogg";
 
         level1.valueGoal = 50;
         level1.startingItems = new Item[] {
@@ -44,9 +43,9 @@ public class LevelManager {
             Item.CANDLE,
         };
 
-        level1.playerStart = new Vector3(14, 1, 8); // Centers the player in the room        
+        level1.playerStart = new Vector3(14, 1, 8); // Centers the player in the room
         level1.map = new Level1Map();
-        
+
         level1.merchants = new MerchantConfig[] {
             new MerchantConfig(
                 MerchantEntity.class,

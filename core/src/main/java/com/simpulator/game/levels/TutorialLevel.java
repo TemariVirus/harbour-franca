@@ -20,7 +20,7 @@ public class TutorialLevel extends Level {
         this.displayName = "Tutorial";
 
         this.skyboxPath = "Skyboxes/miramar";
-        this.bgmPath = "GameAudio.mp3";
+        this.bgmPath = "GameAudio.ogg";
         this.valueGoal = 13;
         this.startingItems = new Item[] { Item.TRINKET, Item.FISH };
 
