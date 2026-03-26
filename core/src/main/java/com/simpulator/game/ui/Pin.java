@@ -4,26 +4,26 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
-import com.simpulator.engine.Entity;
 import com.simpulator.engine.graphics.Renderable;
 import com.simpulator.engine.graphics.TextureBatch;
 import com.simpulator.engine.scene.TextureCache;
+import com.simpulator.game.entities.MerchantEntity;
 
 public class Pin implements Renderable {
-    private final Entity target;
-    private final String texturePath = "Pin.png";
+	private final MerchantEntity target;
+	private final String texturePath = "Pin.png";
     private final Vector3 screenPos = new Vector3();
     private final TextureCache textures;
     
     // Matrix to hold our 2D screen projection
     private final Matrix4 orthoMatrix = new Matrix4();
 
-    public Pin(Entity target, TextureCache textures) {
+    public Pin(MerchantEntity target, TextureCache textures) {
         this.target = target;
         this.textures = textures;
     }
 
-    public Entity getTarget() {
+    public MerchantEntity getTarget() {
         return target;
     }
 

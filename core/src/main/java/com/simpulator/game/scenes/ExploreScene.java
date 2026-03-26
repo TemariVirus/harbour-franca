@@ -362,6 +362,8 @@ public class ExploreScene implements Scene {
             closeTradingUI();
             checkWinCondition();
         }
+        // Pin gone if cant trade
+        activePins.removeIf(pin -> !pin.getTarget().canTrade());
 
         clock.forward(deltaTime);
         if (!isTradingUIOpen()) {
