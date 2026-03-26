@@ -22,6 +22,7 @@ public class MerchantData {
     private final float normalThreshold;
     private final List<Item> items;
     private final Set<Item> wants;
+    public final String hint;
 
     public MerchantData(
         String name,
@@ -35,7 +36,8 @@ public class MerchantData {
         float wantsThreshold,
         float normalThreshold,
         Item[] items,
-        Set<Item> wants
+        Set<Item> wants,
+        String hint
     ) {
         this.name = name;
         this.imagePath = imagePath;
@@ -49,6 +51,7 @@ public class MerchantData {
         this.normalThreshold = normalThreshold;
         this.items = Arrays.asList(items);
         this.wants = new HashSet<>(wants);
+        this.hint = hint;
     }
 
     public String getName() {

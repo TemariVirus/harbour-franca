@@ -44,7 +44,8 @@ public class TutorialLevel extends Level {
                     1000f,
                     1.5f,
                     new Item[] { Item.FISH, Item.GEMSTONE, Item.CANDLE },
-                    new HashSet<>(Arrays.asList(Item.TRINKET))
+                    new HashSet<>(Arrays.asList(Item.TRINKET)),
+                    "This is a hint"
                 )
             ),
         };

@@ -38,10 +38,13 @@ public class GameHUD implements Scene {
 
     // HUD elements
     private Text objectiveLabel;
+    private Text hintLabel;
     private Text crosshair;
     private Text interactionPrompt;
     private Box inventoryGroup;
     private Text[] inventoryLabels;
+    private Text hintCountLabel;
+    private float hintTimer = 0f;
 
     public GameHUD(int levelGoal, Inventory playerInventory) {
         this.levelGoal = levelGoal;
@@ -62,6 +65,30 @@ public class GameHUD implements Scene {
         );
         updateObjectiveText();
         uiRoot.addChild(objectiveLabel);
+        
+        hintCountLabel = new Text(
+                "Hints: 1", // Default starting text
+                font,
+                Text.Alignment.END, // Aligns text to the right
+                Color.CYAN,
+                new UIRelativeLayout.Builder()
+                    .xAlignment(Alignment.END) // Pushes it to the right side of the screen
+                    .padTop(20)                // Matches the height of the objective label
+                    .padRight(20)              // Keeps it from touching the edge
+                    .height(10.5f)
+                    .getLayout()
+            );
+            uiRoot.addChild(hintCountLabel);
+            
+        hintLabel = new Text(
+                "",
+                font,
+                Text.Alignment.CENTER,
+                Color.CYAN,
+                new UIRelativeLayout.Builder().padTop(45).height(10.5f).getLayout()
+            );
+            hintLabel.setVisible(false); // Hide hint by default
+            uiRoot.addChild(hintLabel);
 
         // --- Center: crosshair and interaction prompt ---
         crosshair = new Text(
@@ -182,6 +209,12 @@ public class GameHUD implements Scene {
             inventoryLabels[i].getParent().setVisible(false);
         }
         uiRoot.update(deltaTime);
+        if (hintTimer > 0) {
+            hintTimer -= deltaTime;
+            if (hintTimer <= 0) {
+                hideHint();
+            }
+        }
     }
 
     @Override
@@ -203,7 +236,17 @@ public class GameHUD implements Scene {
         graphics.render(uiRoot, null);
         graphics.endRender();
     }
-
+    public void showHint(String text) {
+        hintLabel.setText(text);
+        hintLabel.setVisible(true);
+        hintTimer = 5.0f;
+    }
+    public void hideHint() {
+        hintLabel.setVisible(false);
+    }
+    public void updateHintCount(int count) {
+        hintCountLabel.setText("Hints: " + count);
+    }
     @Override
     public void dispose() {
         font.dispose();

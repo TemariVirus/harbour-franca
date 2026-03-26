@@ -56,6 +56,10 @@ public class MainMenu implements Scene {
             levelManager.setCurrentLevelId("level_01");
             sceneManager.setScene(Scenes.Explore);
         });
+        km.bind(ButtonBindType.DOWN, Keys.NUM_2, e -> {
+            levelManager.setCurrentLevelId("level_02");
+            sceneManager.setScene(Scenes.Explore);
+        });
         km.bind(ButtonBindType.DOWN, Keys.S, e ->
             sceneManager.setScene(Scenes.SoundMenu)
         );
@@ -63,6 +67,7 @@ public class MainMenu implements Scene {
 
         font = new BitmapFont(Gdx.files.internal("fonts/en.fnt"));
         buildUI(sceneManager, levelManager);
+        
     }
 
     private void buildUI(SceneManager sceneManager, LevelManager levelManager) {
@@ -74,21 +79,29 @@ public class MainMenu implements Scene {
         uiRoot.addChild(new Text("Learn languages through smart trading", font, Text.Alignment.CENTER, TEXT_COLOR,
                 new UIRelativeLayout.Builder().yAlignment(Alignment.START).padTop(108).height(10.5f).getLayout()));
 
-        addMenuButton("Play Tutorial", 250, e -> {
+     // Adjusted Y coordinates to fit all 5 buttons
+        addMenuButton("Play Tutorial", 290, e -> {
             levelManager.setCurrentLevelId("level_00");
             sceneManager.setScene(Scenes.Explore);
         });
         
-        addMenuButton("Play Level 1", 175, e -> {
+        addMenuButton("Play Level 1", 225, e -> {
             levelManager.setCurrentLevelId("level_01");
             sceneManager.setScene(Scenes.Explore);
         });
-        
-        addMenuButton("Sound Options", 100, e -> sceneManager.setScene(Scenes.SoundMenu));
-        
-        addMenuButton("Exit", 25, e -> Gdx.app.exit());
 
-        uiRoot.addChild(new Text("T = Tutorial  |  1 = Level 1  |  S = Sound  |  ESC = Exit", font, Text.Alignment.CENTER, HINT_COLOR,
+        // -> THE NEW BUTTON <-
+        addMenuButton("Play Level 2", 160, e -> {
+            levelManager.setCurrentLevelId("level_02");
+            sceneManager.setScene(Scenes.Explore);
+        });
+        
+        addMenuButton("Sound Options", 95, e -> sceneManager.setScene(Scenes.SoundMenu));
+        
+        addMenuButton("Exit", 30, e -> Gdx.app.exit());
+
+        // Update the hint text at the bottom
+        uiRoot.addChild(new Text("T = Tutorial  |  1 = Level 1  |  2 = Level 2  |  S = Sound  |  ESC = Exit", font, Text.Alignment.CENTER, HINT_COLOR,
                 new UIRelativeLayout.Builder().yAlignment(Alignment.END).padBottom(10).height(10.5f).getLayout()));
     }
 

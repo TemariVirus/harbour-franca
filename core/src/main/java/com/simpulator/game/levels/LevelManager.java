@@ -5,6 +5,7 @@ import com.simpulator.game.entities.MerchantEntity;
 import com.simpulator.game.language.Language;
 import com.simpulator.game.levels.Level.MerchantConfig;
 import com.simpulator.game.levels.maps.Level1Map;
+import com.simpulator.game.levels.maps.Level2Map;
 import com.simpulator.game.trading.Item;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -30,13 +31,14 @@ public class LevelManager {
         // Level 1
         Level level1 = new Level();
         level1.levelId = "level_01";
-        level1.nextLevelId = null;
+        level1.nextLevelId = "level_02";
         level1.displayName = "The Beginning";
 
         level1.skyboxPath = "Skyboxes/miramar";
         level1.bgmPath = "GameAudio.ogg";
 
         level1.valueGoal = 50;
+        level1.levelHint = "HINT: Chinese wants Fish | Vietnamese wants Rope | Japanese wants Candle";
         level1.startingItems = new Item[] {
             Item.FISH,
             Item.CLOTH,
@@ -47,63 +49,161 @@ public class LevelManager {
         level1.map = new Level1Map();
 
         level1.merchants = new MerchantConfig[] {
-            new MerchantConfig(
-                MerchantEntity.class,
-                new Vector3(6, 0, 2),
-                new MerchantData(
-                    "Chinese Merchant",
-                    "Lam.jpeg",
-                    Language.CHINESE,
-                    "我很饿。有食物的话我什么都愿意给！",
-                    "哦！太好了！谢谢你！这个能多吃六月！",
-                    "谢谢你的购买！",
-                    "我才没有那么笨！给我滚！",
-                    "如果你不打算买的话就别浪费我的时间了！",
-                    10f,
-                    2f,
-                    new Item[] { Item.MAP, Item.CANDLE, Item.SPICE },
-                    new HashSet<>(Arrays.asList(Item.FISH))
-                )
-            ),
-            new MerchantConfig(
-                MerchantEntity.class,
-                new Vector3(14, 0, 2),
-                new MerchantData(
-                    "Vietnamese Merchant",
-                    "Nisha.jpeg",
-                    Language.VIETNAMESE,
-                    "Có dây thừng không? Có người thích kiểu\nchơi *đó* đấy.",
-                    "Ồ, tuyệt quá! Cảm ơn nhé. Chắc chủ nhân của tôi sẽ rất thích món này.",
-                    "Cảm ơn bạn đã mua hàng!",
-                    "Hơi bị hớ đấy nhỉ? Đồ của tôi đáng giá hơn thế nhiều.",
-                    "Nếu bạn không định mua thì đừng có lãng phí thời gian của tôi!",
-                    8f,
-                    2f,
-                    new Item[] { Item.PENDANT, Item.CANDLE, Item.FISH },
-                    new HashSet<>(Arrays.asList(Item.ROPE))
-                )
-            ),
-            new MerchantConfig(
-                MerchantEntity.class,
-                new Vector3(22, 0, 2),
-                new MerchantData(
-                    "Japanese Merchant",
-                    "Oran.jpeg",
-                    Language.JAPANESE,
-                    "家にもうちょっと光が欲しいなあ。",
-                    "おお！これはいいね！",
-                    "毎度ありがとうございます。",
-                    "お前さあ…こんなゴミで商売してんの？",
-                    "商売するつもりがないならさっさと消えろ！",
-                    9f,
-                    2f,
-                    new Item[] { Item.ROPE, Item.LENS, Item.COMPASS },
-                    new HashSet<>(Arrays.asList(Item.CANDLE))
-                )
-            ),
-        };
+                new MerchantConfig(
+                    MerchantEntity.class,
+                    new Vector3(6, 0, 2),
+                    new MerchantData(
+                        "Chinese Merchant",
+                        "zh-merchant.png",
+                        Language.CHINESE,
+                        "我很饿。有食物的话我什么都愿意给！",
+                        "哦！太好了！谢谢你！这个能多吃六月！",
+                        "谢谢你的购买！",
+                        "我才没有那么笨！给我滚！",
+                        "如果你不打算买的话就别浪费我的时间了！",
+                        10f, 2f,
+                        new Item[] { Item.MAP, Item.CANDLE, Item.SPICE },
+                        new HashSet<>(Arrays.asList(Item.FISH)),
+                        "(I'll give anything for food!)" //HINT
+                    )
+                ),
+                new MerchantConfig(
+                    MerchantEntity.class,
+                    new Vector3(14, 0, 2),
+                    new MerchantData(
+                        "Vietnamese Merchant",
+                        "vi-merchant.png",
+                        Language.VIETNAMESE,
+                        "Có dây thừng không? Có người thích kiểu\nchơi *đó* đấy.",
+                        "Ồ, tuyệt quá! Cảm ơn nhé.",
+                        "Cảm ơn bạn đã mua hàng!",
+                        "Hơi bị hớ đấy nhỉ? Đồ của tôi đáng giá hơn thế.",
+                        "Nếu bạn không định mua thì đừng có lãng phí thời gian!",
+                        8f, 2f,
+                        new Item[] { Item.PENDANT, Item.CANDLE, Item.FISH },
+                        new HashSet<>(Arrays.asList(Item.ROPE)),
+                        "(Got any rope?)" //HINT
+                        
+                    )
+                ),
+                new MerchantConfig(
+                    MerchantEntity.class,
+                    new Vector3(22, 0, 2),
+                    new MerchantData(
+                        "Japanese Merchant",
+                        "jp-merchant.png",
+                        Language.JAPANESE,
+                        "家にもうちょっと光が欲しいなあ。",
+                        "おお！これはいいね！",
+                        "毎度ありがとうございます。",
+                        "お前さあ…こんなゴミで商売してんの？",
+                        "商売するつもりがないならさっさと消えろ！",
+                        9f, 2f,
+                        new Item[] { Item.ROPE, Item.LENS, Item.COMPASS },
+                        new HashSet<>(Arrays.asList(Item.CANDLE)),
+                        "(I want a bit more light)" //HINT
+                    )
+                ),
+            };
 
         levelDatabase.put(level1.levelId, level1);
+     // ==========================================
+        // LEVEL 2 SETUP
+        // ==========================================
+        Level level2 = new Level();
+        level2.levelId = "level_02";
+        level2.nextLevelId = "level_02"; // Ends the game for now
+        level2.displayName = "The Grand Market";
+        
+        level2.skyboxPath = "Skyboxes/miramar";
+        level2.bgmPath = "GameAudio.ogg";
+        
+        level2.valueGoal = 100; // Increased difficulty!
+        level2.map = new Level2Map();
+        level2.playerStart = new Vector3(16, 1, 8); // Start in the middle of the room
+        
+        // Use the proper Item enums for starting items
+        level2.startingItems = new Item[] {
+            Item.MAP,
+            Item.COMPASS
+        };
+
+        level2.merchants = new MerchantConfig[] {
+            new MerchantConfig(
+                MerchantEntity.class,
+                new Vector3(6, 0, 4), // Top-Left
+                new MerchantData(
+                    "Chinese Merchant",
+                    "vi-merchant.png",
+                    Language.CHINESE,
+                    "欢迎！来看看我的货物吧。",
+                    "太好了，成交！",
+                    "谢谢惠顾。",
+                    "你在开玩笑吗？",
+                    "没钱就别来烦我！",
+                    10f, 2f,
+                    new Item[] { Item.SPICE, Item.CLOTH },
+                    new HashSet<>(Arrays.asList(Item.GEMSTONE)),
+                    "ddsadsa"
+                )
+            ),
+            new MerchantConfig(
+                MerchantEntity.class,
+                new Vector3(26, 0, 4), // Top-Right
+                new MerchantData(
+                    "Japanese Merchant",
+                    "jp-merchant.png",
+                    Language.JAPANESE,
+                    "いらっしゃいませ！",
+                    "素晴らしい取引だ！",
+                    "ありがとうございます。",
+                    "ふざけるな！",
+                    "冷やかしなら帰ってくれ！",
+                    9f, 2f,
+                    new Item[] { Item.CHALICE, Item.PENDANT },
+                    new HashSet<>(Arrays.asList(Item.MAP)),
+                    "PLACE"
+                )
+            ),
+            new MerchantConfig(
+                MerchantEntity.class,
+                new Vector3(6, 0, 10), // Bottom-Left
+                new MerchantData(
+                    "Vietnamese Merchant",
+                    "zh-merchant.png",
+                    Language.VIETNAMESE,
+                    "Chào mừng! Bạn muốn mua gì?",
+                    "Thỏa thuận tuyệt vời!",
+                    "Cảm ơn bạn!",
+                    "Bạn đang đùa tôi à?",
+                    "Không mua thì đi đi!",
+                    8f, 2f,
+                    new Item[] { Item.FISH, Item.CANDLE },
+                    new HashSet<>(Arrays.asList(Item.COMPASS)),
+                    "DSS"
+                )
+            ),
+            new MerchantConfig(
+                MerchantEntity.class,
+                new Vector3(26, 0, 10), // Bottom-Right
+                new MerchantData(
+                    "Foreign Merchant",
+                    "guide.png",
+                    Language.CHINESE,
+                    "你好，朋友。要交易吗？",
+                    "合作愉快！",
+                    "谢谢。",
+                    "这简直是抢劫！",
+                    "再见！",
+                    10f, 2f,
+                    new Item[] { Item.GEMSTONE, Item.ASTROLABE },
+                    new HashSet<>(Arrays.asList(Item.SPICE)),
+                    "ds"
+                )
+            )
+        };
+        
+        levelDatabase.put(level2.levelId, level2);
     }
 
     public Level getLevel(String levelId) {

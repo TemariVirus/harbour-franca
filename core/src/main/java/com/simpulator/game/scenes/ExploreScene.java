@@ -72,6 +72,8 @@ public class ExploreScene implements Scene {
     private final Level level;
     protected final Inventory playerInventory;
     private final int valueGoal;
+    
+    private int hintsRemaining = 1;
 
     public ExploreScene(
         SceneManager sceneManager,
@@ -107,6 +109,7 @@ public class ExploreScene implements Scene {
 
         playerInventory = level.createInventory();
         hud = new GameHUD(level.valueGoal, playerInventory);
+        hud.updateHintCount(hintsRemaining);
         overlays.push(hud, new UIRelativeLayout());
 
         merchants = level.createMerchants(textures, playerCamera);
@@ -123,7 +126,7 @@ public class ExploreScene implements Scene {
         GatekeeperEntity doorkeeper = new GatekeeperEntity(doorPos, textures, playerCamera);
         gatekeepers.add(doorkeeper);
         entityManager.add(doorkeeper);
-        // Create a targeter so the player can look at the door (distance of 3 units)
+        // Create a targeter so the player can look at the gatekeeper (distance of 3 units)
         gatekeeperTargeter = new EntityTargeter<>(gatekeepers, 3);
         
         // Pin on startup
@@ -174,20 +177,38 @@ public class ExploreScene implements Scene {
                 new Vector3(PLAYER_SPEED, 0, 0)
             )
         );
+        keyboard.bind(ButtonBindType.DOWN, Keys.H, event -> {
+            // Find the merchant the player is currently looking at / talking to
+            MerchantEntity activeMerchant = merchantTargeter.getClosest(playerCamera.getCamera());
+            
+            if (activeMerchant != null) {
+                String npcHint = activeMerchant.getData().hint;
+                // Check if they have a hint and if we have any hints remaining
+                if (hintsRemaining > 0 && npcHint != null && !npcHint.isEmpty()) {
+                    hintsRemaining--;
+                    hud.updateHintCount(hintsRemaining);
+                    hud.showHint("Hint: " + npcHint);
+                    sounds.play("sfx/trade-good.ogg");
+                }
+            }
+        });
  
 
         keyboard.bind(ButtonBindType.DOWN, Keys.ESCAPE, e ->
             sceneManager.setScene(Scenes.MainMenu)
         );
         keyboard.bind(ButtonBindType.DOWN, Keys.E, event -> {
-            // First, see if we are trying to interact with the door
+            // First, see if we are trying to interact with the gatekeeper
             GatekeeperEntity gatekeeper = gatekeeperTargeter.getClosest(playerCamera.getCamera());
             if (gatekeeper != null) {
                 if (playerInventory.getTotalValue() >= valueGoal) {
-                    // We met the goal! Remove the door so we can walk past
-                    entityManager.remove(gatekeeper);
-                    gatekeepers.remove(gatekeeper);
-                    hud.setPromptVisible(false);
+                    // Meet the wincon either go next lvl or win
+                	if (level.nextLevelId == null) {
+                        sceneManager.setScene(Scenes.Win);
+                    } else {
+                        levelManager.setCurrentLevelId(level.nextLevelId);
+                        sceneManager.setScene(Scenes.Explore);
+                    }
                 }
                 return; // Stop here so it doesn't try to open the trading UI
             }
@@ -279,28 +300,21 @@ public class ExploreScene implements Scene {
         Gdx.input.setInputProcessor(getInputProcessor());
         onFocus();
     }
-
+    // TODO
+    // tradingUI.showTradeResult("Level Complete! Goal reached!");
     protected void checkWinCondition() {
-        // TODO: change this to some gatekeeper or smth that the player interacts with to check
         for (MerchantEntity merchant : merchants) {
             if (merchant.canTrade()) {
-                return;
+                return; // There are still merchants left to trade with
             }
         }
 
-        if (playerInventory.getTotalValue() >= valueGoal) {
-            if (level.nextLevelId == null) {
-                // TODO ?
-                // tradingUI.showTradeResult("Level Complete! Goal reached!");
-                sceneManager.setScene(Scenes.Win);
-            } else {
-                levelManager.setCurrentLevelId(level.nextLevelId);
-                sceneManager.setScene(Scenes.Explore);
-            }
-        } else {
-            // lose scene
+
+        if (playerInventory.getTotalValue() < valueGoal) {
+
             sceneManager.setScene(Scenes.Lose);
         }
+        
     }
 
     protected boolean isTradingUIOpen() {
