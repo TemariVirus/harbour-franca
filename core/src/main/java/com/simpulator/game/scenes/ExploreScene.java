@@ -76,7 +76,7 @@ public class ExploreScene implements Scene {
     protected final Inventory playerInventory;
     private final int valueGoal;
     
-    private int hintsRemaining = 1;
+    private int hintsRemaining = 2;
 
     public ExploreScene(
         SceneManager sceneManager,

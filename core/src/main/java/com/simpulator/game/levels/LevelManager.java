@@ -11,6 +11,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Random;
+import java.util.ArrayList;
+import java.util.List;
+import com.simpulator.game.trading.ItemRarity;
 
 public class LevelManager {
 
@@ -21,7 +25,8 @@ public class LevelManager {
         // Hardcoded Level
         initLevels();
     }
-
+    
+    
     // TODO: create enum for level ids
     private void initLevels() {
         // Level 0 - Tutorial
@@ -109,10 +114,9 @@ public class LevelManager {
         levelDatabase.put(level1.levelId, level1);
 
         // LEVEL 2
-
         Level level2 = new Level();
         level2.levelId = "level_02";
-        level2.nextLevelId = "null"; // Ends the game for now
+        level2.nextLevelId = "level_03"; // Ends the game for now
         level2.displayName = "The Grand Market";
         
         level2.skyboxPath = "Skyboxes/miramar";
@@ -169,6 +173,102 @@ public class LevelManager {
             };
         
         levelDatabase.put(level2.levelId, level2);
+        // Level 3 Will use the level 1 mao
+        Level level3 = new Level();
+        level3.levelId = "level_03";
+        level3.nextLevelId = null; // This is the final level
+        level3.displayName = "The Endless Bazaar";
+        
+        level3.skyboxPath = "Skyboxes/miramar";
+        level3.bgmPath = "GameAudio.ogg";
+        
+        level3.valueGoal = 200; 
+        
+        // using level 1 map
+        level3.map = new Level1Map();
+        
+        level3.playerStart = new Vector3(14, 1, 8);
+
+        level3.startingItems = generateRandomInventory(
+            new ItemRarity[] { ItemRarity.COMMON, ItemRarity.COMMON, ItemRarity.COMMON }, 
+            null
+        );
+
+        Item vietWants = getRandomItem(ItemRarity.COMMON, null);
+        Item japnWants = getRandomItem(ItemRarity.RARE, null);
+        Item chinWants = getRandomItem(ItemRarity.EPIC, null);
+
+        level3.merchants = new MerchantConfig[] {
+                new MerchantConfig(
+                    MerchantEntity.class,
+                    new Vector3(6, 0, 2), 
+                    new MerchantData(
+                        "Vietnamese Merchant", "zh-merchant.png", Language.VIETNAMESE,
+                        "Chào mừng! Bạn muốn mua gì?", "Thỏa thuận tuyệt vời!", "Cảm ơn bạn!", "Bạn đang đùa tôi à?", "Không mua thì đi đi!",
+                        8f, 2f,
+                        generateRandomInventory(new ItemRarity[] { ItemRarity.RARE, ItemRarity.COMMON, ItemRarity.COMMON }, vietWants),
+                        new HashSet<>(Arrays.asList(vietWants)), 
+                        "(I'm looking for a " + vietWants.toString() + ")" 
+                    )
+                ),
+                new MerchantConfig(
+                    MerchantEntity.class,
+                    new Vector3(14, 0, 2), 
+                    new MerchantData(
+                        "Japanese Merchant", "jp-merchant.png", Language.JAPANESE,
+                        "いらっしゃいませ！", "素晴らしい取引だ！", "ありがとうございます。", "ふざけるな！", "冷やかしなら帰ってくれ！",
+                        9f, 2f,
+                        generateRandomInventory(new ItemRarity[] { ItemRarity.EPIC, ItemRarity.RARE, ItemRarity.RARE }, japnWants),
+                        new HashSet<>(Arrays.asList(japnWants)), 
+                        "(I need a " + japnWants.toString() + ")" 
+                    )
+                ),
+                new MerchantConfig(
+                    MerchantEntity.class,
+                    new Vector3(22, 0, 2), 
+                    new MerchantData(
+                        "Chinese Merchant", "vi-merchant.png", Language.CHINESE,
+                        "欢迎！来看看我的货物吧。", "太好了，成交！", "谢谢惠顾。", "你在开玩笑吗？", "没钱就别来烦我！",
+                        10f, 2f,
+                        generateRandomInventory(new ItemRarity[] { ItemRarity.LEGENDARY, ItemRarity.EPIC, ItemRarity.EPIC }, chinWants),
+                        new HashSet<>(Arrays.asList(chinWants)), 
+                        "(Bring me a " + chinWants.toString() + "!)" 
+                    )
+                )
+            };
+        
+        levelDatabase.put(level3.levelId, level3);
+        
+    }
+    
+    // For Level 3 Randomiser
+    private final Random random = new Random();
+
+    // Pulls a random item of a specific rarity, ignoring any items in the exclude list
+    private Item getRandomItem(ItemRarity targetRarity, List<Item> excludeList) {
+        List<Item> possibleItems = new ArrayList<>();
+        for (Item item : Item.values()) {
+            if (item.rarity() == targetRarity && (excludeList == null || !excludeList.contains(item))) {
+                possibleItems.add(item);
+            }
+        }
+        return possibleItems.get(random.nextInt(possibleItems.size()));
+    }
+
+    // Generates a full 3-item inventory based on a requested spread of rarities
+    private Item[] generateRandomInventory(ItemRarity[] rarities, Item wantedItem) {
+        List<Item> excludes = new ArrayList<>();
+        if (wantedItem != null) {
+            excludes.add(wantedItem); // Prevent the merchant from selling the item they want!
+        }
+
+        Item[] inventory = new Item[rarities.length];
+        for (int i = 0; i < rarities.length; i++) {
+            Item randomItem = getRandomItem(rarities[i], excludes);
+            inventory[i] = randomItem;
+            excludes.add(randomItem); // Prevent duplicate items in the same inventory
+        }
+        return inventory;
     }
 
     public Level getLevel(String levelId) {
