@@ -60,6 +60,10 @@ public class MainMenu implements Scene {
             levelManager.setCurrentLevelId("level_02");
             sceneManager.setScene(Scenes.Explore);
         });
+        km.bind(ButtonBindType.DOWN, Keys.NUM_3, e -> {
+            levelManager.setCurrentLevelId("level_03");
+            sceneManager.setScene(Scenes.Explore);
+        });
         km.bind(ButtonBindType.DOWN, Keys.S, e ->
             sceneManager.setScene(Scenes.SoundMenu)
         );
@@ -74,34 +78,38 @@ public class MainMenu implements Scene {
         UiHelper.setupUiMouseHandlers(mm, viewport, uiRoot);
 
         uiRoot.addChild(new Text("HARBOUR FRANCA", font, Text.Alignment.CENTER, TITLE_COLOR,
-                new UIRelativeLayout.Builder().yAlignment(Alignment.START).padTop(80).height(21).getLayout()));
+                new UIRelativeLayout.Builder().yAlignment(Alignment.START).padTop(30).height(21).getLayout())); 
                 
         uiRoot.addChild(new Text("Learn languages through smart trading", font, Text.Alignment.CENTER, TEXT_COLOR,
-                new UIRelativeLayout.Builder().yAlignment(Alignment.START).padTop(108).height(10.5f).getLayout()));
+                new UIRelativeLayout.Builder().yAlignment(Alignment.START).padTop(58).height(10.5f).getLayout())); 
 
-     // Adjusted Y coordinates to fit all 5 buttons
-        addMenuButton("Play Tutorial", 290, e -> {
+        addMenuButton("Play Tutorial", 330, e -> {
             levelManager.setCurrentLevelId("level_00");
             sceneManager.setScene(Scenes.Explore);
         });
         
-        addMenuButton("Play Level 1", 225, e -> {
+        addMenuButton("Play Level 1", 270, e -> {
             levelManager.setCurrentLevelId("level_01");
             sceneManager.setScene(Scenes.Explore);
         });
 
-        // -> THE NEW BUTTON <-
-        addMenuButton("Play Level 2", 160, e -> {
+        addMenuButton("Play Level 2", 210, e -> {
             levelManager.setCurrentLevelId("level_02");
             sceneManager.setScene(Scenes.Explore);
         });
+
+        addMenuButton("Play Level 3", 150, e -> {
+            levelManager.setCurrentLevelId("level_03");
+            sceneManager.setScene(Scenes.Explore);
+        });
         
-        addMenuButton("Sound Options", 95, e -> sceneManager.setScene(Scenes.SoundMenu));
+        
+        addMenuButton("Sound Options", 90, e -> sceneManager.setScene(Scenes.SoundMenu));
         
         addMenuButton("Exit", 30, e -> Gdx.app.exit());
 
         // Update the hint text at the bottom
-        uiRoot.addChild(new Text("T = Tutorial  |  1 = Level 1  |  2 = Level 2  |  S = Sound  |  ESC = Exit", font, Text.Alignment.CENTER, HINT_COLOR,
+        uiRoot.addChild(new Text("T = Tutorial  |  1-3 = Levels  |  S = Sound  |  ESC = Exit", font, Text.Alignment.CENTER, HINT_COLOR,
                 new UIRelativeLayout.Builder().yAlignment(Alignment.END).padBottom(10).height(10.5f).getLayout()));
     }
 
