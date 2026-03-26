@@ -19,6 +19,7 @@ import com.simpulator.engine.scene.SceneManager;
 import com.simpulator.engine.ui.UIRoot;
 import com.simpulator.game.Config;
 import com.simpulator.game.Scenes;
+import com.simpulator.game.ui.Box;
 import com.simpulator.game.ui.Slider;
 import com.simpulator.game.ui.Text;
 import com.simpulator.game.ui.UIRelativeLayout;
@@ -27,24 +28,22 @@ import com.simpulator.game.ui.UiHelper;
 
 public class SoundMenu implements Scene {
 
-    private static final Color BACKGROUND_COLOR = new Color(
-        0.2f,
-        0.1f,
-        0.1f,
-        1f
-    );
-    private static final Color TEXT_COLOR = Color.YELLOW;
+    private static final Color BACKGROUND_COLOR = new Color(0.08f, 0.11f, 0.16f, 1f);
+    private static final Color TITLE_COLOR = new Color(0.83f, 0.68f, 0.21f, 1f);
+    private static final Color TEXT_COLOR = new Color(0.96f, 0.87f, 0.70f, 1f);
+    private static final Color HINT_COLOR = new Color(0.82f, 0.78f, 0.70f, 1f);
 
-    final float TOP_MARGIN = 30;
-    final float LEFT_MARGIN = 70;
-    final float TITLE_SIZE = 24;
-    final float FONT_SIZE = 18;
+    private static final Color PANEL_BORDER_COLOR = TITLE_COLOR;
+    private static final Color PANEL_FILL_COLOR = new Color(0.10f, 0.15f, 0.23f, 0.94f);
 
-    private MusicManager musics;
+    private static final Color SLIDER_TRACK_COLOR = new Color(0.22f, 0.27f, 0.34f, 1f);
+    private static final Color SLIDER_KNOB_COLOR = new Color(0.83f, 0.68f, 0.21f, 1f);
+
+    private final MusicManager musics;
     private final KeyboardManager km = new KeyboardManager();
     private final MouseManager mm = new MouseManager();
 
-    private final Viewport viewport = new FitViewport(640, 480);
+    private final Viewport viewport = new FitViewport(720, 480);
     private final UIRoot uiRoot = new UIRoot();
     private final BitmapFont font;
 
@@ -68,22 +67,53 @@ public class SoundMenu implements Scene {
         );
 
         font = new BitmapFont(Gdx.files.internal("fonts/en.fnt"));
-        buildUI(sceneManager);
+        buildUI();
     }
 
-    private void buildUI(SceneManager sceneManager) {
+    private void buildUI() {
         UiHelper.setupUiMouseHandlers(mm, viewport, uiRoot);
 
         uiRoot.addChild(
             new Text(
-                "SOUND SETTINGS",
+                "SOUND OPTIONS",
                 font,
-                Text.Alignment.START,
+                Text.Alignment.CENTER,
+                TITLE_COLOR,
+                new UIRelativeLayout.Builder()
+                    .xAlignment(Alignment.CENTER)
+                    .yAlignment(Alignment.START)
+                    .padTop(72)
+                    .height(24)
+                    .getLayout()
+            )
+        );
+
+        uiRoot.addChild(
+            new Text(
+                "Adjust the game volume",
+                font,
+                Text.Alignment.CENTER,
                 TEXT_COLOR,
                 new UIRelativeLayout.Builder()
-                    .padTop(TOP_MARGIN)
-                    .padLeft(LEFT_MARGIN)
-                    .height(TITLE_SIZE)
+                    .xAlignment(Alignment.CENTER)
+                    .yAlignment(Alignment.START)
+                    .padTop(108)
+                    .height(11)
+                    .getLayout()
+            )
+        );
+
+        uiRoot.addChild(
+            new Box(
+                2,
+                PANEL_BORDER_COLOR,
+                PANEL_FILL_COLOR,
+                new UIRelativeLayout.Builder()
+                    .xAlignment(Alignment.CENTER)
+                    .yAlignment(Alignment.CENTER)
+                    .width(420)
+                    .height(170)
+                    .padTop(10)
                     .getLayout()
             )
         );
@@ -91,25 +121,28 @@ public class SoundMenu implements Scene {
         volumeText = new Text(
             formatVolumeText(Config.volume),
             font,
-            Text.Alignment.START,
+            Text.Alignment.CENTER,
             TEXT_COLOR,
             new UIRelativeLayout.Builder()
-                .padTop(TOP_MARGIN + 100)
-                .padLeft(LEFT_MARGIN)
-                .height(FONT_SIZE)
+                .xAlignment(Alignment.CENTER)
+                .yAlignment(Alignment.CENTER)
+                .padTop(-80)
+                .height(16)
                 .getLayout()
         );
         uiRoot.addChild(volumeText);
+
         uiRoot.addChild(
             new Text(
                 "[LEFT] / [RIGHT] or [MOUSE] to adjust",
                 font,
-                Text.Alignment.START,
-                TEXT_COLOR,
+                Text.Alignment.CENTER,
+                HINT_COLOR,
                 new UIRelativeLayout.Builder()
-                    .padTop(TOP_MARGIN + 150)
-                    .padLeft(LEFT_MARGIN)
-                    .height(FONT_SIZE)
+                    .xAlignment(Alignment.CENTER)
+                    .yAlignment(Alignment.CENTER)
+                    .padTop(20)
+                    .height(12)
                     .getLayout()
             )
         );
@@ -118,13 +151,14 @@ public class SoundMenu implements Scene {
             0,
             100,
             10,
-            Color.DARK_GRAY,
+            SLIDER_TRACK_COLOR,
             10,
-            Color.RED,
+            SLIDER_KNOB_COLOR,
             20,
             new UIRelativeLayout.Builder()
                 .xAlignment(Alignment.CENTER)
-                .padTop(TOP_MARGIN + 195)
+                .yAlignment(Alignment.CENTER)
+                .padTop(120)
                 .width(300)
                 .height(40)
                 .getLayout()
@@ -135,14 +169,15 @@ public class SoundMenu implements Scene {
 
         uiRoot.addChild(
             new Text(
-                "Press [ESCAPE] to Return",
+                "ESC = Return to Main Menu",
                 font,
-                Text.Alignment.START,
-                TEXT_COLOR,
+                Text.Alignment.CENTER,
+                HINT_COLOR,
                 new UIRelativeLayout.Builder()
-                    .padTop(TOP_MARGIN + 250)
-                    .padLeft(LEFT_MARGIN)
-                    .height(FONT_SIZE)
+                    .xAlignment(Alignment.CENTER)
+                    .yAlignment(Alignment.END)
+                    .padBottom(28)
+                    .height(10.5f)
                     .getLayout()
             )
         );
