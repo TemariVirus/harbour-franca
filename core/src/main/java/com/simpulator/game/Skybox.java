@@ -1,9 +1,11 @@
-package com.simpulator.engine.graphics;
+package com.simpulator.game;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
+import com.simpulator.engine.graphics.Renderable;
+import com.simpulator.engine.graphics.TextureBatch;
 
 // Centers on cam
 public class Skybox implements Renderable {

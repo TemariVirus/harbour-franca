@@ -1,6 +1,5 @@
 package com.simpulator.game.scenes;
-import com.simpulator.game.ui.Pin;
-import java.util.ArrayList;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
@@ -13,7 +12,6 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.simpulator.engine.EntityManager;
 import com.simpulator.engine.graphics.GraphicsManager;
-import com.simpulator.engine.graphics.Skybox;
 import com.simpulator.engine.input.ButtonManager.ButtonBindType;
 import com.simpulator.engine.input.KeyboardManager;
 import com.simpulator.engine.input.MouseManager;
@@ -29,15 +27,18 @@ import com.simpulator.game.Config;
 import com.simpulator.game.EntityTargeter;
 import com.simpulator.game.RotateCameraAction;
 import com.simpulator.game.Scenes;
+import com.simpulator.game.Skybox;
 import com.simpulator.game.SkyboxLoader;
 import com.simpulator.game.TranslateCameraAction;
 import com.simpulator.game.entities.CameraEntity;
+import com.simpulator.game.entities.GatekeeperEntity;
 import com.simpulator.game.entities.MerchantEntity;
 import com.simpulator.game.levels.Level;
 import com.simpulator.game.levels.LevelManager;
-import com.simpulator.game.trading.Inventory;
-import com.simpulator.game.entities.GatekeeperEntity;
 import com.simpulator.game.levels.maps.Level1Map;
+import com.simpulator.game.trading.Inventory;
+import com.simpulator.game.ui.Pin;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ExploreScene implements Scene {
