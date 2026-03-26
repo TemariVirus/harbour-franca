@@ -111,6 +111,7 @@ public class MainMenu implements Scene {
             BUTTON_HOVER_COLOR,
             new Text(text, font, Text.Alignment.CENTER, TEXT_COLOR, new UIRelativeLayout()),
             FONT_SIZE,
+            sounds,
             e -> {
                 onClick.act(e);
                 return true;

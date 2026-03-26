@@ -12,6 +12,7 @@ import com.simpulator.engine.input.MouseManager.MouseButton;
 import com.simpulator.engine.input.MouseManager.MouseButtonEvent;
 import com.simpulator.engine.input.MouseManager.MouseMoveEvent;
 import com.simpulator.engine.input.MouseManager.MouseScrollEvent;
+import com.simpulator.engine.scene.SoundManager;
 import com.simpulator.engine.ui.UIListener;
 import com.simpulator.engine.ui.UIRelativeLayout;
 import com.simpulator.engine.ui.UIRelativeLayout.Alignment;
@@ -160,6 +161,7 @@ public final class UiHelper {
         Color hoverColor,
         Text text,
         float fontSize,
+        SoundManager sounds,
         UIListener<MouseButtonEvent> onClick
     ) {
         text.setLayout(
@@ -178,6 +180,7 @@ public final class UiHelper {
             ) {
                 return false;
             }
+            sounds.play("click.mp3");
             return onClick.handle(e);
         });
         return box;

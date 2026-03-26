@@ -254,7 +254,7 @@ public class ExploreScene implements Scene {
             throw new IllegalStateException("Trading UI is already open");
         }
 
-        tradingUI = new TradingUI(playerInventory, target, textures);
+        tradingUI = new TradingUI(playerInventory, target, textures, sounds);
         overlays.push(tradingUI, new UIRelativeLayout());
         hud.setCrosshairVisible(false);
         hud.setPromptVisible(false);

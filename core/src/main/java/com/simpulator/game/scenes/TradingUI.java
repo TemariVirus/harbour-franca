@@ -13,6 +13,8 @@ import com.simpulator.engine.input.MouseManager.MouseButton;
 import com.simpulator.engine.input.MouseManager.MouseButtonEvent;
 import com.simpulator.engine.input.MouseManager.MouseMoveEvent;
 import com.simpulator.engine.scene.Scene;
+import com.simpulator.engine.scene.SoundManager;
+import com.simpulator.engine.scene.TextureCache;
 import com.simpulator.engine.ui.UIRelativeLayout;
 import com.simpulator.engine.ui.UIRelativeLayout.Alignment;
 import com.simpulator.engine.ui.UIRoot;
@@ -22,7 +24,6 @@ import com.simpulator.game.language.Translators;
 import com.simpulator.game.trading.Inventory;
 import com.simpulator.game.trading.Item;
 import com.simpulator.game.trading.TradeProcessor.TradeResult;
-import com.simpulator.engine.scene.TextureCache;
 import com.simpulator.game.ui.Box;
 import com.simpulator.game.ui.Image;
 import com.simpulator.game.ui.Text;
@@ -99,7 +100,8 @@ public class TradingUI implements Scene {
     final float DIALOGUE_MARGIN = 8;
     final float DIALOGUE_HEIGHT = 120;
 
-    private State state;
+    private State state = State.TRADING;
+    private final SoundManager sounds;
     private final MouseManager mouse = new MouseManager();
 
     private final Viewport viewport = new ExtendViewport(720, 480);
@@ -123,14 +125,19 @@ public class TradingUI implements Scene {
     private final TextureCache textures;
     private final Translator translator;
 
-    public TradingUI(Inventory playerInventory, MerchantEntity merchant, TextureCache textures) {
+    public TradingUI(
+        Inventory playerInventory,
+        MerchantEntity merchant,
+        TextureCache textures,
+        SoundManager sounds
+    ) {
         if (merchant.getData().getItems().size() != CHOICE_COUNT) {
             throw new IllegalArgumentException(
                 "Merchant must have exactly " + CHOICE_COUNT + " items."
             );
         }
 
-        this.state = State.TRADING;
+        this.sounds = sounds;
         this.playerInventory = playerInventory;
         this.merchant = merchant;
         this.textures = textures;
@@ -376,6 +383,7 @@ public class TradingUI implements Scene {
                 new UIRelativeLayout()
             ),
             FONT_SIZE,
+            sounds,
             e -> confirmTrade()
         );
         confirmButton.setVisible(false);
@@ -404,6 +412,7 @@ public class TradingUI implements Scene {
                 new UIRelativeLayout()
             ),
             FONT_SIZE,
+            sounds,
             e -> cancelTrade()
         );
         cancelButton.setVisible(false);
@@ -478,6 +487,7 @@ public class TradingUI implements Scene {
                 new UIRelativeLayout()
             ),
             12,
+            sounds,
             e -> setOfferedItemIndex(offeredItemIndex + step)
         );
 

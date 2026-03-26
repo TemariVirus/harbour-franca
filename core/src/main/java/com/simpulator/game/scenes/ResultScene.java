@@ -16,9 +16,11 @@ import com.simpulator.engine.input.KeyboardManager;
 import com.simpulator.engine.input.MouseManager;
 import com.simpulator.engine.scene.Scene;
 import com.simpulator.engine.scene.SceneManager;
+import com.simpulator.engine.scene.SoundManager;
 import com.simpulator.engine.ui.UIRelativeLayout;
 import com.simpulator.engine.ui.UIRelativeLayout.Alignment;
 import com.simpulator.engine.ui.UIRoot;
+import com.simpulator.game.Config;
 import com.simpulator.game.Scenes;
 import com.simpulator.game.ui.Box;
 import com.simpulator.game.ui.Text;
@@ -34,6 +36,7 @@ public class ResultScene implements Scene {
     private final SceneManager sceneManager;
     private final ResultType resultType;
 
+    private final SoundManager sounds = new SoundManager();
     private final KeyboardManager km = new KeyboardManager();
     private final MouseManager mm = new MouseManager();
 
@@ -62,6 +65,7 @@ public class ResultScene implements Scene {
     public ResultScene(SceneManager sceneManager, ResultType resultType) {
         this.sceneManager = sceneManager;
         this.resultType = resultType;
+        sounds.setVolume(Config.volume * 0.01f);
 
         km.bind(ButtonBindType.DOWN, Keys.ENTER, e ->
             sceneManager.setScene(Scenes.Explore)
@@ -178,6 +182,7 @@ public class ResultScene implements Scene {
                 new UIRelativeLayout()
             ),
             13f,
+            sounds,
             e -> {
                 onClick.act(e);
                 return true;
