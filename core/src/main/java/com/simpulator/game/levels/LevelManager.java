@@ -107,58 +107,63 @@ public class LevelManager {
             };
 
         levelDatabase.put(level1.levelId, level1);
-     // ==========================================
-        // LEVEL 2 SETUP
-        // ==========================================
+
+        // LEVEL 2
+
         Level level2 = new Level();
         level2.levelId = "level_02";
-        level2.nextLevelId = "level_02"; // Ends the game for now
+        level2.nextLevelId = "null"; // Ends the game for now
         level2.displayName = "The Grand Market";
         
         level2.skyboxPath = "Skyboxes/miramar";
         level2.bgmPath = "GameAudio.ogg";
         
-        level2.valueGoal = 100; // Increased difficulty!
+        level2.valueGoal = 100; 
         level2.map = new Level2Map();
-     // Player starts precisely on the pavement at the bottom right
-        level2.playerStart = new Vector3(14, 1, 2);        // Use the proper Item enums for starting items
+    
+        level2.playerStart = new Vector3(14, 1, 2); 
+        
         level2.startingItems = new Item[] {
-            Item.MAP,
-            Item.COMPASS
-        };
+                Item.ROPE,    
+                Item.FISH,   
+                Item.TRINKET  
+            };
 
         level2.merchants = new MerchantConfig[] {
                 new MerchantConfig(
                     MerchantEntity.class,
-                    new Vector3(8, 0, 12), // Middle-Left Booth (Col 4, Row 6)
+                    new Vector3(8, 0, 12), // Middle-Left Booth
                     new MerchantData(
                         "Vietnamese Merchant", "zh-merchant.png", Language.VIETNAMESE,
                         "Chào mừng! Bạn muốn mua gì?", "Thỏa thuận tuyệt vời!", "Cảm ơn bạn!", "Bạn đang đùa tôi à?", "Không mua thì đi đi!",
                         8f, 2f,
-                        new Item[] { Item.FISH, Item.CANDLE },
-                        new HashSet<>(Arrays.asList(Item.COMPASS)), ""
+                        // Sells Rares, wants a specific Common.
+                        new Item[] { Item.COMPASS, Item.SPICE, Item.CANDLE },
+                        new HashSet<>(Arrays.asList(Item.ROPE)), "(I need some rope...)" 
                     )
                 ),
                 new MerchantConfig(
                     MerchantEntity.class,
-                    new Vector3(20, 0, 6), // Top-Right Booth (Col 10, Row 3)
+                    new Vector3(20, 0, 6), // Top-Right Booth
                     new MerchantData(
                         "Japanese Merchant", "jp-merchant.png", Language.JAPANESE,
                         "いらっしゃいませ！", "素晴らしい取引だ！", "ありがとうございます。", "ふざけるな！", "冷やかしなら帰ってくれ！",
                         9f, 2f,
-                        new Item[] { Item.CHALICE, Item.PENDANT },
-                        new HashSet<>(Arrays.asList(Item.MAP)), ""
+                        // Sells Epics, wants a specific Rare
+                        new Item[] { Item.CHALICE, Item.GEMSTONE, Item.LENS },
+                        new HashSet<>(Arrays.asList(Item.COMPASS)), "(I lost my way...)" 
                     )
                 ),
                 new MerchantConfig(
                     MerchantEntity.class,
-                    new Vector3(20, 0, 18), // Bottom-Right Booth (Col 10, Row 9)
+                    new Vector3(20, 0, 18), // Bottom-Right Booth
                     new MerchantData(
                         "Chinese Merchant", "vi-merchant.png", Language.CHINESE,
                         "欢迎！来看看我的货物吧。", "太好了，成交！", "谢谢惠顾。", "你在开玩笑吗？", "没钱就别来烦我！",
                         10f, 2f,
-                        new Item[] { Item.SPICE, Item.CLOTH },
-                        new HashSet<>(Arrays.asList(Item.GEMSTONE)), ""
+                        // Sells a Legendary, wants a specific Epic
+                        new Item[] { Item.DRAGON_SCALE, Item.IDOL, Item.CLOTH },
+                        new HashSet<>(Arrays.asList(Item.CHALICE)), "(A golden cup would be nice...)" 
                     )
                 )
             };
