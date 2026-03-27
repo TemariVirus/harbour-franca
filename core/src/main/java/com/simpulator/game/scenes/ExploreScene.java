@@ -34,7 +34,6 @@ import com.simpulator.game.entities.MerchantEntity;
 import com.simpulator.game.levels.Level;
 import com.simpulator.game.levels.LevelManager;
 import com.simpulator.game.trading.Inventory;
-import com.simpulator.game.ui.Pin;
 import com.simpulator.game.ui.UIRelativeLayout;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +59,6 @@ public class ExploreScene implements Scene {
     private TradingUI tradingUI = null;
 
     protected final Clock clock = new Clock(0);
-    protected final List<Pin> activePins = new ArrayList<>();
     protected final List<MerchantEntity> merchants;
     protected final EntityTargeter<MerchantEntity> merchantTargeter;
 
@@ -120,11 +118,6 @@ public class ExploreScene implements Scene {
         entityManager.addAll(gatekeepers);
         // Create a targeter so the player can look at the gatekeeper (distance of 3 units)
         gatekeeperTargeter = new EntityTargeter<>(gatekeepers, 3);
-
-        // Pin on startup
-        for (MerchantEntity merchant : merchants) {
-            activePins.add(new Pin(merchant, textures));
-        }
 
         setupKeybinds(sceneManager);
         mouse.bindMove(new RotateCameraAction(playerCamera, 0.15f));
@@ -345,9 +338,6 @@ public class ExploreScene implements Scene {
             closeTradingUI();
             checkWinCondition();
         }
-        // TODO
-        // Pin gone if cant trade
-        activePins.removeIf(pin -> !pin.getTarget().canTrade());
 
         clock.forward(deltaTime);
         if (!isTradingUIOpen()) {
@@ -386,14 +376,6 @@ public class ExploreScene implements Scene {
             playerCamera.getCamera()
         );
         graphics.endRender();
-        // TODO
-        if (!activePins.isEmpty()) {
-            graphics.beginRender(viewport);
-            for (Pin pin : activePins) {
-                graphics.render(pin, playerCamera.getCamera());
-            }
-            graphics.endRender();
-        }
 
         // Render UI on top
         overlays.render(
