@@ -17,7 +17,7 @@ public interface Scene extends Disposable {
     public boolean onFocus();
 
     /** Update the scene's state by the given delta time in seconds. */
-    public abstract void update(float deltaTime);
+    public void update(float deltaTime);
 
     /** Render the scene at screen x and y, with width and height (in pixels). */
     public void render(int x, int y, int width, int height);

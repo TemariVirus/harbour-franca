@@ -7,7 +7,7 @@ import java.util.HashMap;
 /** Manages loading and unloading of scenes. */
 public class SceneManager implements Disposable {
 
-    private Scene currentScene;
+    private Scene currentScene = null;
     private HashMap<String, SceneFactory> scenes;
 
     /** Create an empty SceneManager. */

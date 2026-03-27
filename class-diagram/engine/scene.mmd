@@ -1,0 +1,116 @@
+---
+config:
+    theme: neutral
+    layout: elk
+    defaultRenderer: elk
+    elk:
+        nodePlacementStrategy: NETWORK_SIMPLEX
+---
+
+classDiagram
+    MusicManager *-- MusicCache
+    ResourceCache <|-- MusicCache: #60;#60;bind#62;#62; #60;K -> String, V -> Music#62;
+    Disposable <|.. MusicManager
+    Disposable <|.. ResourceCache~K&comma; V: Disposable~
+    SceneCompositor o-- Scene
+    SceneCompositor ..|> Scene
+    SceneFactory ..> Scene: Creates
+    SceneFactory --o SceneManager
+    Scene --* SceneManager
+    SceneManager ..|> Disposable
+    TextureManager --|> ResourceCache: #60;#60;bind#62;#62; #60;K -> String, V -> Texture#62;
+    SoundManager --|> ResourceCache: #60;#60;bind#62;#62; #60;K -> String, V -> Sound#62;
+
+
+    class ResourceCache~K&comma; V: Disposable~ {
+        <<abstract>>
+
+        - items: HashMap~K&comma; V~
+
+        # load(key: K)* V
+        + get(key: K) V
+        # values() Iterable~V~
+        + remove(key: K) void
+        + dispose() void
+    }
+
+    class Scene {
+        <<interface>>
+
+        + getInputProcessor() InputProcessor
+        + onFocus() boolean
+        + update(deltaTime: float) void
+        + render(x: int, y: int, width: int, height: int) void
+    }
+
+    class SceneManager {
+        - currentScene: Scene
+        - scenes: HashMap~String&comma; SceneFactory~
+
+        + SceneManager()
+        + addScene(name: String, factory: SceneFactory) void
+        + setScene(name: String) void
+        + update(deltaTime: float) void
+        + render(width: int, height: int) void
+        + dispose() void
+    }
+
+    class StackNode {
+        + scene: Scene
+        + layout: UILayout
+
+        + StackNode(scene: Scene, layout: UILayout)
+    }
+
+    class SceneCompositor {
+        - scenes: List~StackNode~
+
+        + push(scene: Scene, layout: UILayout): void
+        + pop() Scene
+        + getInputProcessor() InputProcessor
+        + onFocus() boolean
+        + update(float deltaTime) void
+        + render(x: int, y: int, width: int, height: int) void
+        + dispose() void
+    }
+
+    class SceneFactory {
+        <<functionalInterface>>
+
+        + create() Scene
+    }
+
+    class MusicCache {
+        + MusicCache()
+        # load(path: String) Music
+        + dispose() void
+    }
+
+    class MusicManager {
+        - musicCache: MusicCache
+        - playingMusics: Set~String~
+        - volume: float
+
+        + MusicManager()
+        + getVolume() float
+        + setVolume(volume: float) void
+        + isMusicPlaying(path: String) boolean
+        + startMusic(path: String) void
+        + pauseMusic(path: String) void
+        + stopMusic(path: String) void
+        + stopAllMusic() void
+        + dispose() void
+    }
+
+    class SoundManager {
+        - volume: float
+
+        + getVolume() float
+        + setVolume(volume: float) void
+        # load(path: String) Sound
+        + play(path: String) long
+    }
+
+    class TextureManager {
+        # load(path: String) Texture
+    }
