@@ -20,6 +20,7 @@ import com.simpulator.engine.scene.SoundManager;
 import com.simpulator.engine.ui.UIRoot;
 import com.simpulator.game.Config;
 import com.simpulator.game.Scenes;
+import com.simpulator.game.levels.LevelId;
 import com.simpulator.game.levels.LevelManager;
 import com.simpulator.game.ui.Box;
 import com.simpulator.game.ui.Text;
@@ -64,15 +65,15 @@ public class MainMenu implements Scene {
 
         // Keyboard shortcuts for the menu
         km.bind(ButtonBindType.DOWN, Keys.T, e -> {
-            levelManager.setCurrentLevelId("level_00");
+            levelManager.setCurrentLevelId(LevelId.TUTORIAL);
             sceneManager.setScene(Scenes.Explore);
         });
         km.bind(ButtonBindType.DOWN, Keys.NUM_1, e -> {
-            levelManager.setCurrentLevelId("level_01");
+            levelManager.setCurrentLevelId(LevelId.LEVEL_1);
             sceneManager.setScene(Scenes.Explore);
         });
         km.bind(ButtonBindType.DOWN, Keys.NUM_2, e -> {
-            levelManager.setCurrentLevelId("level_02");
+            levelManager.setCurrentLevelId(LevelId.LEVEL_2);
             sceneManager.setScene(Scenes.Explore);
         });
         km.bind(ButtonBindType.DOWN, Keys.S, e ->
@@ -116,17 +117,17 @@ public class MainMenu implements Scene {
         );
 
         addMenuButton("Play Tutorial", 330, e -> {
-            levelManager.setCurrentLevelId("level_00");
+            levelManager.setCurrentLevelId(LevelId.TUTORIAL);
             sceneManager.setScene(Scenes.Explore);
         });
 
         addMenuButton("Play Level 1", 270, e -> {
-            levelManager.setCurrentLevelId("level_01");
+            levelManager.setCurrentLevelId(LevelId.LEVEL_1);
             sceneManager.setScene(Scenes.Explore);
         });
 
         addMenuButton("Play Level 2", 210, e -> {
-            levelManager.setCurrentLevelId("level_02");
+            levelManager.setCurrentLevelId(LevelId.LEVEL_2);
             sceneManager.setScene(Scenes.Explore);
         });
 

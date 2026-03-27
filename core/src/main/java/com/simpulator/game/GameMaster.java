@@ -4,6 +4,7 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.simpulator.engine.scene.MusicManager;
 import com.simpulator.engine.scene.SceneManager;
+import com.simpulator.game.levels.LevelId;
 import com.simpulator.game.levels.LevelManager;
 import com.simpulator.game.scenes.MainMenu;
 import com.simpulator.game.scenes.ResultScene;
@@ -24,7 +25,7 @@ public class GameMaster extends ApplicationAdapter {
         windowHeight = Gdx.graphics.getHeight();
 
         LevelManager levelManager = new LevelManager();
-        levelManager.setCurrentLevelId("level_00");
+        levelManager.setCurrentLevelId(LevelId.TUTORIAL);
 
         sceneManager.addScene(Scenes.MainMenu, () ->
             new MainMenu(sceneManager, levelManager)

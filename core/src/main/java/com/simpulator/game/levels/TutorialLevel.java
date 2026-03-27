@@ -1,5 +1,6 @@
 package com.simpulator.game.levels;
 
+import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.simpulator.engine.scene.MusicManager;
 import com.simpulator.engine.scene.SceneManager;
@@ -15,40 +16,40 @@ import java.util.HashSet;
 public class TutorialLevel extends Level {
 
     public TutorialLevel() {
-        this.levelId = "level_00";
-        this.nextLevelId = "level_01";
-        this.displayName = "Tutorial";
-
-        this.skyboxPath = "Skyboxes/miramar";
-        this.bgmPath = "GameAudio.ogg";
-        this.valueGoal = 13;
-        this.startingItems = new Item[] { Item.TRINKET, Item.FISH };
-
-        this.playerStart = new Vector3(0, 1, 0);
-
-        this.map = new TutorialMap();
-
-        this.merchants = new MerchantConfig[] {
-            new MerchantConfig(
-                MerchantEntity.class,
-                new Vector3(0, 0, 2),
-                new MerchantData(
-                    "Friendly Guide",
-                    "guide.png",
-                    Language.ENGLISH,
-                    "Welcome to Harbour Franca! Let's make a simple trade. I would pay\nanything for a trinket.",
-                    "Thank you!",
-                    "I'll only pay slightly more for that.",
-                    "No, the value difference is too great! Our deal is off.",
-                    "Too slow! It seems you do not have that iron in you!",
-                    1000f,
-                    1.5f,
-                    new Item[] { Item.FISH, Item.GEMSTONE, Item.CANDLE },
-                    new HashSet<>(Arrays.asList(Item.TRINKET)),
-                    "This is a hint"
-                )
-            ),
-        };
+        super(
+            LevelId.TUTORIAL,
+            LevelId.LEVEL_1,
+            "Tutorial",
+            "Skyboxes/miramar",
+            "GameAudio.ogg",
+            13,
+            new Item[] { Item.TRINKET, Item.FISH },
+            new Vector3(0, 1, 0),
+            new Quaternion().idt(),
+            new TutorialMap(),
+            new MerchantConfig[] {
+                new MerchantConfig(
+                    MerchantEntity.class,
+                    new Vector3(0, 0, 2),
+                    new MerchantData(
+                        "Friendly Guide",
+                        "guide.png",
+                        Language.ENGLISH,
+                        "Welcome to Harbour Franca! Let's make a simple trade. I would pay\nanything for a trinket.",
+                        "Thank you!",
+                        "I'll only pay slightly more for that.",
+                        "No, the value difference is too great! Our deal is off.",
+                        "Too slow! It seems you do not have that iron in you!",
+                        1000f,
+                        1.5f,
+                        new Item[] { Item.FISH, Item.GEMSTONE, Item.CANDLE },
+                        new HashSet<>(Arrays.asList(Item.TRINKET)),
+                        "This is a hint"
+                    )
+                ),
+            },
+            new Vector3[] {}
+        );
     }
 
     @Override

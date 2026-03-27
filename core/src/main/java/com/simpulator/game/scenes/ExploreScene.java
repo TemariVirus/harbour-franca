@@ -6,7 +6,6 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -34,8 +33,6 @@ import com.simpulator.game.entities.GatekeeperEntity;
 import com.simpulator.game.entities.MerchantEntity;
 import com.simpulator.game.levels.Level;
 import com.simpulator.game.levels.LevelManager;
-import com.simpulator.game.levels.maps.Level1Map;
-import com.simpulator.game.levels.maps.Level2Map;
 import com.simpulator.game.trading.Inventory;
 import com.simpulator.game.ui.Pin;
 import com.simpulator.game.ui.UIRelativeLayout;
@@ -86,7 +83,7 @@ public class ExploreScene implements Scene {
         this.sceneManager = sceneManager;
         this.levelManager = levelManager;
         musics.stopAllMusic();
-        musics.startMusic(level.bgmPath);
+        musics.startMusic(level.getBgmPath());
         sounds.setVolume(Config.volume * 0.01f);
 
         PerspectiveCamera camera = new PerspectiveCamera(
@@ -99,18 +96,18 @@ public class ExploreScene implements Scene {
         viewport.setCamera(camera);
 
         playerCamera = new CameraEntity(
-            level.playerStart,
+            level.getPlayerStartPosition(),
             new Vector3(1, 1, 1),
-            new Quaternion().setFromAxis(Vector3.Y, level.playerStartYaw),
+            level.getPlayerStartRotation(),
             camera
         );
         entityManager.add(playerCamera);
 
-        skybox = SkyboxLoader.load(textures, level.skyboxPath, camera.far);
-        level.map.load(entityManager, textures);
+        skybox = SkyboxLoader.load(textures, level.getSkyboxPath(), camera.far);
+        level.loadMap(entityManager, textures);
 
         playerInventory = level.createInventory();
-        hud = new GameHUD(level.valueGoal, playerInventory);
+        hud = new GameHUD(level.getValueGoal(), playerInventory);
         hud.updateHintCount(hintsRemaining);
         overlays.push(hud, new UIRelativeLayout());
 
@@ -118,22 +115,11 @@ public class ExploreScene implements Scene {
         entityManager.addAll(merchants);
         merchantTargeter = new EntityTargeter<>(merchants, 2);
 
-        Vector3 doorPos;
-        if (level.map instanceof Level1Map) {
-            doorPos = ((Level1Map) level.map).getDoorPosition();
-        } else if (level.map instanceof Level2Map) {
-            doorPos = ((Level2Map) level.map).getDoorPosition();
-        } else {
-            doorPos = new Vector3(0, 0, -10); // Fallback for other maps
-        }
-
-        GatekeeperEntity doorkeeper = new GatekeeperEntity(
-            doorPos,
+        List<GatekeeperEntity> gatekeepers = level.createGatekeepers(
             textures,
             playerCamera
         );
-        gatekeepers.add(doorkeeper);
-        entityManager.add(doorkeeper);
+        entityManager.addAll(gatekeepers);
         // Create a targeter so the player can look at the gatekeeper (distance of 3 units)
         gatekeeperTargeter = new EntityTargeter<>(gatekeepers, 3);
 
@@ -149,7 +135,7 @@ public class ExploreScene implements Scene {
         );
 
         this.level = level;
-        valueGoal = level.valueGoal;
+        valueGoal = level.getValueGoal();
     }
 
     private void setupKeybinds(SceneManager sceneManager) {
@@ -216,10 +202,10 @@ public class ExploreScene implements Scene {
             if (gatekeeper != null) {
                 if (playerInventory.getTotalValue() >= valueGoal) {
                     // Meet the wincon either go next lvl or win
-                    if (level.nextLevelId == null) {
+                    if (level.getNextLevelId() == null) {
                         sceneManager.setScene(Scenes.Win);
                     } else {
-                        levelManager.setCurrentLevelId(level.nextLevelId);
+                        levelManager.setCurrentLevelId(level.getNextLevelId());
                         sceneManager.setScene(Scenes.Explore);
                     }
                 }
@@ -316,8 +302,6 @@ public class ExploreScene implements Scene {
         onFocus();
     }
 
-    // TODO
-    // tradingUI.showTradeResult("Level Complete! Goal reached!");
     protected void checkWinCondition() {
         for (MerchantEntity merchant : merchants) {
             if (merchant.canTrade()) {
