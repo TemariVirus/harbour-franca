@@ -8,7 +8,7 @@ import java.util.Set;
 public class KeyboardManager extends InputAdapter {
 
     /** Represents a keyboard event. */
-    public final class KeyEvent {
+    public static final class KeyEvent {
 
         /** The relevant key. */
         public final int keycode;

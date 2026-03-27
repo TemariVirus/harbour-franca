@@ -5,5 +5,7 @@ package com.simpulator.game;
  */
 public final class Config {
 
+    private Config() {}
+
     public static int volume = 100;
 }

@@ -19,6 +19,8 @@ import com.simpulator.game.ui.UIRelativeLayout.Alignment;
 
 public final class UiHelper {
 
+    private UiHelper() {}
+
     public static class MouseHandlers {
 
         private final Action<MouseMoveEvent> moveHandler;

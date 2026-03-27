@@ -5,6 +5,8 @@ import com.simpulator.engine.scene.TextureCache;
 
 public final class SkyboxLoader {
 
+    private SkyboxLoader() {}
+
     public static Skybox load(
         TextureCache textures,
         String path,

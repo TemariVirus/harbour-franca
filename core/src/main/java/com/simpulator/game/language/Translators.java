@@ -2,6 +2,8 @@ package com.simpulator.game.language;
 
 public final class Translators {
 
+    private Translators() {}
+
     public static Translator get(Language language) {
         switch (language) {
             case ENGLISH:

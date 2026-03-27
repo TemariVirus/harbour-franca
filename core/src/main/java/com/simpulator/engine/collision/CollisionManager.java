@@ -7,6 +7,8 @@ import java.util.List;
 /** Collision detection and resolution. */
 public final class CollisionManager {
 
+    private CollisionManager() {}
+
     /**
      * Returns whether 2 convex shapes are intersecting using the GJK algorithm.
      */
@@ -84,6 +86,8 @@ final class ListUtil {
 
 /** GJK algorithm implementation. */
 final class GJK {
+
+    private GJK() {}
 
     /** Returns whether 2 vectors generally point in the same direction. */
     public static boolean sameDirection(Vector3 a, Vector3 b) {
