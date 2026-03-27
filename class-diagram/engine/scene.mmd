@@ -12,11 +12,14 @@ classDiagram
     ResourceCache <|-- MusicCache: #60;#60;bind#62;#62; #60;K -> String, V -> Music#62;
     Disposable <|.. MusicManager
     Disposable <|.. ResourceCache~K&comma; V: Disposable~
-    SceneCompositor o-- Scene
+    SceneCompositor *-- StackNode
+    StackNode *-- Scene
+    StackNode *-- UILayout
     SceneCompositor ..|> Scene
     SceneFactory ..> Scene: Creates
     SceneFactory --o SceneManager
     Scene --* SceneManager
+    Scene --|> Disposable
     SceneManager ..|> Disposable
     TextureManager --|> ResourceCache: #60;#60;bind#62;#62; #60;K -> String, V -> Texture#62;
     SoundManager --|> ResourceCache: #60;#60;bind#62;#62; #60;K -> String, V -> Sound#62;
@@ -37,10 +40,10 @@ classDiagram
     class Scene {
         <<interface>>
 
-        + getInputProcessor() InputProcessor
-        + onFocus() boolean
-        + update(deltaTime: float) void
-        + render(x: int, y: int, width: int, height: int) void
+        + getInputProcessor()* InputProcessor
+        + onFocus()* boolean
+        + update(deltaTime: float)* void
+        + render(x: int, y: int, width: int, height: int)* void
     }
 
     class SceneManager {
@@ -56,6 +59,8 @@ classDiagram
     }
 
     class StackNode {
+        <<dataType>>
+
         + scene: Scene
         + layout: UILayout
 
@@ -65,7 +70,7 @@ classDiagram
     class SceneCompositor {
         - scenes: List~StackNode~
 
-        + push(scene: Scene, layout: UILayout): void
+        + push(scene: Scene, layout: UILayout) void
         + pop() Scene
         + getInputProcessor() InputProcessor
         + onFocus() boolean
@@ -77,7 +82,7 @@ classDiagram
     class SceneFactory {
         <<functionalInterface>>
 
-        + create() Scene
+        + create()* Scene
     }
 
     class MusicCache {

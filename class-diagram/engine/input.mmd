@@ -29,7 +29,7 @@ classDiagram
     class Action~T~ {
         <<functionalInterface>>
 
-        + act(data: T) void
+        + act(data: T)* void
     }
 
     class ButtonBindType {
@@ -43,7 +43,7 @@ classDiagram
     class ButtonEventConstructor~T~ {
         <<functionalInterface>>
 
-        + apply(button: int, type: ButtonBindType, thisFrameButtons: Set~Integer~) T
+        + apply(button: int, type: ButtonBindType, thisFrameButtons: Set~Integer~)* T
     }
 
     class QueueNode~T~ {

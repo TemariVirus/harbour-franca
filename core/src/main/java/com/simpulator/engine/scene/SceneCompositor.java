@@ -10,7 +10,7 @@ import java.util.List;
 /** Stacks multiple scenes that handle input and render together. */
 public class SceneCompositor implements Scene {
 
-    private static class StackNode {
+    private static final class StackNode {
 
         public final Scene scene;
         public final UILayout layout;

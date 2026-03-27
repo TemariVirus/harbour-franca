@@ -14,14 +14,16 @@ classDiagram
     Entity ..|> Renderable
     GraphicsManager ..|> Disposable
     GraphicsManager ..> Renderable: Uses
+    GraphicsManager *-- TextureBatch
+    GraphicsManager o-- Viewport
     RectangleRenderer ..|> EntityRenderer
 
 
     class EntityRenderer {
         <<interface>>
 
-        + isVisible(camera: Camera, entity: Entity) boolean
-        + render(batch: TextureBatch, camera: Camera, entity: Entity) void
+        + isVisible(camera: Camera, entity: Entity)* boolean
+        + render(batch: TextureBatch, camera: Camera, entity: Entity)* void
     }
 
     class GraphicsManager {
@@ -57,7 +59,7 @@ classDiagram
     class Renderable {
         <<interface>>
 
-        + isVisible(camera: Camera) boolean
+        + isVisible(camera: Camera)* boolean
         + getZOrder(camera: Camera) float
-        + render(batch: TextureBatch, camera: Camera) void
+        + render(batch: TextureBatch, camera: Camera)* void
     }

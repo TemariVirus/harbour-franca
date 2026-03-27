@@ -57,13 +57,13 @@ classDiagram
     class UILayout {
         <<interface>>
 
-        + computeBounds(bounds: Rect) Rect
+        + computeBounds(bounds: Rect)* Rect
     }
 
     class UIListener~T~ {
         <<functionalInterface>>
 
-        + handle(data: T) boolean
+        + handle(data: T)* boolean
     }
 
     class UIRoot {

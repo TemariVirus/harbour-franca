@@ -24,8 +24,8 @@ classDiagram
     class ColliderMesh {
         <<interface>>
 
-        + getShapes() Iterable~GJKShape~
-        + getBounds() BoundingBox
+        + getShapes()* Iterable~GJKShape~
+        + getBounds()* BoundingBox
         + intersects(other: ColliderMesh) boolean
         + intersects(immovable: ColliderMesh, out outPush: Vector3) boolean
     }
@@ -88,7 +88,7 @@ classDiagram
     class GJKShape {
         <<interface>>
 
-        + furthestPoint(direction: Vector3, reverse: boolean) Vector3
+        + furthestPoint(direction: Vector3, reverse: boolean)* Vector3
     }
 
     class Polyhedron {
