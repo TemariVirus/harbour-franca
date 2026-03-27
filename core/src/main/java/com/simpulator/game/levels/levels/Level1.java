@@ -53,7 +53,7 @@ public class Level1 extends Level {
                         "Vietnamese Merchant",
                         "vi-merchant.png",
                         Language.VIETNAMESE,
-                        "Có dây thừng không? Có người thích kiểu\nchơi *đó* đấy.",
+                        "Có dây thừng không? Có người thích kiểu chơi *đó* đấy.",
                         "Ồ, tuyệt quá! Cảm ơn nhé.",
                         "Cảm ơn bạn đã mua hàng!",
                         "Hơi bị hớ đấy nhỉ? Đồ của tôi đáng giá hơn thế.",

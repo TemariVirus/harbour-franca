@@ -64,18 +64,9 @@ public class MainMenu implements Scene {
         sounds.setVolume(Config.volume * 0.01f);
 
         // Keyboard shortcuts for the menu
-        km.bind(ButtonBindType.DOWN, Keys.T, e -> {
-            levelManager.setCurrentLevelId(LevelId.TUTORIAL);
-            sceneManager.setScene(Scenes.Explore);
-        });
-        km.bind(ButtonBindType.DOWN, Keys.NUM_1, e -> {
-            levelManager.setCurrentLevelId(LevelId.LEVEL_1);
-            sceneManager.setScene(Scenes.Explore);
-        });
-        km.bind(ButtonBindType.DOWN, Keys.NUM_2, e -> {
-            levelManager.setCurrentLevelId(LevelId.LEVEL_2);
-            sceneManager.setScene(Scenes.Explore);
-        });
+        km.bind(ButtonBindType.DOWN, Keys.ENTER, e ->
+            sceneManager.setScene(Scenes.Explore)
+        );
         km.bind(ButtonBindType.DOWN, Keys.S, e ->
             sceneManager.setScene(Scenes.SoundMenu)
         );
@@ -96,7 +87,7 @@ public class MainMenu implements Scene {
                 TITLE_COLOR,
                 new UIRelativeLayout.Builder()
                     .yAlignment(Alignment.START)
-                    .padTop(30)
+                    .padTop(90)
                     .height(21)
                     .getLayout()
             )
@@ -110,43 +101,31 @@ public class MainMenu implements Scene {
                 TEXT_COLOR,
                 new UIRelativeLayout.Builder()
                     .yAlignment(Alignment.START)
-                    .padTop(58)
+                    .padTop(118)
                     .height(10.5f)
                     .getLayout()
             )
         );
 
-        addMenuButton("Play Tutorial", 330, e -> {
+        addMenuButton("Play", 225, e -> {
             levelManager.setCurrentLevelId(LevelId.TUTORIAL);
             sceneManager.setScene(Scenes.Explore);
         });
-        // TODO: remove after testing
-        addMenuButton("Play Level 1", 270, e -> {
-            levelManager.setCurrentLevelId(LevelId.LEVEL_1);
-            sceneManager.setScene(Scenes.Explore);
-        });
-
-        addMenuButton("Play Level 2", 210, e -> {
-            levelManager.setCurrentLevelId(LevelId.LEVEL_2);
-            sceneManager.setScene(Scenes.Explore);
-        });
-
-        addMenuButton("Sound Options", 90, e ->
+        addMenuButton("Sound Options", 150, e ->
             sceneManager.setScene(Scenes.SoundMenu)
         );
-
-        addMenuButton("Exit", 30, e -> Gdx.app.exit());
+        addMenuButton("Exit", 75, e -> Gdx.app.exit());
 
         // Update the hint text at the bottom
         uiRoot.addChild(
             new Text(
-                "T = Tutorial  |  1-2 = Levels  |  S = Sound  |  ESC = Exit",
+                "ENTER = Start   |   S = Sound   |   ESC = Exit",
                 font,
                 Text.Alignment.CENTER,
                 HINT_COLOR,
                 new UIRelativeLayout.Builder()
                     .yAlignment(Alignment.END)
-                    .padBottom(10)
+                    .padBottom(24)
                     .height(10.5f)
                     .getLayout()
             )

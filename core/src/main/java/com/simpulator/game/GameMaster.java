@@ -38,7 +38,6 @@ public class GameMaster extends ApplicationAdapter {
                 .getCurrentLevel()
                 .createScene(sceneManager, levelManager, musics)
         );
-
         sceneManager.addScene(Scenes.Win, () ->
             new ResultScene(sceneManager, ResultScene.ResultType.WIN)
         );
