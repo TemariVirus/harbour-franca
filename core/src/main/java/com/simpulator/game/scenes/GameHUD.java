@@ -85,7 +85,7 @@ public class GameHUD implements Scene {
             font,
             Text.Alignment.CENTER,
             Color.CYAN,
-            new UIRelativeLayout.Builder().padTop(45).height(10.5f).getLayout()
+            new UIRelativeLayout.Builder().padTop(41).height(10.5f).getLayout()
         );
         hintLabel.setVisible(false);
         uiRoot.addChild(hintLabel);
