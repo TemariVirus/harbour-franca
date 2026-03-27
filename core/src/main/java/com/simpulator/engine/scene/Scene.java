@@ -2,7 +2,6 @@ package com.simpulator.engine.scene;
 
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.utils.Disposable;
-import com.simpulator.engine.graphics.GraphicsManager;
 
 /** A scene encapsulates the state and business logic of a section of the simulation. */
 public interface Scene extends Disposable {
@@ -21,11 +20,5 @@ public interface Scene extends Disposable {
     public abstract void update(float deltaTime);
 
     /** Render the scene at screen x and y, with width and height (in pixels). */
-    public void render(
-        GraphicsManager graphics,
-        int x,
-        int y,
-        int width,
-        int height
-    );
+    public void render(int x, int y, int width, int height);
 }

@@ -1,6 +1,7 @@
 package com.simpulator.game.scenes;
 
 import com.badlogic.gdx.Input.Keys;
+import com.simpulator.engine.graphics.GraphicsManager;
 import com.simpulator.engine.input.Action;
 import com.simpulator.engine.input.ButtonManager.ButtonBindType;
 import com.simpulator.engine.scene.MusicManager;
@@ -19,11 +20,12 @@ public class TutorialScene extends ExploreScene {
 
     public TutorialScene(
         SceneManager sceneManager,
+        GraphicsManager graphics,
         LevelManager levelManager,
         MusicManager musics,
         Level level
     ) {
-        super(sceneManager, levelManager, musics, level);
+        super(sceneManager, graphics, levelManager, musics, level);
         keyboard.bind(ButtonBindType.DOWN, Keys.W, onMoveAction());
         keyboard.bind(ButtonBindType.DOWN, Keys.A, onMoveAction());
         keyboard.bind(ButtonBindType.DOWN, Keys.S, onMoveAction());

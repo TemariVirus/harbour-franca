@@ -33,6 +33,7 @@ public class ResultScene implements Scene {
         LOSE,
     }
 
+    private final GraphicsManager graphics;
     private final SceneManager sceneManager;
     private final ResultType resultType;
 
@@ -62,8 +63,13 @@ public class ResultScene implements Scene {
         1f
     );
 
-    public ResultScene(SceneManager sceneManager, ResultType resultType) {
+    public ResultScene(
+        SceneManager sceneManager,
+        GraphicsManager graphics,
+        ResultType resultType
+    ) {
         this.sceneManager = sceneManager;
+        this.graphics = graphics;
         this.resultType = resultType;
         sounds.setVolume(Config.volume * 0.01f);
 
@@ -218,13 +224,7 @@ public class ResultScene implements Scene {
     }
 
     @Override
-    public void render(
-        GraphicsManager graphics,
-        int x,
-        int y,
-        int width,
-        int height
-    ) {
+    public void render(int x, int y, int width, int height) {
         ScreenUtils.clear(backgroundColor);
         viewport.update(width, height, true);
         viewport.setScreenPosition(

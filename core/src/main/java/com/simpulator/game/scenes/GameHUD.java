@@ -29,6 +29,8 @@ public class GameHUD implements Scene {
         0.7f
     );
 
+    private final GraphicsManager graphics;
+
     private final Viewport viewport = new ExtendViewport(640, 480);
     private final BitmapFont font;
     private final UIRoot uiRoot = new UIRoot();
@@ -46,7 +48,12 @@ public class GameHUD implements Scene {
     private Text[] inventoryLabels;
     private Text hintCountLabel;
 
-    public GameHUD(int levelGoal, Inventory playerInventory) {
+    public GameHUD(
+        GraphicsManager graphics,
+        int levelGoal,
+        Inventory playerInventory
+    ) {
+        this.graphics = graphics;
         this.levelGoal = levelGoal;
         this.playerInventory = playerInventory;
 
@@ -218,13 +225,7 @@ public class GameHUD implements Scene {
     }
 
     @Override
-    public void render(
-        GraphicsManager graphics,
-        int x,
-        int y,
-        int width,
-        int height
-    ) {
+    public void render(int x, int y, int width, int height) {
         viewport.update(width, height, true);
         viewport.setScreenPosition(
             viewport.getScreenX() + x,

@@ -52,6 +52,7 @@ public class MainMenu implements Scene {
         1f
     );
 
+    private final GraphicsManager graphics;
     private final SoundManager sounds = new SoundManager();
     private final KeyboardManager km = new KeyboardManager();
     private final MouseManager mm = new MouseManager();
@@ -60,7 +61,12 @@ public class MainMenu implements Scene {
     private final UIRoot uiRoot = new UIRoot();
     private final BitmapFont font;
 
-    public MainMenu(SceneManager sceneManager, LevelManager levelManager) {
+    public MainMenu(
+        SceneManager sceneManager,
+        GraphicsManager graphics,
+        LevelManager levelManager
+    ) {
+        this.graphics = graphics;
         sounds.setVolume(Config.volume * 0.01f);
 
         // Keyboard shortcuts for the menu
@@ -200,13 +206,7 @@ public class MainMenu implements Scene {
     }
 
     @Override
-    public void render(
-        GraphicsManager graphics,
-        int x,
-        int y,
-        int width,
-        int height
-    ) {
+    public void render(int x, int y, int width, int height) {
         ScreenUtils.clear(BACKGROUND_COLOR);
         viewport.update(width, height, true);
         viewport.setScreenPosition(

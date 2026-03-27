@@ -2,7 +2,6 @@ package com.simpulator.engine.scene;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Disposable;
-import com.simpulator.engine.graphics.GraphicsManager;
 import java.util.HashMap;
 
 /** Manages loading and unloading of scenes. */
@@ -10,12 +9,10 @@ public class SceneManager implements Disposable {
 
     private Scene currentScene;
     private HashMap<String, SceneFactory> scenes;
-    private GraphicsManager graphics;
 
     /** Create an empty SceneManager. */
     public SceneManager() {
         this.scenes = new HashMap<>();
-        this.graphics = new GraphicsManager();
     }
 
     /** Add a new scene that can be reference by its name. */
@@ -58,7 +55,7 @@ public class SceneManager implements Disposable {
     /** Render the current scene to the screen. */
     public void render(int width, int height) {
         if (currentScene != null) {
-            currentScene.render(graphics, 0, 0, width, height);
+            currentScene.render(0, 0, width, height);
         }
     }
 
@@ -67,6 +64,5 @@ public class SceneManager implements Disposable {
         if (currentScene != null) {
             currentScene.dispose();
         }
-        graphics.dispose();
     }
 }

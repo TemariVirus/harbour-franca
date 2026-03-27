@@ -2,7 +2,6 @@ package com.simpulator.engine.scene;
 
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
-import com.simpulator.engine.graphics.GraphicsManager;
 import com.simpulator.engine.ui.Rect;
 import com.simpulator.engine.ui.UILayout;
 import java.util.ArrayList;
@@ -86,18 +85,11 @@ public class SceneCompositor implements Scene {
 
     /** Renders all scenes in the stack. */
     @Override
-    public void render(
-        GraphicsManager graphics,
-        int x,
-        int y,
-        int width,
-        int height
-    ) {
+    public void render(int x, int y, int width, int height) {
         Rect bounds = new Rect(x, y, x + width, y + height);
         for (StackNode node : scenes) {
             Rect area = node.layout.computeBounds(bounds);
             node.scene.render(
-                graphics,
                 area.left,
                 area.top,
                 area.right - area.left,

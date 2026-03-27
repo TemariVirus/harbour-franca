@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.simpulator.engine.Entity;
 import com.simpulator.engine.EntityManager;
+import com.simpulator.engine.graphics.GraphicsManager;
 import com.simpulator.engine.scene.MusicManager;
 import com.simpulator.engine.scene.SceneManager;
 import com.simpulator.engine.scene.TextureCache;
@@ -190,9 +191,16 @@ public class Level {
 
     public ExploreScene createScene(
         SceneManager sceneManager,
+        GraphicsManager graphics,
         LevelManager levelManager,
         MusicManager musicManager
     ) {
-        return new ExploreScene(sceneManager, levelManager, musicManager, this);
+        return new ExploreScene(
+            sceneManager,
+            graphics,
+            levelManager,
+            musicManager,
+            this
+        );
     }
 }

@@ -101,6 +101,7 @@ public class TradingUI implements Scene {
     final float DIALOGUE_HEIGHT = 120;
 
     private State state = State.TRADING;
+    private final GraphicsManager graphics;
     private final SoundManager sounds;
     private final MouseManager mouse = new MouseManager();
 
@@ -128,6 +129,7 @@ public class TradingUI implements Scene {
     public TradingUI(
         Inventory playerInventory,
         MerchantEntity merchant,
+        GraphicsManager graphics,
         TextureCache textures,
         SoundManager sounds
     ) {
@@ -140,6 +142,7 @@ public class TradingUI implements Scene {
         this.sounds = sounds;
         this.playerInventory = playerInventory;
         this.merchant = merchant;
+        this.graphics = graphics;
         this.textures = textures;
         this.translator = Translators.get(merchant.getData().getLanguage());
 
@@ -649,13 +652,7 @@ public class TradingUI implements Scene {
     }
 
     @Override
-    public void render(
-        GraphicsManager graphics,
-        int x,
-        int y,
-        int width,
-        int height
-    ) {
+    public void render(int x, int y, int width, int height) {
         viewport.update(width, height, true);
         viewport.setScreenPosition(
             viewport.getScreenX() + x,

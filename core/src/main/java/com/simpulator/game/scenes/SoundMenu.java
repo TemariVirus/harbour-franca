@@ -59,6 +59,7 @@ public class SoundMenu implements Scene {
         1f
     );
 
+    private final GraphicsManager graphics;
     private final MusicManager musics;
     private final KeyboardManager km = new KeyboardManager();
     private final MouseManager mm = new MouseManager();
@@ -70,7 +71,12 @@ public class SoundMenu implements Scene {
     private Text volumeText;
     private Slider volumeSlider;
 
-    public SoundMenu(SceneManager sceneManager, MusicManager musicManager) {
+    public SoundMenu(
+        SceneManager sceneManager,
+        GraphicsManager graphics,
+        MusicManager musicManager
+    ) {
+        this.graphics = graphics;
         this.musics = musicManager;
 
         km.bind(ButtonBindType.DOWN, Keys.ESCAPE, e ->
@@ -242,13 +248,7 @@ public class SoundMenu implements Scene {
     }
 
     @Override
-    public void render(
-        GraphicsManager graphics,
-        int x,
-        int y,
-        int width,
-        int height
-    ) {
+    public void render(int x, int y, int width, int height) {
         ScreenUtils.clear(BACKGROUND_COLOR);
         viewport.update(width, height, true);
         viewport.setScreenPosition(

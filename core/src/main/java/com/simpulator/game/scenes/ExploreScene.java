@@ -42,6 +42,7 @@ public class ExploreScene implements Scene {
     protected static final float PLAYER_SPEED = 4f;
 
     private final SceneManager sceneManager;
+    private final GraphicsManager graphics;
     private final LevelManager levelManager;
     protected final TextureCache textures = new TextureCache();
     protected final SoundManager sounds = new SoundManager();
@@ -71,11 +72,13 @@ public class ExploreScene implements Scene {
 
     public ExploreScene(
         SceneManager sceneManager,
+        GraphicsManager graphics,
         LevelManager levelManager,
         MusicManager musics,
         Level level
     ) {
         this.sceneManager = sceneManager;
+        this.graphics = graphics;
         this.levelManager = levelManager;
         musics.stopAllMusic();
         musics.startMusic(level.getBgmPath());
@@ -102,7 +105,7 @@ public class ExploreScene implements Scene {
         level.loadMap(entityManager, textures);
 
         playerInventory = level.createInventory();
-        hud = new GameHUD(level.getValueGoal(), playerInventory);
+        hud = new GameHUD(graphics, level.getValueGoal(), playerInventory);
         hud.setHintCount(hintsRemaining);
         overlays.push(hud, new UIRelativeLayout());
 
@@ -248,7 +251,13 @@ public class ExploreScene implements Scene {
             throw new IllegalStateException("Trading UI is already open");
         }
 
-        tradingUI = new TradingUI(playerInventory, target, textures, sounds);
+        tradingUI = new TradingUI(
+            playerInventory,
+            target,
+            graphics,
+            textures,
+            sounds
+        );
         overlays.push(tradingUI, new UIRelativeLayout());
         hud.setCrosshairVisible(false);
         hud.setPromptVisible(false);
@@ -348,13 +357,7 @@ public class ExploreScene implements Scene {
     }
 
     @Override
-    public void render(
-        GraphicsManager graphics,
-        int x,
-        int y,
-        int width,
-        int height
-    ) {
+    public void render(int x, int y, int width, int height) {
         viewport.update(width, height);
         viewport.setScreenPosition(
             viewport.getScreenX() + y,
@@ -376,7 +379,6 @@ public class ExploreScene implements Scene {
 
         // Render UI on top
         overlays.render(
-            graphics,
             viewport.getScreenX(),
             viewport.getScreenY(),
             viewport.getScreenWidth(),

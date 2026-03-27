@@ -2,6 +2,7 @@ package com.simpulator.game.levels.levels;
 
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
+import com.simpulator.engine.graphics.GraphicsManager;
 import com.simpulator.engine.scene.MusicManager;
 import com.simpulator.engine.scene.SceneManager;
 import com.simpulator.game.entities.MerchantEntity;
@@ -59,11 +60,13 @@ public class TutorialLevel extends Level {
     @Override
     public ExploreScene createScene(
         SceneManager sceneManager,
+        GraphicsManager graphics,
         LevelManager levelManager,
         MusicManager musicManager
     ) {
         return new TutorialScene(
             sceneManager,
+            graphics,
             levelManager,
             musicManager,
             this
