@@ -1,0 +1,89 @@
+---
+config:
+    theme: neutral
+    layout: elk
+    defaultRenderer: elk
+    elk:
+        nodePlacementStrategy: NETWORK_SIMPLEX
+---
+
+classDiagram
+    Inventory --* Item
+    Item --* ItemRarity
+    TradeProcessor --* Item
+    TradeProcessor ..> TradeResult: Creates
+
+    class Inventory {
+        + MAX_ITEMS: int$
+        - items: List~Item~
+
+        + add(item: Item) void
+        + remove(item: Item) boolean
+        + removeAt(index: int) void
+        + getItems() List~Item~
+        + getTotalValue() int
+        + clear() void
+    }
+
+    class Item {
+        <<enumeration>>
+        TRINKET
+        ROPE
+        CLOTH
+        CANDLE
+        FISH
+        PENDANT
+        COMPASS
+        SPICE
+        MAP
+        LENS
+        GEMSTONE
+        IDOL
+        SEXTANT
+        CHALICE
+        ASTROLABE
+        DRAGON_SCALE
+        CROWN
+        ORB
+        - name: String
+        - rarity: ItemRarity
+        - value: int
+        - imagePath: String
+
+        + toString() String
+        + rarity() ItemRarity
+        + value() int
+        + imagePath() String
+        + getTexture(textures: TextureCache) Texture
+    }
+
+    class ItemRarity {
+        <<enumeration>>
+        COMMON
+        RARE
+        EPIC
+        LEGENDARY
+        - tier: int
+        - name: String
+        - color: Color
+
+        + tier() int
+        + toString() String
+        + color() Color
+    }
+
+    class TradeProcessor {
+        - wantsThreshold: float
+        - normalThreshold: float
+        - wants: Set~Item~
+
+        + TradeProcessor(wantsThreshold: float, normalThreshold: float, wants: Set~Item~)
+        + trade(give: Item, receive: Item) TradeResult
+    }
+
+    class TradeResult {
+        <<enumeration>>
+        FAILED
+        TRADED
+        GOT_WANTS
+    }

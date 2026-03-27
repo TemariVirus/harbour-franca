@@ -1,0 +1,53 @@
+---
+config:
+    theme: neutral
+    layout: elk
+    defaultRenderer: elk
+    elk:
+        nodePlacementStrategy: NETWORK_SIMPLEX
+---
+
+classDiagram
+    Translator <|.. ChineseTranslator
+    Translator <|.. EnglishTranslator
+    Translator <|.. JapaneseTranslator
+    Translator <|.. VietnameseTranslator
+    Translators ..> Translator : Creates
+    Translators ..> Language : Uses
+
+    class Language {
+        <<enumeration>>
+        ENGLISH
+        VIETNAMESE
+        JAPANESE
+        CHINESE
+    }
+
+    class Translator {
+        <<interface>>
+
+        + translateItemName(item: Item)* String
+    }
+
+    class ChineseTranslator {
+        + translateItemName(item: Item) String
+    }
+
+    class EnglishTranslator {
+        + translateItemName(item: Item) String
+    }
+
+    class JapaneseTranslator {
+        + translateItemName(item: Item) String
+    }
+
+    class VietnameseTranslator {
+        + translateItemName(item: Item) String
+    }
+
+    class Translators {
+        <<final>>
+
+        - Translators()
+        + get(language: Language)$ Translator
+    }

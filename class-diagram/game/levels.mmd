@@ -1,0 +1,143 @@
+---
+config:
+    theme: neutral
+    layout: elk
+    defaultRenderer: elk
+    elk:
+        nodePlacementStrategy: NETWORK_SIMPLEX
+---
+
+classDiagram
+    LevelManager --* Level
+    Level --* LevelId
+    Level --* LevelMap
+    Level --* MerchantConfig
+    MerchantConfig --* MerchantData
+    Level1 ..|> Level
+    Level2 ..|> Level
+    TutorialLevel ..|> Level
+    Level1Map ..|> LevelMap
+    Level2Map ..|> LevelMap
+    TutorialMap ..|> LevelMap
+
+    class LevelId {
+        <<enumeration>>
+
+        TUTORIAL
+        LEVEL_1
+        LEVEL_2
+    }
+
+    class Level {
+        - levelId: LevelId
+        - nextLevelId: LevelId
+        - displayName: String
+        - skyboxPath: String
+        - bgmPath: String
+        - valueGoal: int
+        - startingItems: Item[]
+        - playerStartPosition: Vector3
+        - playerStartRotation: Quaternion
+        - map: LevelMap
+        - merchants: MerchantConfig[]
+        - gatekeeperPositions: Vector3[]
+
+        + Level(levelId: LevelId, nextLevelId: LevelId, displayName: String, skyboxPath: String, bgmPath: String, valueGoal: int, startingItems: Item[], playerStartPosition: Vector3, playerStartRotation: Quaternion, map: LevelMap, merchants: MerchantConfig[], gatekeeperPositions: Vector3[])
+        + getLevelId() LevelId
+        + getNextLevelId() LevelId
+        + getDisplayName() String
+        + getSkyboxPath() String
+        + getBgmPath() String
+        + getValueGoal() int
+        + createInventory() Inventory
+        + getPlayerStartPosition() Vector3
+        + getPlayerStartRotation() Quaternion
+        + loadMap(entityManager: EntityManager, textures: TextureCache) void
+        + createMerchants(textures: TextureCache, player: Entity) ArrayList~MerchantEntity~
+        + createGatekeepers(textures: TextureCache, player: Entity) ArrayList~GatekeeperEntity~
+        + createScene(sceneManager: SceneManager, graphics: GraphicsManager, levelManager: LevelManager, musicManager: MusicManager) ExploreScene
+    }
+
+    class Level1 {
+        + Level1()
+    }
+
+    class Level2 {
+        + Level2()
+    }
+
+    class TutorialLevel {
+        + TutorialLevel()
+    }
+
+    class MerchantConfig {
+        - merchantClass: Class~? extends MerchantEntity~
+        - position: Vector3
+        - data: MerchantData
+
+        + MerchantConfig(merchantClass: Class~? extends MerchantEntity~, position: Vector3, data: MerchantData)
+        + getMerchantClass() Class~? extends MerchantEntity~
+        + getPosition() Vector3
+        + getData() MerchantData
+    }
+
+    class LevelManager {
+        - levelDatabase: Map~LevelId&comma; Level~
+        - currentLevelId: LevelId
+
+        + LevelManager()
+        - initLevels() void
+        + getLevel(levelId: LevelId) Level
+        + setCurrentLevelId(levelId: LevelId) void
+        + getCurrentLevel() Level
+    }
+
+    class LevelMap {
+        <<interface>>
+
+        + load(entityManager: EntityManager, textures: TextureCache)* void
+    }
+
+    class Level1Map {
+        + load(entityManager: EntityManager, textures: TextureCache) void
+    }
+
+    class Level2Map {
+        - boolean isBooth(layout: String[], r: int, c: int) boolean
+        + load(entityManager: EntityManager, textures: TextureCache) void
+    }
+
+    class TutorialMap {
+        + load(entityManager: EntityManager, textures: TextureCache) void
+    }
+
+    class MerchantData {
+        - name: String
+        - imagePath: String
+        - language: Language
+        - dialogue: String
+        - gotWantsDialogue: String
+        - tradedDialogue: String
+        - tradeFailedDialogue: String
+        - timesUpDialogue: String
+        - wantsThreshold: float
+        - normalThreshold: float
+        - items: List~Item~
+        - wants: Set~Item~
+        + hint: String
+
+        + MerchantData(name: String, imagePath: String, language: Language, dialogue: String, gotWantsDialogue: String, tradedDialogue: String, tradeFailedDialogue: String, timesUpDialogue: String, wantsThreshold: float, normalThreshold: float, items: Item[], wants: Set~Item~, hint: String)
+        + getName() String
+        + getImagePath() String
+        + getLanguage() Language
+        + getDialogue() String
+        + getGotWantsDialogue() String
+        + getTradedDialogue() String
+        + getTradeFailedDialogue() String
+        + getTimesUpDialogue() String
+        + getWantsThreshold() float
+        + getNormalThreshold() float
+        + getItems() List~Item~
+        + getWants() Set~Item~
+        + wantsItem(item: Item) boolean
+    }

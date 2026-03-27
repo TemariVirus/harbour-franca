@@ -1,0 +1,202 @@
+---
+config:
+    theme: neutral
+    layout: elk
+    defaultRenderer: elk
+    elk:
+        nodePlacementStrategy: NETWORK_SIMPLEX
+---
+
+classDiagram
+    Box --|> UIElement
+    Image --|> UIElement
+    Slider --|> UIElement
+    Slider o-- Action~Float~
+    Text --|> UIElement
+    Text *-- TextAlignment
+    Timer --|> UIElement
+    Timer o-- Text
+    UIRelativeLayout ..|> UILayout
+    UiHelper ..> MouseHandlers: Creates
+    Builder ..> UIRelativeLayout: Builds
+    UIRelativeLayout *-- UIRelativeLayoutAlignment
+
+
+    class UIElement {
+        <<interface>>
+    }
+
+    class UILayout {
+        <<interface>>
+    }
+
+    class Box {
+        - borderWidth: int
+        - borderColor: Color
+        - fillColor: Color
+
+        + Box(borderWidth: int, borderColor: Color, fillColor: Color, layout: UILayout)
+        + getBorderWidth() int
+        + setBorderWidth(borderWidth: int) void
+        + getBorderColor() Color
+        + setBorderColor(borderColor: Color) void
+        + getFillColor() Color
+        + setFillColor(fillColor: Color) void
+        + render(batch: TextureBatch) void
+    }
+
+    class Image {
+        - texture: Texture
+        - tint: Color
+
+        + Image(texture: Texture, layout: UILayout)
+        + Image(texture: Texture, tint: Color, layout: UILayout)
+        + setTexture(texture: Texture) void
+        + setTint(tint: Color) void
+        + render(batch: TextureBatch) void
+    }
+
+    class Slider {
+        - value: float
+        - min: float
+        - max: float
+        - step: float
+        - valueListeners: ArrayList~Action~
+        - backgroundColor: Color
+        - backGroundHeight: float
+        - knobColor: Color
+        - knobSize: float
+        - isDragging: boolean
+
+        + Slider(min: float, max: float, step: float, backgroundColor: Color, backGroundHeight: float, knobColor: Color, knobSize: float, layout: UILayout)
+        + getValue() float
+        + setValue(value: float, notifyListeners: boolean) void
+        + getMin() float
+        + setMin(min: float) void
+        + getMax() float
+        + setMax(max: float) void
+        + getStep() float
+        + setStep(step: float) void
+        + setBackgroundColor(color: Color) void
+        + setBackGroundHeight(height: float) void
+        + setKnobColor(color: Color) void
+        + setKnobSize(size: float) void
+        + addValueListener(action: Action~Float~) void
+        + render(batch: TextureBatch) void
+    }
+
+    class Text {
+        - text: CharSequence
+        - font: BitmapFont
+        - xAnchor: Alignment
+        - color: Color
+        - width: float
+
+        + Text(text: CharSequence, font: BitmapFont, xAnchor: Alignment, color: Color, layout: UILayout)
+        - invalidateWidth() void
+        + updateBounds(parentBounds: Rect) void
+        + setText(text: CharSequence) void
+        + setFont(font: BitmapFont) void
+        + getXAnchor() Alignment
+        + setXAnchor(xAnchor: Alignment) void
+        + getColor() Color
+        + setColor(color: Color) void
+        + getTextWidth() float
+        + render(batch: TextureBatch) void
+    }
+
+    class TextAlignment {
+        <<enumeration>>
+
+        START
+        CENTER
+        END
+    }
+
+    class Timer {
+        - timeLeft: float
+        - isRunning: boolean
+        - backgroundColor: Color
+        - text: Text
+
+        + Timer(initialTime: float, backgroundColor: Color, layout: UILayout, text: Text)
+        + getTimeLeft() float
+        + restart(time: float) void
+        + isRunning() boolean
+        + setRunning(running: boolean) void
+        + isFinished() boolean
+        + update(deltaTime: float) void
+        + render(batch: TextureBatch) void
+    }
+
+    class UiHelper {
+        <<final>>
+
+        - UiHelper()
+        + getWhiteTexture()$ Texture
+        + setupUiMouseHandlers(mm: MouseManager, viewport: Viewport, root: UIRoot)$ MouseHandlers
+        + removeUiMouseHandlers(mm: MouseManager, handlers: MouseHandlers)$ void
+        + uiMouseMoveHandler(viewport: Viewport, root: UIRoot)$ Action~MouseMoveEvent~
+        + uiMouseButtonHandler(viewport: Viewport, root: UIRoot)$ Action~MouseButtonEvent~
+        + uiMouseScrollHandler(viewport: Viewport, root: UIRoot)$ Action~MouseScrollEvent~
+        + addHoverColor(box: Box, hoverColor: Color)$ Box
+        + createButton(box: Box, hoverColor: Color, text: Text, fontSize: float, sounds: SoundManager, onClick: UIListener~MouseButtonEvent~)$ Box
+    }
+
+    class MouseHandlers {
+        - moveHandler: Action~MouseMoveEvent~
+        - buttonHandler: Action~MouseButtonEvent~
+        - scrollHandler: Action~MouseScrollEvent~
+
+        - MouseHandlers(moveHandler: Action~MouseMoveEvent~, buttonHandler: Action~MouseButtonEvent~, scrollHandler: Action~MouseScrollEvent~)
+    }
+
+    class UIRelativeLayout {
+        + EXPAND: float$
+        - xAlignment: Alignment
+        - yAlignment: Alignment
+        - padLeft: float
+        - padRight: float
+        - padTop: float
+        - padBottom: float
+        - width: float
+        - height: float
+
+        + UIRelativeLayout()
+        + setXAlignment(align: Alignment) void
+        + setYAlignment(align: Alignment) void
+        + setPadLeft(pad: float) void
+        + setPadRight(pad: float) void
+        + setPadTop(pad: float) void
+        + setPadBottom(pad: float) void
+        + setPadAll(pad: float) void
+        + setWidth(width: float) void
+        + setHeight(height: float) void
+        - getSize(size: float, start: float, end: float, padStart: float, padEnd: float)$ float
+        - getOffset(align: Alignment, start: float, end: float, padStart: float, padEnd: float, size: float)$ float
+        - alignmentOpposite(align: Alignment)$ Alignment
+        + computeBounds(bounds: Rect) Rect
+    }
+
+    class Builder {
+        - layout: UIRelativeLayout
+
+        + xAlignment(align: Alignment) Builder
+        + yAlignment(align: Alignment) Builder
+        + padLeft(pad: float) Builder
+        + padRight(pad: float) Builder
+        + padTop(pad: float) Builder
+        + padBottom(pad: float) Builder
+        + padAll(pad: float) Builder
+        + width(width: float) Builder
+        + height(height: float) Builder
+        + getLayout() UIRelativeLayout
+    }
+
+    class UIRelativeLayoutAlignment {
+        <<enumeration>>
+
+        START
+        CENTER
+        END
+    }

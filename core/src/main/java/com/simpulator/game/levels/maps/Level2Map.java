@@ -11,7 +11,7 @@ import com.simpulator.game.levels.LevelMap;
 
 public class Level2Map implements LevelMap {
 
-    public static final String[] LEVEL_2_LAYOUT = {
+    private static final String[] LEVEL_2_LAYOUT = {
         // W = Outer Brick Wall, B = Inner Booth Wall, C = Counter, D = Door, M = Merchant P = Pavement
         "WWWWWWWWWWWWWWW", // 0
         "W......P......W", // 1

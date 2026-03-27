@@ -1,0 +1,262 @@
+---
+config:
+    theme: neutral
+    layout: elk
+    defaultRenderer: elk
+    elk:
+        nodePlacementStrategy: NETWORK_SIMPLEX
+---
+
+classDiagram
+    ExploreScene ..|> Scene
+    GameHUD ..|> Scene
+    MainMenu ..|> Scene
+    ResultScene ..|> Scene
+    SoundMenu ..|> Scene
+    TradingUI ..|> Scene
+    TutorialScene --|> ExploreScene
+    ResultScene *-- ResultType
+    TutorialScene *-- TutorialState
+    TradingUI *-- State
+    ExploreScene --* TradingUI
+    ExploreScene --* CameraEntity
+    ExploreScene --* GameHUD
+    ExploreScene --* MerchantEntity
+    ExploreScene --* EntityTargeter~MerchantEntity~
+    ExploreScene --* GatekeeperEntity
+    ExploreScene --* EntityTargeter~GatekeeperEntity~
+    ExploreScene --o Level
+    ExploreScene --* Inventory
+
+
+    class Scene {
+        <<interface>>
+    }
+
+    class ExploreScene {
+        # PLAYER_SPEED: float$
+        - sceneManager: SceneManager
+        - graphics: GraphicsManager
+        - levelManager: LevelManager
+        # textures: TextureCache
+        # sounds: SoundManager
+        # entityManager: EntityManager
+        # keyboard: KeyboardManager
+        # mouse: MouseManager
+        - viewport: Viewport
+        # playerCamera: CameraEntity
+        - skybox: Skybox
+        # overlays: SceneCompositor
+        # hud: GameHUD
+        - tradingUI: TradingUI
+        # clock: Clock
+        # merchants: List~MerchantEntity~
+        # merchantTargeter: EntityTargeter~MerchantEntity~
+        # gatekeepers: List~GatekeeperEntity~
+        # gatekeeperTargeter: EntityTargeter~GatekeeperEntity~
+        # level: Level
+        # playerInventory: Inventory
+        # valueGoal: int
+        - hintsRemaining: int
+
+        + ExploreScene(sceneManager: SceneManager, graphics: GraphicsManager, levelManager: LevelManager, musics: MusicManager, level: Level)
+        - setupKeybinds(sceneManager: SceneManager) void
+        - showHint() void
+        - handleInteract() void
+        # tryGoToNextLevel() void
+        + getInputProcessor() InputProcessor
+        + onFocus() boolean
+        + dispose() void
+        # openTradingUIWithLookingAt() void
+        # closeTradingUI() void
+        # checkWinCondition() void
+        # isTradingUIOpen() boolean
+        # updateTargeted() void
+        + update(deltaTime: float) void
+        + render(x: int, y: int, width: int, height: int) void
+    }
+
+    class GameHUD {
+        - graphics: GraphicsManager
+        - viewport: Viewport
+        - font: BitmapFont
+        - uiRoot: UIRoot
+        - levelGoal: int
+        - playerInventory: Inventory
+        - hintTimer: float
+        - objectiveLabel: Text
+        - hintLabel: Text
+        - crosshair: Text
+        - interactionPrompt: Text
+        - inventoryGroup: Box
+        - inventoryLabels: Text[]
+        - hintCountLabel: Text
+
+        + GameHUD(graphics: GraphicsManager, levelGoal: int, playerInventory: Inventory)
+        - buildHUD() void
+        + getInputProcessor() InputProcessor
+        + onFocus() boolean
+        - updateObjectiveText() void
+        + setObjectiveVisible(visible: boolean) void
+        + setCrosshairVisible(visible: boolean) void
+        + setPrompt(text: String) void
+        + setPromptVisible(visible: boolean) void
+        + setInventoryVisible(visible: boolean) void
+        + update(deltaTime: float) void
+        + render(x: int, y: int, width: int, height: int) void
+        + showHint(text: String) void
+        + hideHint() void
+        + setHintCount(count: int) void
+        + dispose() void
+    }
+
+    class MainMenu {
+        - graphics: GraphicsManager
+        - sounds: SoundManager
+        - km: KeyboardManager
+        - mm: MouseManager
+        - viewport: Viewport
+        - uiRoot: UIRoot
+        - font: BitmapFont
+
+        + MainMenu(sceneManager: SceneManager, graphics: GraphicsManager, levelManager: LevelManager)
+        - buildUI(sceneManager: SceneManager, levelManager: LevelManager) void
+        - addMenuButton(text: String, y: float, onClick: Action~MouseManager.MouseButtonEvent~) void
+        + getInputProcessor() InputProcessor
+        + onFocus() boolean
+        + dispose() void
+        + update(deltaTime: float) void
+        + render(x: int, y: int, width: int, height: int) void
+    }
+
+    class ResultScene {
+        - graphics: GraphicsManager
+        - sceneManager: SceneManager
+        - resultType: ResultType
+        - sounds: SoundManager
+        - km: KeyboardManager
+        - mm: MouseManager
+        - viewport: Viewport
+        - uiRoot: UIRoot
+        - font: BitmapFont
+        - backgroundColor: Color
+        - titleColor: Color
+
+        + ResultScene(sceneManager: SceneManager, graphics: GraphicsManager, resultType: ResultType)
+        - setupColors() void
+        - buildUI() void
+        - addMenuButton(text: String, y: float, onClick: Action~MouseManager.MouseButtonEvent~) void
+        + getInputProcessor() InputProcessor
+        + onFocus() boolean
+        + dispose() void
+        + update(deltaTime: float) void
+        + render(x: int, y: int, width: int, height: int) void
+    }
+
+    class ResultType {
+        <<enumeration>>
+        WIN
+        LOSE
+    }
+
+    class SoundMenu {
+        - graphics: GraphicsManager
+        - musics: MusicManager
+        - km: KeyboardManager
+        - mm: MouseManager
+        - viewport: Viewport
+        - uiRoot: UIRoot
+        - font: BitmapFont
+        - volumeText: Text
+        - volumeSlider: Slider
+
+        + SoundMenu(sceneManager: SceneManager, graphics: GraphicsManager, musicManager: MusicManager)
+        - buildUI() void
+        - formatVolumeText(volume: int)$ String
+        - updateVolume(newVolume: float) void
+        + getInputProcessor() InputProcessor
+        + onFocus() boolean
+        + dispose() void
+        + update(deltaTime: float) void
+        + render(x: int, y: int, width: int, height: int) void
+    }
+
+    class TradingUI {
+        ~ SIDE_MARGIN: float
+        ~ TOP_MARGIN: float
+        ~ FONT_SIZE: float
+        ~ ITEM_BOX_WIDTH: float
+        ~ ITEM_BOX_HEIGHT: float
+        ~ RARITY_BOX_HEIGHT: float
+        ~ LEFT_BOX_GAP: float
+        ~ CHOICE_SPACE: float
+        ~ CHOICE_TOTAL_HEIGHT: float
+        ~ CHOICE_WIDTH: float
+        ~ CHOICE_HEIGHT: float
+        ~ CONFIRM_CANCEL_WIDTH: float
+        ~ CONFIRM_CANCEL_HEIGHT: float
+        ~ CONFIRM_CANCEL_GAP: float
+        ~ DIALOGUE_MARGIN: float
+        ~ DIALOGUE_HEIGHT: float
+        - state: State
+        - graphics: GraphicsManager
+        - sounds: SoundManager
+        - mouse: MouseManager
+        - viewport: Viewport
+        - font: BitmapFont
+        - uiRoot: UIRoot
+        - playerInventory: Inventory
+        - offeredItemIndex: int
+        - merchant: MerchantEntity
+        - choiceIndex: int
+        - timer: Timer
+        - offeredItemImage: Image
+        - offeredItemNameText: Text
+        - rarityText: Text
+        - choiceImages: Image[]
+        - choiceTexts: Text[]
+        - dialogueText: Text
+        - confirmButton: Box
+        - cancelButton: Box
+        - textures: TextureCache
+        - translator: Translator
+
+        + TradingUI(playerInventory: Inventory, merchant: MerchantEntity, graphics: GraphicsManager, textures: TextureCache, sounds: SoundManager)
+        - buildUI() void
+        - makeItemArrowButton(isLeft: boolean) Box
+        - makeDialogueOptionButton(y: float, index: int) Box
+        + getInputProcessor() InputProcessor
+        + onFocus() boolean
+        - setChoiceIndex(i: int) void
+        - setOfferedItemIndex(i: int) boolean
+        - setTradeResult(dialogue: String) void
+        - confirmTrade() boolean
+        - cancelTrade() boolean
+        + isInteractive() boolean
+        + shouldClose() boolean
+        + update(deltaTime: float) void
+        + render(x: int, y: int, width: int, height: int) void
+        + dispose() void
+    }
+
+    class State {
+        <<enumeration>>
+        TRADING
+        TRADE_RESULT
+        SHOULD_CLOSE
+    }
+
+    class TutorialScene {
+        - tutorialState: TutorialState
+
+        + TutorialScene(sceneManager: SceneManager, graphics: GraphicsManager, levelManager: LevelManager, musics: MusicManager, level: Level)
+        - onMoveAction() Action~T~
+        + update(deltaTime: float) void
+        - handleTutorialHints() void
+    }
+
+    class TutorialState {
+        <<enumeration>>
+        MOVEMENT
+        TRADING
+    }

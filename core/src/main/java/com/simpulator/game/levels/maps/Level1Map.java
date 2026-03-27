@@ -12,7 +12,7 @@ import com.simpulator.game.levels.LevelMap;
 public class Level1Map implements LevelMap {
 
     // W = Outer Brick Wall, B = Inner Booth Wall, C = Counter, D = Door, M = Merchant
-    public static final String[] LEVEL_1_LAYOUT = {
+    private static final String[] LEVEL_1_LAYOUT = {
         "WWWWWWWWWWWWWWW",
         "W.BMB.BMB.BMB.W",
         "W.BCB.BCB.BCB.W",

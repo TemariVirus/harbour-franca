@@ -1,0 +1,261 @@
+---
+config:
+    theme: neutral
+    layout: elk
+    defaultRenderer: elk
+    elk:
+        nodePlacementStrategy: NETWORK_SIMPLEX
+---
+
+classDiagram
+    Cuboid --|> Polyhedron
+    GameMaster --|> ApplicationAdapter
+    RotateCameraAction ..|> Action~MouseManager.MouseMoveEvent~
+    Skybox ..|> Renderable
+    TranslateCameraAction ..|> Action~KeyboardManager.KeyEvent~
+
+    GameMaster *-- SceneManager
+    GameMaster *-- GraphicsManager
+    GameMaster *-- MusicManager
+    GameMaster ..> LevelManager
+    GameMaster ..> MainMenu
+    GameMaster ..> SoundMenu
+    GameMaster ..> ResultScene
+    GameMaster ..> Scenes
+
+    RotateCameraAction --o CameraEntity
+    TranslateCameraAction --o CameraEntity
+
+    EntityTargeter --o Entity
+
+    SkyboxLoader ..> Skybox: Creates
+
+    CameraEntity --|> CollidableEntity
+    CameraEntity o.. EmptyRenderer
+    CameraEntity ..> Cuboid: Creates
+    CuboidEntity --|> CollidableEntity
+    CuboidEntity ..> Cuboid: Creates
+    EmptyRenderer ..|> EntityRenderer
+    GatekeeperEntity --|> CuboidEntity
+    GatekeeperEntity o.. Entity
+    GatekeeperEntity o.. RectangleRenderer
+    MerchantEntity --|> CuboidEntity
+    MerchantEntity o.. RectangleRenderer
+    MerchantEntity *.. TradeProcessor
+    MerchantEntity *.. MerchantData
+    MerchantEntity o.. Entity
+    TiledRenderer --|> EntityRenderer
+
+    ChineseTranslator --|> Translator
+    EnglishTranslator --|> Translator
+    JapaneseTranslator --|> Translator
+    VietnameseTranslator --|> Translator
+    Translator ..> Item: Uses
+    Translators ..> Translator: Creates
+
+    Level *.. MerchantData
+    Level *.. LevelMap
+    Level ..> ExploreScene: Creates
+    LevelManager --* Level
+
+    ExploreScene --|> Scene
+    ExploreScene *-- GameHUD
+    ExploreScene *-- Inventory
+    ExploreScene *-- CameraEntity
+    ExploreScene *-- Skybox
+    ExploreScene *-- EntityTargeter~MerchantEntity~
+    ExploreScene *-- EntityTargeter~GatekeeperEntity~
+    ExploreScene *-- MerchantEntity
+    ExploreScene *-- GatekeeperEntity
+    ExploreScene *-- Clock
+    ExploreScene *-- TradingUI
+    ExploreScene o-- Level
+    GameHUD --|> Scene
+    GameHUD *-- Box
+    GameHUD *-- Text
+    GameHUD o-- Inventory
+    MainMenu --|> Scene
+    MainMenu *-- Box
+    MainMenu *-- Text
+    SoundMenu --|> Scene
+    SoundMenu *-- Box
+    SoundMenu *-- Slider
+    SoundMenu *-- Text
+    ResultScene --|> Scene
+    ResultScene *-- Box
+    ResultScene *-- Text
+    TradingUI --|> Scene
+    TradingUI *-- Box
+    TradingUI *-- Text
+    TradingUI *-- Image
+    TradingUI *-- Translator
+    TradingUI o-- MerchantEntity
+    TutorialScene --|> ExploreScene
+
+    Inventory *-- Item
+    Item *-- ItemRarity
+    TradeProcessor ..> Item: Uses
+    TradeProcessor *-- Item
+
+    Box --|> UIElement
+    Slider --|> UIElement
+    Text --|> UIElement
+    Image --|> UIElement
+    Timer --|> UIElement
+    TImer *.. Text
+
+
+    class Polyhedron {
+        <<abstract>>
+    }
+
+    class ApplicationAdapter {
+        <<abstract>>
+    }
+
+    class Action~T~ {
+        <<interface>>
+    }
+
+    class Renderable {
+        <<interface>>
+    }
+
+    class Entity {
+        <<interface>>
+    }
+
+    class SceneManager
+    class GraphicsManager
+    class MusicManager
+    class LevelManager
+    class MainMenu
+    class SoundMenu
+    class ResultScene
+    class CameraEntity
+
+    class Clock {
+        - seconds: float
+        + Clock(seconds: float)
+        + getSeconds() float
+        + setSeconds(seconds: float) void
+        + reset() void
+        + forward(seconds: float) void
+        + backward(seconds: float) void
+    }
+
+    class Config {
+        <<final>>
+        + volume: int$
+        - Config()
+    }
+
+    class Cuboid {
+        - obb: OrientedBoundingBox
+        + Cuboid(obb: OrientedBoundingBox)
+        + getAllVertices() Iterable~Vector3~
+        + getBounds() BoundingBox
+    }
+
+    class EntityTargeter~T~ {
+        - targets: List~T~
+        - range: float
+        - lastTarget: T
+        + EntityTargeter(targets: List~T~, range: float)
+        + getClosest(camera: Camera) T
+        + getLastTarget() T
+    }
+
+    class GameMaster {
+        - sceneManager: SceneManager
+        - graphics: GraphicsManager
+        - musics: MusicManager
+        - windowWidth: int
+        - windowHeight: int
+        + create() void
+        + render() void
+        + resize(width: int, height: int) void
+        + dispose() void
+    }
+
+    class RotateCameraAction {
+        - entity: CameraEntity
+        - sensitivity: float
+        + RotateCameraAction(entity: CameraEntity, sensitivity: float)
+        + act(event: MouseManager.MouseMoveEvent) void
+    }
+
+    class Scenes {
+        <<final>>
+        + MainMenu: String$
+        + SoundMenu: String$
+        + Explore: String$
+        + Win: String$
+        + Lose: String$
+        - Scenes()
+    }
+
+    class Skybox {
+        - faces: TextureRegion[]
+        - tmpTransform: Matrix4
+        - scale: float
+        + Skybox(faces: TextureRegion[], cameraFarDinstance: float)
+        + render(batch: TextureBatch, camera: Camera) void
+        + isVisible(camera: Camera) boolean
+    }
+
+    class SkyboxLoader {
+        <<final>>
+        - SkyboxLoader()
+        + load(textures: TextureCache, path: String, cameraFarDistance: float)$ Skybox
+    }
+
+    class TranslateCameraAction {
+        - entity: CameraEntity
+        - velocity: Vector3
+        + TranslateCameraAction(entity: CameraEntity, velocity: Vector3)
+        + act(event: KeyboardManager.KeyEvent) void
+    }
+
+    class Box
+    class Slider
+    class Text
+    class Image
+    class Timer
+
+    class EmptyRenderer
+    class TiledRenderer
+    class CuboidEntity
+    class GatekeeperEntity
+    class MerchantEntity
+
+    class ChineseTranslator
+    class EnglishTranslator
+    class JapaneseTranslator
+    class Translator {
+        <<interface>>
+    }
+    class Translators {
+        <<final>>
+    }
+    class VietnameseTranslator
+
+    class MerchantData
+    class Level
+    class LevelMap {
+        <<interface>>
+    }
+
+    class TutorialScene
+    class TradingUI
+    class ExploreScene
+    class GameHUD
+
+    class Inventory
+    class Item {
+        <<enumeration>>
+    }
+    class ItemRarity {
+        <<enumeration>>
+    }
+    class TradeProcessor

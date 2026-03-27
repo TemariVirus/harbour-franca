@@ -1,0 +1,92 @@
+---
+config:
+    theme: neutral
+    layout: elk
+    defaultRenderer: elk
+    elk:
+        nodePlacementStrategy: NETWORK_SIMPLEX
+---
+
+classDiagram
+    CameraEntity --|> CollidableEntity
+    CuboidEntity --|> CollidableEntity
+    GatekeeperEntity --|> CuboidEntity
+    MerchantEntity --|> CuboidEntity
+    EmptyRenderer ..|> EntityRenderer
+    TiledRenderer ..|> EntityRenderer
+    EmptyRenderer --o CameraEntity
+    EntityRenderer --o CuboidEntity
+    RectangleRenderer --o GatekeeperEntity
+    RectangleRenderer --o MerchantEntity
+
+    class CameraEntity {
+        - camera: Camera
+
+        + CameraEntity(position: Vector3, size: Vector3, rotation: Quaternion, camera: Camera)
+        + getCamera() Camera
+        + translate(delta: Vector3) void
+        + rotate(delta: Quaternion) void
+        + rotate(axis: Vector3, radians: float) void
+        + getShapes() Iterable~GJKShape~
+        + getBounds() BoundingBox
+        + onCollision(other: CollidableEntity) void
+    }
+
+    class CuboidEntity {
+        - isMovable: boolean
+
+        + CuboidEntity(position: Vector3, size: Vector3, rotation: Quaternion, renderer: EntityRenderer, isMovable: boolean)
+        + getMovable() boolean
+        + setMovable(isMovable: boolean) void
+        + getOrientedBoundingBox() OrientedBoundingBox
+        + getShapes() Iterable~GJKShape~
+        + getBounds() BoundingBox
+        + onCollision(other: CollidableEntity) void
+    }
+
+    class EmptyRenderer {
+        + isVisible(camera: Camera, entity: Entity) boolean
+        + render(batch: TextureBatch, camera: Camera, entity: Entity) void
+    }
+
+    class GatekeeperEntity {
+        - player: Entity
+
+        + GatekeeperEntity(position: Vector3, textures: TextureCache, player: Entity)
+        + update(deltaTime: float) void
+    }
+
+    class MerchantEntity {
+        - pinTexture: TextureRegion
+        - data: MerchantData
+        - tradeManager: TradeProcessor
+        - player: Entity
+        - canTrade: boolean
+
+        + MerchantEntity(position: Vector3, textures: TextureCache, data: MerchantData, player: Entity)
+        + canTrade() boolean
+        + setCanTrade(canTrade: boolean) void
+        + getData() MerchantData
+        + trade(giveIndex: int, receive: Item) TradeResult
+        + update(deltaTime: float) void
+        + isVisible(camera: Camera) boolean
+        + render(batch: TextureBatch, camera: Camera) void
+    }
+
+    class TiledRenderer {
+        - textureRegion: TextureRegion
+        - tileSize: Vector2
+        - tint: Color
+
+        + TiledRenderer(textureRegion: TextureRegion, tileSize: Vector2)
+        + TiledRenderer(textureRegion: TextureRegion, tileSize: Vector2, tint: Color)
+        + getTextureRegion() TextureRegion
+        + setTextureRegion(textureRegion: TextureRegion) void
+        + getTileSize() Vector2
+        + setTileSize(tileSize: Vector2) void
+        + getTint() Color
+        + setTint(tint: Color) void
+        # isPortionVisible(camera: Camera, modelTransform: Matrix4, x: float, y: float, width: float, height: float) boolean
+        + isVisible(camera: Camera, entity: Entity) boolean
+        + render(batch: TextureBatch, camera: Camera, entity: Entity) void
+    }
