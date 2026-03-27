@@ -21,6 +21,7 @@ public class GraphicsManager implements Disposable {
         }
     }
 
+    /** Begin rendering in the given viewport */
     public void beginRender(Viewport viewport) {
         if (isRendering()) {
             endRender();
@@ -131,6 +132,7 @@ public class GraphicsManager implements Disposable {
         viewport = null;
     }
 
+    /** Returns whether a render pass is currently occuring. */
     public boolean isRendering() {
         return this.viewport != null;
     }

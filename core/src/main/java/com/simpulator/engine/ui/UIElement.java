@@ -71,6 +71,7 @@ public abstract class UIElement {
         return this;
     }
 
+    /** Removes the child from the children list. */
     public void removeChild(UIElement child) {
         children.remove(child);
         child.parent = null;

@@ -28,6 +28,10 @@ public class ButtonManager<T> {
         );
     }
 
+    /**
+     * Queue buttons to be binded/unbinded so that bind() and unbind() may be called
+     * from within an action without causing concurrent modification exceptions.
+     */
     private final class QueueNode {
 
         public final ButtonBindType type;

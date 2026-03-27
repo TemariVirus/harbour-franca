@@ -6,7 +6,7 @@ import com.simpulator.engine.graphics.Renderable;
 import com.simpulator.engine.graphics.TextureBatch;
 import java.util.ArrayList;
 
-/** The root of the UI tree. */
+/** The root of the UI tree. Handles rendering and message passing of all elements within it. */
 public class UIRoot extends UIElement implements Renderable {
 
     public UIRoot() {
