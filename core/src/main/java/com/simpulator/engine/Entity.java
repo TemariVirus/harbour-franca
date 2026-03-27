@@ -9,7 +9,7 @@ import com.simpulator.engine.graphics.Renderable;
 import com.simpulator.engine.graphics.TextureBatch;
 
 /**
- * An entity with 3D position, 2D size, and 3D rotation.
+ * An entity with 3D position, 3D size, and 3D rotation.
  */
 public abstract class Entity implements Movable, Renderable {
 

@@ -1,0 +1,76 @@
+---
+config:
+    theme: neutral
+    layout: elk
+    defaultRenderer: elk
+    elk:
+        nodePlacementStrategy: NETWORK_SIMPLEX
+---
+
+classDiagram
+    Entity ..|> Movable
+    Entity ..|> Renderable
+    EntityRenderer --o Entity
+    Entity --o EntityManager
+    CollidableEntity --|> Entity
+    CollidableEntity ..|> ColliderMesh
+    EntityRenderer --o Entity
+
+
+    class Entity {
+        <<abstract>>
+
+        # position: Vector3
+        # size: Vector3
+        # rotation: Quaternion
+        - transform: Matrix4
+        - transformDirty: boolean
+        # renderer: EntityRenderer
+
+        # Entity(position: Vector3, size: Vector3, rotation: Quaternion, renderer: EntityRenderer)
+        + getPosition() Vector3
+        + setPosition(position: Vector3) void
+        + getSize() Vector3
+        + setSize(size: Vector3) void
+        + getRotation() Quaternion
+        + setRotation(rotation: Quaternion) void
+        + setRotation(axis: Vector3, radians: float) void
+        + getTransform() Matrix4
+        + getRenderer() EntityRenderer
+        + setRenderer(renderer: EntityRenderer) void
+        + translate(delta: Vector3) void
+        + scale(scale: Vector3) void
+        + rotate(delta: Quaternion) void
+        + rotate(axis: Vector3, radians: float) void
+        + isVisible(camera: Camera) boolean
+        + getZOrder(camera: Camera) float
+        + render(batch: TextureBatch, camera: Camera) void
+        + update(deltaTime: float) void
+    }
+
+    class CollidableEntity {
+        <<abstract>>
+
+        # CollidableEntity(position: Vector3, size: Vector3, rotation: Quaternion, renderer: EntityRenderer)
+        + onCollision(other: CollidableEntity)* void
+    }
+
+    class EntityManager {
+        - entities: ArrayList~Entity~
+
+        + EntityManager()
+        + getEntities() Entity[]
+        + add(entity: Entity) void
+        + addAll(entities: List~Entity~) void
+        + remove(entity: Entity) void
+        + removeAll() void
+        + updateCollisions() void
+        + update(deltaTime: float) void
+    }
+
+    class Movable {
+        <<interface>>
+
+        + translate(delta: Vector3) void
+        + rotate(axis: Vector3, radians: float) void
+    }
