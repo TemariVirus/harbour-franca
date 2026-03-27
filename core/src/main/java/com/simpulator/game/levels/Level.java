@@ -39,13 +39,12 @@ public class Level {
     public String bgmPath;
 
     public int valueGoal;
-    public String levelHint;
     public Item[] startingItems;
 
     public Vector3 playerStart;
     public LevelMap map;
     public MerchantConfig[] merchants;
-    
+
     public float playerStartYaw = 0f;
 
     public Inventory createInventory() {

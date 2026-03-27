@@ -11,15 +11,17 @@ public class GatekeeperEntity extends CuboidEntity {
 
     private Entity player;
 
-    public GatekeeperEntity(Vector3 position, TextureCache textures, Entity player) {
+    public GatekeeperEntity(
+        Vector3 position,
+        TextureCache textures,
+        Entity player
+    ) {
         super(
             position,
-            new Vector3(2f, 2.5f, 0.5f), 
+            new Vector3(2f, 2.5f, 0.5f),
             new Quaternion().setFromAxis(Vector3.Y, 0),
-            new RectangleRenderer(
-                new TextureRegion(textures.get("Door.png")) 
-            ),
-            false 
+            new RectangleRenderer(new TextureRegion(textures.get("Door.png"))),
+            false
         );
         this.player = player;
     }

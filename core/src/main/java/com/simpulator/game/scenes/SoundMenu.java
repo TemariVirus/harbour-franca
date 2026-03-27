@@ -28,16 +28,36 @@ import com.simpulator.game.ui.UiHelper;
 
 public class SoundMenu implements Scene {
 
-    private static final Color BACKGROUND_COLOR = new Color(0.08f, 0.11f, 0.16f, 1f);
+    private static final Color BACKGROUND_COLOR = new Color(
+        0.08f,
+        0.11f,
+        0.16f,
+        1f
+    );
     private static final Color TITLE_COLOR = new Color(0.83f, 0.68f, 0.21f, 1f);
     private static final Color TEXT_COLOR = new Color(0.96f, 0.87f, 0.70f, 1f);
     private static final Color HINT_COLOR = new Color(0.82f, 0.78f, 0.70f, 1f);
 
     private static final Color PANEL_BORDER_COLOR = TITLE_COLOR;
-    private static final Color PANEL_FILL_COLOR = new Color(0.10f, 0.15f, 0.23f, 0.94f);
+    private static final Color PANEL_FILL_COLOR = new Color(
+        0.10f,
+        0.15f,
+        0.23f,
+        0.94f
+    );
 
-    private static final Color SLIDER_TRACK_COLOR = new Color(0.22f, 0.27f, 0.34f, 1f);
-    private static final Color SLIDER_KNOB_COLOR = new Color(0.83f, 0.68f, 0.21f, 1f);
+    private static final Color SLIDER_TRACK_COLOR = new Color(
+        0.22f,
+        0.27f,
+        0.34f,
+        1f
+    );
+    private static final Color SLIDER_KNOB_COLOR = new Color(
+        0.83f,
+        0.68f,
+        0.21f,
+        1f
+    );
 
     private final MusicManager musics;
     private final KeyboardManager km = new KeyboardManager();

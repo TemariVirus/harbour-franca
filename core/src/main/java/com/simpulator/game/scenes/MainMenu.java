@@ -29,12 +29,27 @@ import com.simpulator.game.ui.UiHelper;
 
 public class MainMenu implements Scene {
 
-    private static final Color BACKGROUND_COLOR = new Color(0.08f, 0.11f, 0.16f, 1f);
+    private static final Color BACKGROUND_COLOR = new Color(
+        0.08f,
+        0.11f,
+        0.16f,
+        1f
+    );
     private static final Color TITLE_COLOR = new Color(0.83f, 0.68f, 0.21f, 1f);
     private static final Color TEXT_COLOR = new Color(0.96f, 0.87f, 0.70f, 1f);
     private static final Color HINT_COLOR = new Color(0.82f, 0.78f, 0.70f, 1f);
-    private static final Color BUTTON_COLOR = new Color(0.10f, 0.15f, 0.23f, 0.94f);
-    private static final Color BUTTON_HOVER_COLOR = new Color(0.16f, 0.22f, 0.32f, 1f);
+    private static final Color BUTTON_COLOR = new Color(
+        0.10f,
+        0.15f,
+        0.23f,
+        0.94f
+    );
+    private static final Color BUTTON_HOVER_COLOR = new Color(
+        0.16f,
+        0.22f,
+        0.32f,
+        1f
+    );
 
     private final SoundManager sounds = new SoundManager();
     private final KeyboardManager km = new KeyboardManager();
@@ -60,10 +75,6 @@ public class MainMenu implements Scene {
             levelManager.setCurrentLevelId("level_02");
             sceneManager.setScene(Scenes.Explore);
         });
-        km.bind(ButtonBindType.DOWN, Keys.NUM_3, e -> {
-            levelManager.setCurrentLevelId("level_03");
-            sceneManager.setScene(Scenes.Explore);
-        });
         km.bind(ButtonBindType.DOWN, Keys.S, e ->
             sceneManager.setScene(Scenes.SoundMenu)
         );
@@ -71,23 +82,44 @@ public class MainMenu implements Scene {
 
         font = new BitmapFont(Gdx.files.internal("fonts/en.fnt"));
         buildUI(sceneManager, levelManager);
-        
     }
 
     private void buildUI(SceneManager sceneManager, LevelManager levelManager) {
         UiHelper.setupUiMouseHandlers(mm, viewport, uiRoot);
 
-        uiRoot.addChild(new Text("HARBOUR FRANCA", font, Text.Alignment.CENTER, TITLE_COLOR,
-                new UIRelativeLayout.Builder().yAlignment(Alignment.START).padTop(30).height(21).getLayout())); 
-                
-        uiRoot.addChild(new Text("Learn languages through smart trading", font, Text.Alignment.CENTER, TEXT_COLOR,
-                new UIRelativeLayout.Builder().yAlignment(Alignment.START).padTop(58).height(10.5f).getLayout())); 
+        uiRoot.addChild(
+            new Text(
+                "HARBOUR FRANCA",
+                font,
+                Text.Alignment.CENTER,
+                TITLE_COLOR,
+                new UIRelativeLayout.Builder()
+                    .yAlignment(Alignment.START)
+                    .padTop(30)
+                    .height(21)
+                    .getLayout()
+            )
+        );
+
+        uiRoot.addChild(
+            new Text(
+                "Learn languages through smart trading",
+                font,
+                Text.Alignment.CENTER,
+                TEXT_COLOR,
+                new UIRelativeLayout.Builder()
+                    .yAlignment(Alignment.START)
+                    .padTop(58)
+                    .height(10.5f)
+                    .getLayout()
+            )
+        );
 
         addMenuButton("Play Tutorial", 330, e -> {
             levelManager.setCurrentLevelId("level_00");
             sceneManager.setScene(Scenes.Explore);
         });
-        
+
         addMenuButton("Play Level 1", 270, e -> {
             levelManager.setCurrentLevelId("level_01");
             sceneManager.setScene(Scenes.Explore);
@@ -98,29 +130,43 @@ public class MainMenu implements Scene {
             sceneManager.setScene(Scenes.Explore);
         });
 
-        addMenuButton("Play Level 3", 150, e -> {
-            levelManager.setCurrentLevelId("level_03");
-            sceneManager.setScene(Scenes.Explore);
-        });
-        
-        
-        addMenuButton("Sound Options", 90, e -> sceneManager.setScene(Scenes.SoundMenu));
-        
+        addMenuButton("Sound Options", 90, e ->
+            sceneManager.setScene(Scenes.SoundMenu)
+        );
+
         addMenuButton("Exit", 30, e -> Gdx.app.exit());
 
         // Update the hint text at the bottom
-        uiRoot.addChild(new Text("T = Tutorial  |  1-3 = Levels  |  S = Sound  |  ESC = Exit", font, Text.Alignment.CENTER, HINT_COLOR,
-                new UIRelativeLayout.Builder().yAlignment(Alignment.END).padBottom(10).height(10.5f).getLayout()));
+        uiRoot.addChild(
+            new Text(
+                "T = Tutorial  |  1-2 = Levels  |  S = Sound  |  ESC = Exit",
+                font,
+                Text.Alignment.CENTER,
+                HINT_COLOR,
+                new UIRelativeLayout.Builder()
+                    .yAlignment(Alignment.END)
+                    .padBottom(10)
+                    .height(10.5f)
+                    .getLayout()
+            )
+        );
     }
 
-    private void addMenuButton(String text, float y, Action<MouseManager.MouseButtonEvent> onClick) {
+    private void addMenuButton(
+        String text,
+        float y,
+        Action<MouseManager.MouseButtonEvent> onClick
+    ) {
         final float WIDTH = 320f;
         final float HEIGHT = 55f;
         final int BORDER_WIDTH = 2;
         final float FONT_SIZE = 13f;
 
         Box button = UiHelper.createButton(
-            new Box(BORDER_WIDTH, TITLE_COLOR, BUTTON_COLOR,
+            new Box(
+                BORDER_WIDTH,
+                TITLE_COLOR,
+                BUTTON_COLOR,
                 new UIRelativeLayout.Builder()
                     .xAlignment(Alignment.CENTER)
                     .yAlignment(Alignment.END)
@@ -130,7 +176,13 @@ public class MainMenu implements Scene {
                     .getLayout()
             ),
             BUTTON_HOVER_COLOR,
-            new Text(text, font, Text.Alignment.CENTER, TEXT_COLOR, new UIRelativeLayout()),
+            new Text(
+                text,
+                font,
+                Text.Alignment.CENTER,
+                TEXT_COLOR,
+                new UIRelativeLayout()
+            ),
             FONT_SIZE,
             sounds,
             e -> {
@@ -168,10 +220,19 @@ public class MainMenu implements Scene {
     }
 
     @Override
-    public void render(GraphicsManager graphics, int x, int y, int width, int height) {
+    public void render(
+        GraphicsManager graphics,
+        int x,
+        int y,
+        int width,
+        int height
+    ) {
         ScreenUtils.clear(BACKGROUND_COLOR);
         viewport.update(width, height, true);
-        viewport.setScreenPosition(viewport.getScreenX() + x, viewport.getScreenY() + y);
+        viewport.setScreenPosition(
+            viewport.getScreenX() + x,
+            viewport.getScreenY() + y
+        );
         uiRoot.updateBounds(viewport);
 
         graphics.beginRender(viewport);
