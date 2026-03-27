@@ -1,4 +1,4 @@
-package com.simpulator.game.levels;
+package com.simpulator.game.levels.levels;
 
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
@@ -6,6 +6,10 @@ import com.simpulator.engine.scene.MusicManager;
 import com.simpulator.engine.scene.SceneManager;
 import com.simpulator.game.entities.MerchantEntity;
 import com.simpulator.game.language.Language;
+import com.simpulator.game.levels.Level;
+import com.simpulator.game.levels.LevelId;
+import com.simpulator.game.levels.LevelManager;
+import com.simpulator.game.levels.MerchantData;
 import com.simpulator.game.levels.maps.TutorialMap;
 import com.simpulator.game.scenes.ExploreScene;
 import com.simpulator.game.scenes.TutorialScene;
