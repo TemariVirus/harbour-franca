@@ -1,0 +1,63 @@
+---
+config:
+    theme: neutral
+    layout: elk
+    defaultRenderer: elk
+    elk:
+        nodePlacementStrategy: NETWORK_SIMPLEX
+---
+
+classDiagram
+    EntityRenderer ..> Entity: Renders
+    EntityRenderer ..> TextureBatch: Uses
+    EntityRenderer --o Entity
+    Entity ..|> Renderable
+    GraphicsManager ..|> Disposable
+    GraphicsManager ..> Renderable: Uses
+    RectangleRenderer ..|> EntityRenderer
+
+
+    class EntityRenderer {
+        <<interface>>
+
+        + isVisible(camera: Camera, entity: Entity) boolean
+        + render(batch: TextureBatch, camera: Camera, entity: Entity) void
+    }
+
+    class GraphicsManager {
+        # batch: TextureBatch
+        - viewport: Viewport
+
+        + GraphicsManager()
+        - setCamera(camera: Camera) void
+        + beginRender(viewport: Viewport) void
+        + render(renderable: Renderable, camera: Camera) void
+        + render(renderables: Renderable[], camera: Camera) void
+        + render3D(renderable: Renderable, camera: Camera) void
+        + render3D(renderables: Renderable[], camera: Camera) void
+        + endRender() void
+        + isRendering() boolean
+        + dispose() void
+    }
+
+    class RectangleRenderer {
+        - textureRegion: TextureRegion
+        - tint: Color
+
+        + RectangleRenderer(textureRegion: TextureRegion)
+        + RectangleRenderer(textureRegion: TextureRegion, tint: Color)
+        + getTextureRegion() TextureRegion
+        + setTextureRegion(textureRegion: TextureRegion) void
+        + getTint() Color
+        + setTint(tint: Color) void
+        + isVisible(camera: Camera, entity: Entity) boolean
+        + render(batch: TextureBatch, camera: Camera, entity: Entity) void
+    }
+
+    class Renderable {
+        <<interface>>
+
+        + isVisible(camera: Camera) boolean
+        + getZOrder(camera: Camera) float
+        + render(batch: TextureBatch, camera: Camera) void
+    }

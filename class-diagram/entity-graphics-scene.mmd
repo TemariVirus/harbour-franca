@@ -14,7 +14,6 @@ classDiagram
     Disposable <|.. ResourceCache~K&comma; V: Disposable~
     Scene --o SceneManager
     SceneManager ..|> Disposable
-    GraphicsManager --* SceneManager
     ResourceCache <|-- MusicCache: #60;#60;bind#62;#62; #60;K -> String, V -> Music#62;
     Entity ..|> Movable
     Entity ..|> Renderable
@@ -22,7 +21,6 @@ classDiagram
     CollidableEntity --|> Entity
     CollidableEntity ..|> ColliderMesh
     EntityRenderer --o Entity
-    RectangleRenderer ..|> EntityRenderer
     MusicManager *-- MusicCache
     Disposable <|.. MusicManager
     TextureManager --|> ResourceCache: #60;#60;bind#62;#62; #60;K -> String, V -> Texture#62;
@@ -78,55 +76,11 @@ classDiagram
         + update(deltaTime: float) void
     }
 
-    class EntityRenderer {
-        <<interface>>
-
-        + isVisible(camera: Camera, entity: Entity) boolean
-        + getZOrder(camera: Camera, entity: Entity) float
-        + render(batch: TextureBatch, camera: Camera, entity: Entity) void
-    }
-
-    class RectangleRenderer {
-        - textureRegion: TextureRegion
-        - tint: Color
-
-        + RectangleRenderer(textureRegion: TextureRegion)
-        + RectangleRenderer(textureRegion: TextureRegion, tint: Color)
-        + getTint() Color
-        + setTint(tint: Color) void
-        + getTextureRegion() TextureRegion
-        + setTextureRegion(textureRegion: TextureRegion) void
-        - getVertex(index: int) Vector3
-        + isVisible(camera: Camera, entity: Entity) boolean
-        + getZOrder(camera: Camera, entity: Entity) float
-        + render(batch: TextureBatch, camera: Camera, entity: Entity) void
-    }
-
-    class GraphicsManager {
-        # batch: TextureBatch
-        - isRendering: boolean
-
-        + GraphicsManager()
-        # beginRender() void
-        + renderEntity(entity: Entity, camera: Camera) void
-        + renderEntities(entities: Entity[], camera: Camera) void
-        + endRender() void
-        + dispose() void
-    }
-
     class Movable {
         <<interface>>
 
         + translate(delta: Vector3) void
         + rotate(axis: Vector3, radians: float) void
-    }
-
-    class Renderable {
-        <<interface>>
-
-        + isVisible(camera: Camera) boolean
-        + getZOrder(camera: Camera) float
-        + render(batch: TextureBatch, camera: Camera) void
     }
 
     class ResourceCache~K&comma; V: Disposable~ {
