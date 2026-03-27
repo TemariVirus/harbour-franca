@@ -8,7 +8,6 @@ config:
 ---
 
 classDiagram
-    Cuboid --|> Polyhedron
     GJKShape <|.. Polyhedron
     ColliderMesh ..> GJKShape: Creates
     ColliderMesh ..> CollisionManager: Uses
@@ -78,14 +77,6 @@ classDiagram
         + updateNormal(vertices: List~Vector3~) void
     }
 
-    class Cuboid {
-        - obb: OrientedBoundingBox
-
-        + Cuboid(obb: OrientedBoundingBox)
-        + getAllVertices() Iterable~Vector3~
-        + getBounds() BoundingBox
-    }
-
     class GJKShape {
         <<interface>>
 
@@ -96,7 +87,7 @@ classDiagram
         <<abstract>>
 
         + getAllVertices()* Iterable~Vector3~
-        + getBounds()* BoundingBox
+        + getBounds() BoundingBox
         + furthestPoint(direction: Vector3, reverse: boolean) Vector3
     }
 
