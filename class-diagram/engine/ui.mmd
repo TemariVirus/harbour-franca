@@ -1,0 +1,88 @@
+---
+config:
+    theme: neutral
+---
+
+classDiagram
+    Rect --* UIElement
+    UILayout --* UIElement
+    %% TODO: add manually
+    UIElement --o UIElement
+    UIElement --o UIListener
+    UIRoot --|> UIElement
+    UIRoot ..|> Renderable
+    UIRoot ..> UIWalker: Uses
+
+
+    class Rect {
+        <<dataType>>
+
+        + left: int
+        + top: int
+        + right: int
+        + bottom: int
+
+        + Rect(left: int, top: int, right: int, bottom: int)
+        + contains(x: int, y: int) boolean
+        + equals(obj: Object) boolean
+    }
+
+    class UIElement {
+        <<abstract>>
+
+        - layout: UILayout
+        - bounds: Rect
+        - visible: boolean
+        - parent: UIElement
+        - children: List~UIElement~
+        - eventHandlers: Map~Class&comma; List~UIListener~~
+
+        # UIElement(layout: UILayout)
+        + setLayout(layout: UILayout) void
+        + getBounds() Rect
+        + updateBounds(parentBounds: Rect) void
+        + isVisible() boolean
+        + setVisible(visible: boolean) UIElement
+        + getParent() UIElement
+        + addChild(child: UIElement) UIElement
+        + removeChild(child: UIElement) void
+        + insertChild(index: int, child: UIElement) UIElement
+        + getChildrenReversed() Iterable~UIElement~
+        + addListener(eventType: Class~T~, handler: UIListener~T~) UIElement
+        + handleEvent(event: T) boolean
+        + update(deltaTime: float) void
+        + render(batch: TextureBatch)* void
+    }
+
+    class UILayout {
+        <<interface>>
+
+        + computeBounds(bounds: Rect) Rect
+    }
+
+    class UIListener~T~ {
+        <<functionalInterface>>
+
+        + handle(data: T) boolean
+    }
+
+    class UIRoot {
+        + UIRoot()
+        + updateBounds(viewport: Viewport) void
+        + update(deltaTime: float) void
+        + render(batch: TextureBatch) void
+        + handleEvent(event: T) boolean
+        + isVisible(camera: Camera) boolean
+        + getZOrder(camera: Camera) float
+        + render(batch: TextureBatch, camera: Camera) void
+    }
+
+    class UIWalker {
+        <<final>>
+
+        stack: ArrayList~UIElement~
+
+        + isEmpty() boolean
+        + push(element: UIElement) void
+        + pop() UIElement
+    }
