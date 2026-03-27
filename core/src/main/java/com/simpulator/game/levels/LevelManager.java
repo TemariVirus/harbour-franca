@@ -142,7 +142,7 @@ public class LevelManager {
                         "Vietnamese Merchant", 
                         "zh-merchant.png", 
                         Language.VIETNAMESE,
-                        "Nó mềm mại. Bạn dùng nó để may áo quần.", //TODO add fnt
+                        "Nó mềm mại. Bạn dùng nó để may áo quần.",
                         "Ồ, tuyệt quá! Cảm ơn nhé.",
                         "Cảm ơn bạn đã mua hàng!",
                         "Hơi bị hớ đấy nhỉ? Đồ của tôi đáng giá hơn thế.",
@@ -160,7 +160,7 @@ public class LevelManager {
                         "Japanese Merchant", 
                         "jp-merchant.png", 
                         Language.JAPANESE,
-                        "道に迷いました。", //TODO add fnt
+                        "道に迷いました。",
                         "おお！これはいいね！",
                         "毎度ありがとうございます。",
                         "お前さあ…こんなゴミで商売してんの？",
@@ -178,7 +178,7 @@ public class LevelManager {
                         "Chinese Merchant",
                         "vi-merchant.png",
                         Language.CHINESE,
-                        "它是由金子做的。你可以用它来喝水！", //TODO add fnt
+                        "它是由金子做的。你可以用它来喝水！",
                         "哦！太好了！谢谢你！这个能多吃六月！",
                         "谢谢你的购买！",
                         "我才没有那么笨！给我滚！",
