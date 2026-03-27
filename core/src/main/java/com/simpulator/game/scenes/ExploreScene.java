@@ -35,7 +35,6 @@ import com.simpulator.game.levels.Level;
 import com.simpulator.game.levels.LevelManager;
 import com.simpulator.game.trading.Inventory;
 import com.simpulator.game.ui.UIRelativeLayout;
-import java.util.ArrayList;
 import java.util.List;
 
 public class ExploreScene implements Scene {
@@ -62,7 +61,7 @@ public class ExploreScene implements Scene {
     protected final List<MerchantEntity> merchants;
     protected final EntityTargeter<MerchantEntity> merchantTargeter;
 
-    protected final List<GatekeeperEntity> gatekeepers = new ArrayList<>();
+    protected final List<GatekeeperEntity> gatekeepers;
     protected final EntityTargeter<GatekeeperEntity> gatekeeperTargeter;
 
     protected final Level level;
@@ -111,10 +110,7 @@ public class ExploreScene implements Scene {
         entityManager.addAll(merchants);
         merchantTargeter = new EntityTargeter<>(merchants, 2);
 
-        List<GatekeeperEntity> gatekeepers = level.createGatekeepers(
-            textures,
-            playerCamera
-        );
+        gatekeepers = level.createGatekeepers(textures, playerCamera);
         entityManager.addAll(gatekeepers);
         // Create a targeter so the player can look at the gatekeeper (distance of 3 units)
         gatekeeperTargeter = new EntityTargeter<>(gatekeepers, 3);
@@ -195,7 +191,7 @@ public class ExploreScene implements Scene {
             playerCamera.getCamera()
         );
         if (gatekeeper != null) {
-            goToNextLevel();
+            tryGoToNextLevel();
             return;
         }
 
@@ -203,15 +199,16 @@ public class ExploreScene implements Scene {
         openTradingUIWithLookingAt();
     }
 
-    protected void goToNextLevel() {
-        if (playerInventory.getTotalValue() >= valueGoal) {
-            // Meet the wincon either go next lvl or win
-            if (level.getNextLevelId() == null) {
-                sceneManager.setScene(Scenes.Win);
-            } else {
-                levelManager.setCurrentLevelId(level.getNextLevelId());
-                sceneManager.setScene(Scenes.Explore);
-            }
+    protected void tryGoToNextLevel() {
+        if (playerInventory.getTotalValue() < valueGoal) {
+            return;
+        }
+
+        if (level.getNextLevelId() == null) {
+            sceneManager.setScene(Scenes.Win);
+        } else {
+            levelManager.setCurrentLevelId(level.getNextLevelId());
+            sceneManager.setScene(Scenes.Explore);
         }
     }
 
@@ -288,7 +285,7 @@ public class ExploreScene implements Scene {
             sceneManager.setScene(Scenes.Lose);
         } else if (gatekeepers.size() == 0) {
             // If there are no gatekeepers, just win immediately
-            goToNextLevel();
+            tryGoToNextLevel();
         }
     }
 
