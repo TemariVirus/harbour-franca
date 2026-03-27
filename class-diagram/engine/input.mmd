@@ -13,6 +13,7 @@ classDiagram
     Action~T~ --o ButtonManager~T~
     ButtonManager~T~ ..> ButtonBindType: Creates
     ButtonEventConstructor~T~ <.. ButtonManager~T~: Uses
+    QueueNode~T~ --o ButtonManager~T~: #60;#60;binds#62;#62; #60;T -> T#62;
     ButtonManager~T~ --* KeyboardManager: #60;#60;binds#62;#62; #60;T -> KeyEvent#62;
     KeyboardManager --|> InputAdapter
     MouseManager --|> InputAdapter
@@ -26,7 +27,7 @@ classDiagram
 
 
     class Action~T~ {
-        <<interface>>
+        <<functionalInterface>>
 
         + act(data: T) void
     }
@@ -45,9 +46,23 @@ classDiagram
         + apply(button: int, type: ButtonBindType, thisFrameButtons: Set~Integer~) T
     }
 
+    class QueueNode~T~ {
+        <<dataType>>
+
+        + type: ButtonBindType
+        + button: int
+        + action: Action~T~
+
+        + QueueNode(type: ButtonBindType, button: int, action: Action~T~)
+        + bind(manager: ButtonManager~T~) void
+        + unbind(manager: ButtonManager~T~) void
+    }
+
     class ButtonManager~T~ {
         - lastFrameButtons: HashSet~Integer~
         - thisFrameButtons: HashSet~Integer~
+        - queuedBindings: ArrayList~QueueNode~
+        - queuedUnbindings: ArrayList~QueueNode~
         - downBindings: HashMap~Integer&comma; ArrayList~Action~T~~~
         - holdBindings: HashMap~Integer&comma; ArrayList~Action~T~~~
         - upBindings: HashMap~Integer&comma; ArrayList~Action~T~~~
@@ -118,6 +133,8 @@ classDiagram
         - scrollBindings: ArrayList~Action~MouseScrollEvent~~
 
         + MouseManager()
+        + resetMousePosition() void
+        + resetMouseScroll() void
         + mouseMoved(screenX: int, screenY: int) boolean
         + touchDown(screenX: int, screenY: int, pointer: int, button: int) boolean
         + touchUp(screenX: int, screenY: int, pointer: int, button: int) boolean

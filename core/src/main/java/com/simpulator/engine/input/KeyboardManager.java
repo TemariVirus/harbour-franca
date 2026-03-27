@@ -18,11 +18,11 @@ public class KeyboardManager extends InputAdapter {
         public final float deltaTime;
         /** Time since some epoch, in seconds. */
         public final float timestamp;
-        /** Whther left or right shift being held down. */
+        /** Whether left or right shift being held down. */
         public final boolean isShiftPressed;
-        /** Whther left or right control being held down. */
+        /** Whether left or right control being held down. */
         public final boolean isCtrlPressed;
-        /** Whther left or right alt being held down. */
+        /** Whether left or right alt being held down. */
         public final boolean isAltPressed;
 
         public KeyEvent(
