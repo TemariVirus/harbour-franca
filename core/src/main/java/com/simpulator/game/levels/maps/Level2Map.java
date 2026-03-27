@@ -28,8 +28,6 @@ public class Level2Map implements LevelMap {
     };
 
     private static final float TILE_SIZE = 2.0f;
-    // This is so i don't crash
-    private static final float SMALL_OFFSET = 0.01f;
 
     private boolean isBooth(String[] layout, int r, int c) {
         if (
@@ -67,8 +65,8 @@ public class Level2Map implements LevelMap {
             for (int col = 0; col < line.length(); col++) {
                 char tile = line.charAt(col);
 
-                float x = (col * TILE_SIZE) + SMALL_OFFSET;
-                float z = (row * TILE_SIZE) + SMALL_OFFSET;
+                float x = col * TILE_SIZE;
+                float z = row * TILE_SIZE;
 
                 if (tile == 'P') {
                     entityManager.add(
@@ -115,7 +113,7 @@ public class Level2Map implements LevelMap {
                     entityManager.add(
                         new CuboidEntity(
                             new Vector3(x + xOffset, 1.0f, z + zOffset),
-                            new Vector3(TILE_SIZE, 4.0f, TILE_SIZE),
+                            new Vector3(TILE_SIZE, 4.0f, 0.1f),
                             new Quaternion().setFromAxis(Vector3.Y, rotation),
                             outerWallTex,
                             false
@@ -137,7 +135,7 @@ public class Level2Map implements LevelMap {
                         entityManager.add(
                             new CuboidEntity(
                                 new Vector3(x, 1.0f, z - offset),
-                                new Vector3(TILE_SIZE, 4.0f, TILE_SIZE),
+                                new Vector3(TILE_SIZE, 4.0f, 0.1f),
                                 new Quaternion().setFromAxis(Vector3.Y, 180f),
                                 boothWallTex,
                                 false
@@ -146,7 +144,7 @@ public class Level2Map implements LevelMap {
                         entityManager.add(
                             new CuboidEntity(
                                 new Vector3(x, 1.0f, z - offset),
-                                new Vector3(TILE_SIZE, 4.0f, TILE_SIZE),
+                                new Vector3(TILE_SIZE, 4.0f, 0.1f),
                                 new Quaternion().setFromAxis(Vector3.Y, 0f),
                                 boothWallTex,
                                 false
@@ -158,7 +156,7 @@ public class Level2Map implements LevelMap {
                         entityManager.add(
                             new CuboidEntity(
                                 new Vector3(x, 1.0f, z + offset),
-                                new Vector3(TILE_SIZE, 4.0f, TILE_SIZE),
+                                new Vector3(TILE_SIZE, 4.0f, 0.1f),
                                 new Quaternion().setFromAxis(Vector3.Y, 0f),
                                 boothWallTex,
                                 false
@@ -167,7 +165,7 @@ public class Level2Map implements LevelMap {
                         entityManager.add(
                             new CuboidEntity(
                                 new Vector3(x, 1.0f, z + offset),
-                                new Vector3(TILE_SIZE, 4.0f, TILE_SIZE),
+                                new Vector3(TILE_SIZE, 4.0f, 0.1f),
                                 new Quaternion().setFromAxis(Vector3.Y, 180f),
                                 boothWallTex,
                                 false
@@ -179,7 +177,7 @@ public class Level2Map implements LevelMap {
                         entityManager.add(
                             new CuboidEntity(
                                 new Vector3(x - offset, 1.0f, z),
-                                new Vector3(TILE_SIZE, 4.0f, TILE_SIZE),
+                                new Vector3(TILE_SIZE, 4.0f, 0.1f),
                                 new Quaternion().setFromAxis(Vector3.Y, -90f),
                                 boothWallTex,
                                 false
@@ -188,7 +186,7 @@ public class Level2Map implements LevelMap {
                         entityManager.add(
                             new CuboidEntity(
                                 new Vector3(x - offset, 1.0f, z),
-                                new Vector3(TILE_SIZE, 4.0f, TILE_SIZE),
+                                new Vector3(TILE_SIZE, 4.0f, 0.1f),
                                 new Quaternion().setFromAxis(Vector3.Y, 90f),
                                 boothWallTex,
                                 false
@@ -200,7 +198,7 @@ public class Level2Map implements LevelMap {
                         entityManager.add(
                             new CuboidEntity(
                                 new Vector3(x + offset, 1.0f, z),
-                                new Vector3(TILE_SIZE, 4.0f, TILE_SIZE),
+                                new Vector3(TILE_SIZE, 4.0f, 0.1f),
                                 new Quaternion().setFromAxis(Vector3.Y, 90f),
                                 boothWallTex,
                                 false
@@ -209,7 +207,7 @@ public class Level2Map implements LevelMap {
                         entityManager.add(
                             new CuboidEntity(
                                 new Vector3(x + offset, 1.0f, z),
-                                new Vector3(TILE_SIZE, 4.0f, TILE_SIZE),
+                                new Vector3(TILE_SIZE, 4.0f, 0.1f),
                                 new Quaternion().setFromAxis(Vector3.Y, -90f),
                                 boothWallTex,
                                 false
@@ -221,7 +219,7 @@ public class Level2Map implements LevelMap {
                     entityManager.add(
                         new CuboidEntity(
                             new Vector3(x, 0.0f, z),
-                            new Vector3(TILE_SIZE, 1.0f, TILE_SIZE),
+                            new Vector3(TILE_SIZE, 1.0f, 0.1f),
                             new Quaternion().setFromAxis(Vector3.Y, counterRot),
                             counterTex,
                             false

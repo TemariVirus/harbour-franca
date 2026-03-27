@@ -84,7 +84,7 @@ public class Level1Map implements LevelMap {
                     entityManager.add(
                         new CuboidEntity(
                             new Vector3(x + xOffset, 1.0f, z + zOffset),
-                            new Vector3(TILE_SIZE, 4.0f, TILE_SIZE),
+                            new Vector3(TILE_SIZE, 4.0f, 0.1f),
                             new Quaternion().setFromAxis(Vector3.Y, rotation),
                             outerWallTex,
                             false
@@ -95,7 +95,7 @@ public class Level1Map implements LevelMap {
                     entityManager.add(
                         new CuboidEntity(
                             new Vector3(x, 1.0f, z),
-                            new Vector3(TILE_SIZE, 4.0f, TILE_SIZE),
+                            new Vector3(TILE_SIZE, 4.0f, 0.1f),
                             new Quaternion().setFromAxis(Vector3.Y, 90f),
                             boothWallTex,
                             false
@@ -104,7 +104,7 @@ public class Level1Map implements LevelMap {
                     entityManager.add(
                         new CuboidEntity(
                             new Vector3(x, 1.0f, z),
-                            new Vector3(TILE_SIZE, 4.0f, TILE_SIZE),
+                            new Vector3(TILE_SIZE, 4.0f, 0.1f),
                             new Quaternion().setFromAxis(Vector3.Y, -90f),
                             boothWallTex,
                             false
@@ -114,7 +114,7 @@ public class Level1Map implements LevelMap {
                     entityManager.add(
                         new CuboidEntity(
                             new Vector3(x, 0.0f, z),
-                            new Vector3(TILE_SIZE * 2.0f, 1.0f, TILE_SIZE),
+                            new Vector3(TILE_SIZE * 2.0f, 1.0f, 0.1f),
                             new Quaternion().setFromAxis(Vector3.Y, 0f),
                             counterTex,
                             false

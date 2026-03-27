@@ -99,7 +99,7 @@ public class LevelManager {
                     )
                 ),
             },
-            new Vector3[] { new Vector3(12, 1, 13) }
+            new Vector3[] { new Vector3(14, 1, 11) }
         );
         levelDatabase.put(level1.getLevelId(), level1);
 

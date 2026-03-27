@@ -42,7 +42,7 @@ public class TutorialLevel extends Level {
                         "Too slow! It seems you do not have that iron in you!",
                         1000f,
                         1.5f,
-                        new Item[] { Item.FISH, Item.GEMSTONE, Item.CANDLE },
+                        new Item[] { Item.FISH, Item.PENDANT, Item.CANDLE },
                         new HashSet<>(Arrays.asList(Item.TRINKET)),
                         "This is a hint"
                     )
