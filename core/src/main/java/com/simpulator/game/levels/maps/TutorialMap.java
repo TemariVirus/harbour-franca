@@ -10,9 +10,9 @@ import com.simpulator.game.entities.CuboidEntity;
 import com.simpulator.game.entities.TiledRenderer;
 import com.simpulator.game.levels.LevelMap;
 
-public class MiramarMap implements LevelMap {
+public class TutorialMap implements LevelMap {
 
-    private static final String BRICK_IMG = "Oran.jpeg";
+    private static final String BRICK_IMG = "brick.png";
     private static final float WIDTH = 5;
     private static final float HEIGHT = 3;
     private static final float WALL_THICKNESS = 0.2f;

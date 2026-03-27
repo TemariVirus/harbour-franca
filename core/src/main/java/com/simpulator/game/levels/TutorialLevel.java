@@ -5,7 +5,7 @@ import com.simpulator.engine.scene.MusicManager;
 import com.simpulator.engine.scene.SceneManager;
 import com.simpulator.game.entities.MerchantEntity;
 import com.simpulator.game.language.Language;
-import com.simpulator.game.levels.maps.MiramarMap;
+import com.simpulator.game.levels.maps.TutorialMap;
 import com.simpulator.game.scenes.ExploreScene;
 import com.simpulator.game.scenes.TutorialScene;
 import com.simpulator.game.trading.Item;
@@ -26,7 +26,7 @@ public class TutorialLevel extends Level {
 
         this.playerStart = new Vector3(0, 1, 0);
 
-        this.map = new MiramarMap();
+        this.map = new TutorialMap();
 
         this.merchants = new MerchantConfig[] {
             new MerchantConfig(
