@@ -28,9 +28,8 @@ public class TradeProcessor {
     }
 
     public TradeResult trade(Item give, Item receive) {
-        //  +/- 1 Rarity
-        int rarityDifference = Math.abs(give.rarity().tier() - receive.rarity().tier());
-        
+        // Deny +2 or more rarity
+        int rarityDifference = give.rarity().tier() - receive.rarity().tier();
         if (rarityDifference > 1) {
             return TradeResult.FAILED;
         }

@@ -120,7 +120,7 @@ public class MainMenu implements Scene {
             levelManager.setCurrentLevelId(LevelId.TUTORIAL);
             sceneManager.setScene(Scenes.Explore);
         });
-
+        // TODO: remove after testing
         addMenuButton("Play Level 1", 270, e -> {
             levelManager.setCurrentLevelId(LevelId.LEVEL_1);
             sceneManager.setScene(Scenes.Explore);

@@ -43,35 +43,33 @@ public class ExploreScene implements Scene {
 
     protected static final float PLAYER_SPEED = 4f;
 
-    protected final SceneManager sceneManager;
-    protected final LevelManager levelManager;
+    private final SceneManager sceneManager;
+    private final LevelManager levelManager;
     protected final TextureCache textures = new TextureCache();
     protected final SoundManager sounds = new SoundManager();
     protected final EntityManager entityManager = new EntityManager();
     protected final KeyboardManager keyboard = new KeyboardManager();
     protected final MouseManager mouse = new MouseManager();
 
-    protected final Viewport viewport = new ExtendViewport(640, 480);
+    private final Viewport viewport = new ExtendViewport(640, 480);
     protected final CameraEntity playerCamera;
 
-    protected final Skybox skybox;
+    private final Skybox skybox;
     protected final SceneCompositor overlays = new SceneCompositor();
     protected final GameHUD hud;
-    protected TradingUI tradingUI = null;
+    private TradingUI tradingUI = null;
 
     protected final Clock clock = new Clock(0);
+    protected final List<Pin> activePins = new ArrayList<>();
     protected final List<MerchantEntity> merchants;
     protected final EntityTargeter<MerchantEntity> merchantTargeter;
 
     protected final List<GatekeeperEntity> gatekeepers = new ArrayList<>();
     protected final EntityTargeter<GatekeeperEntity> gatekeeperTargeter;
 
-    protected final List<Pin> activePins = new ArrayList<>();
-
-    private final Level level;
+    protected final Level level;
     protected final Inventory playerInventory;
-    private final int valueGoal;
-
+    protected final int valueGoal;
     private int hintsRemaining = 2;
 
     public ExploreScene(
@@ -108,7 +106,7 @@ public class ExploreScene implements Scene {
 
         playerInventory = level.createInventory();
         hud = new GameHUD(level.getValueGoal(), playerInventory);
-        hud.updateHintCount(hintsRemaining);
+        hud.setHintCount(hintsRemaining);
         overlays.push(hud, new UIRelativeLayout());
 
         merchants = level.createMerchants(textures, playerCamera);
@@ -171,73 +169,57 @@ public class ExploreScene implements Scene {
                 new Vector3(PLAYER_SPEED, 0, 0)
             )
         );
-        keyboard.bind(ButtonBindType.DOWN, Keys.H, event -> {
-            // Find the merchant the player is currently looking at / talking to
-            MerchantEntity activeMerchant = merchantTargeter.getClosest(
-                playerCamera.getCamera()
-            );
-
-            if (activeMerchant != null) {
-                String npcHint = activeMerchant.getData().hint;
-                // Check if they have a hint and if we have any hints remaining
-                if (
-                    hintsRemaining > 0 && npcHint != null && !npcHint.isEmpty()
-                ) {
-                    hintsRemaining--;
-                    hud.updateHintCount(hintsRemaining);
-                    hud.showHint("Hint: " + npcHint);
-                    sounds.play("sfx/trade-good.ogg");
-                }
-            }
-        });
 
         keyboard.bind(ButtonBindType.DOWN, Keys.ESCAPE, e ->
             sceneManager.setScene(Scenes.MainMenu)
         );
-        keyboard.bind(ButtonBindType.DOWN, Keys.E, event -> {
-            // First, see if we are trying to interact with the gatekeeper
-            GatekeeperEntity gatekeeper = gatekeeperTargeter.getClosest(
-                playerCamera.getCamera()
-            );
-            if (gatekeeper != null) {
-                if (playerInventory.getTotalValue() >= valueGoal) {
-                    // Meet the wincon either go next lvl or win
-                    if (level.getNextLevelId() == null) {
-                        sceneManager.setScene(Scenes.Win);
-                    } else {
-                        levelManager.setCurrentLevelId(level.getNextLevelId());
-                        sceneManager.setScene(Scenes.Explore);
-                    }
-                }
-                return; // Stop here so it doesn't try to open the trading UI
-            }
-
-            // If not looking at the door, try trading normally
-            openTradingUIWithLookingAt();
-        });
+        keyboard.bind(ButtonBindType.DOWN, Keys.H, event -> showHint());
+        keyboard.bind(ButtonBindType.DOWN, Keys.E, event -> handleInteract());
     }
 
-    protected void togglePinOnTarget() {
-        if (isTradingUIOpen()) return;
-
-        MerchantEntity target = merchantTargeter.getClosest(
+    private void showHint() {
+        // Find the merchant the player is currently looking at / talking to
+        MerchantEntity activeMerchant = merchantTargeter.getClosest(
             playerCamera.getCamera()
         );
-        if (target != null) {
-            // Check if pin already exists to remove it
-            for (int i = 0; i < activePins.size(); i++) {
-                if (activePins.get(i).getTarget() == target) {
-                    activePins.remove(i);
-                    return;
-                }
-            }
-            // Otherwise, add a new pin
-            activePins.add(new Pin(target, textures));
+        if (activeMerchant == null) {
+            return;
+        }
+
+        String npcHint = activeMerchant.getData().hint;
+        // Check if they have a hint and if we have any hints remaining
+        if (hintsRemaining > 0 && npcHint != null && !npcHint.isEmpty()) {
+            hintsRemaining--;
+            hud.setHintCount(hintsRemaining);
+            hud.showHint("Hint: " + npcHint);
+            sounds.play("sfx/trade-good.ogg");
         }
     }
 
-    protected int getValueGoal() {
-        return valueGoal;
+    private void handleInteract() {
+        // First, see if we are trying to interact with the gatekeeper
+        GatekeeperEntity gatekeeper = gatekeeperTargeter.getClosest(
+            playerCamera.getCamera()
+        );
+        if (gatekeeper != null) {
+            goToNextLevel();
+            return;
+        }
+
+        // If not looking at the door, try trading normally
+        openTradingUIWithLookingAt();
+    }
+
+    protected void goToNextLevel() {
+        if (playerInventory.getTotalValue() >= valueGoal) {
+            // Meet the wincon either go next lvl or win
+            if (level.getNextLevelId() == null) {
+                sceneManager.setScene(Scenes.Win);
+            } else {
+                levelManager.setCurrentLevelId(level.getNextLevelId());
+                sceneManager.setScene(Scenes.Explore);
+            }
+        }
     }
 
     @Override
@@ -311,6 +293,9 @@ public class ExploreScene implements Scene {
 
         if (playerInventory.getTotalValue() < valueGoal) {
             sceneManager.setScene(Scenes.Lose);
+        } else if (gatekeepers.size() == 0) {
+            // If there are no gatekeepers, just win immediately
+            goToNextLevel();
         }
     }
 
@@ -335,12 +320,11 @@ public class ExploreScene implements Scene {
             }
             return;
         }
+
         MerchantEntity targeted = merchantTargeter.getClosest(
             playerCamera.getCamera()
         );
-        if (targeted == null) {
-            hud.setPromptVisible(false);
-        } else {
+        if (targeted != null) {
             hud.setPromptVisible(true);
             if (targeted.canTrade()) {
                 hud.setPrompt("[E] Trade with " + targeted.getData().getName());
@@ -349,7 +333,10 @@ public class ExploreScene implements Scene {
                     targeted.getData().getName() + " does not want to trade."
                 );
             }
+            return;
         }
+
+        hud.setPromptVisible(false);
     }
 
     @Override
@@ -358,6 +345,7 @@ public class ExploreScene implements Scene {
             closeTradingUI();
             checkWinCondition();
         }
+        // TODO
         // Pin gone if cant trade
         activePins.removeIf(pin -> !pin.getTarget().canTrade());
 
@@ -398,6 +386,7 @@ public class ExploreScene implements Scene {
             playerCamera.getCamera()
         );
         graphics.endRender();
+        // TODO
         if (!activePins.isEmpty()) {
             graphics.beginRender(viewport);
             for (Pin pin : activePins) {

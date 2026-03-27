@@ -35,6 +35,7 @@ public class GameHUD implements Scene {
 
     private final int levelGoal;
     private final Inventory playerInventory;
+    private float hintTimer = 0f;
 
     // HUD elements
     private Text objectiveLabel;
@@ -44,7 +45,6 @@ public class GameHUD implements Scene {
     private Box inventoryGroup;
     private Text[] inventoryLabels;
     private Text hintCountLabel;
-    private float hintTimer = 0f;
 
     public GameHUD(int levelGoal, Inventory playerInventory) {
         this.levelGoal = levelGoal;
@@ -67,14 +67,14 @@ public class GameHUD implements Scene {
         uiRoot.addChild(objectiveLabel);
 
         hintCountLabel = new Text(
-            "Hints: 1", // Default starting text
+            "",
             font,
-            Text.Alignment.END, // Aligns text to the right
+            Text.Alignment.END,
             Color.CYAN,
             new UIRelativeLayout.Builder()
-                .xAlignment(Alignment.END) // Pushes it to the right side of the screen
-                .padTop(20) // Matches the height of the objective label
-                .padRight(20) // Keeps it from touching the edge
+                .xAlignment(Alignment.END)
+                .padTop(20)
+                .padRight(20)
                 .height(10.5f)
                 .getLayout()
         );
@@ -87,7 +87,7 @@ public class GameHUD implements Scene {
             Color.CYAN,
             new UIRelativeLayout.Builder().padTop(45).height(10.5f).getLayout()
         );
-        hintLabel.setVisible(false); // Hide hint by default
+        hintLabel.setVisible(false);
         uiRoot.addChild(hintLabel);
 
         // --- Center: crosshair and interaction prompt ---
@@ -247,7 +247,7 @@ public class GameHUD implements Scene {
         hintLabel.setVisible(false);
     }
 
-    public void updateHintCount(int count) {
+    public void setHintCount(int count) {
         hintCountLabel.setText("Hints: " + count);
     }
 
