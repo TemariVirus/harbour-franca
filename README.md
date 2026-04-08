@@ -22,6 +22,6 @@ Class diagrams for all packages are available in [`class-diagram/`](class-diagra
 
 ## Acknowledgements
 
-The original version of this game contained some assets which were not suitable for distribution, and thus have been removed. You will find that old commits cause the game to crash due to missing assets. The current files in `assets/` are of our own creation, with exceptions listed below.
+The original version of this game contained some assets which were not suitable for distribution, and thus have been removed. You will find that the game to crash due to missing assets when built from old commits. The current files in `assets/` are of our own creation, with exceptions listed below.
 
 All fonts: GNU Unifont (https://www.unifoundry.com/unifont/index.html)
