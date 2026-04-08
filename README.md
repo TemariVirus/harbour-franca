@@ -19,3 +19,9 @@ Harbour Franca is built with libGDX and OOP principles, as part of our Object-Or
 The app is split into two layers: a reusable abstract engine layer, and a game-specific layer. Engine code is in [`core/src/main/java/com/simpulator/engine/`](core/src/main/java/com/simpulator/engine/) and contains logic that is reusable for any game or simulations. Game code is in [`core/src/main/java/com/simpulator/game/`](core/src/main/java/com/simpulator/game/) and contains logic specific to Harbour Franca.
 
 Class diagrams for all packages are available in [`class-diagram/`](class-diagram/).
+
+## Acknowledgements
+
+The original version of this game contained some assets which were not suitable for distribution, and thus have been removed. You will find that old commits cause the game to crash due to missing assets. The current files in `assets/` are of our own creation, with exceptions listed below.
+
+All fonts: GNU Unifont (https://www.unifoundry.com/unifont/index.html)
